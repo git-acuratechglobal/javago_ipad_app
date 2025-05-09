@@ -1,0 +1,48 @@
+class OrderDetails {
+  final String? orderId;
+  final String? customerName;
+  final String? groupName;
+  final String? orderTime;
+  final String? orderDate;
+  final int? totalMembers;
+  final List<OrderItem>? items;
+
+  OrderDetails({
+    this.orderId,
+    this.customerName,
+    this.groupName,
+    this.orderTime,
+    this.orderDate,
+    this.totalMembers,
+    this.items,
+  });
+
+  factory OrderDetails.fromJson(Map<String, dynamic> json) {
+    return OrderDetails(
+      orderId: json['orderId'],
+      customerName: json['customerName'],
+      groupName: json['groupName'],
+      orderTime: json['orderTime'],
+      orderDate: json['orderDate'],
+      totalMembers: json['totalMembers'],
+      items: (json['items'] as List<dynamic>?)
+          ?.map((item) => OrderItem.fromJson(item))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'orderId': orderId,
+      'customerName': customerName,
+      'groupName': groupName,
+      'orderTime': orderTime,
+      'orderDate': orderDate,
+      'totalMembers': totalMembers,
+      'items': items?.map((item) => item.toJson()).toList(),
+    };
+  }
+}
+description: This file stores settings for Dart & Flutter DevTools.
+documentation: https://docs.flutter.dev/tools/devtools/extensions#configure-extension-enablement-states
+extensions:
