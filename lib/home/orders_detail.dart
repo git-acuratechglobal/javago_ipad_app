@@ -23,7 +23,6 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
   @override
   Widget build(BuildContext context) {
     final orderState = 
-    // ref.read(getOrderDetailsProvider).getOrderDetail(widget.id, widget.isIndividualOrder);
     ref.watch(getOrderDetailsProvider(widget.id, widget.isIndividualOrder));
 
     return Scaffold(
@@ -102,7 +101,7 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
                   ? '-'
                   : item.addonSizes!
                       .map((addon) =>
-                          '${addon.addonName ?? ''} (${addon.addonSizeName ?? ''}, ₹${addon.addonSizePrice ?? ''})')
+                          '${addon.addonName ?? ''} (${addon.addonSizeName ?? ''}, £${addon.addonSizePrice ?? ''})')
                       .join(', '),
             )),
           ]);

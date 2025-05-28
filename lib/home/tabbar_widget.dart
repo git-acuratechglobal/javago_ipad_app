@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
-import 'package:java_go/home/orders.dart';
+import 'package:java_go/home/bottombar.dart';
+import 'package:java_go/home/homescreen.dart';
+import 'package:java_go/home/notifiers/view_order_provider.dart';
+
+final tabIndexProvider = StateProvider<int>((ref) => 0);
 
 class CustomTabBar extends ConsumerStatefulWidget {
-
   final String title;
   final void Function(int val) onTap;
   const CustomTabBar({
     super.key,
     required this.title,
-    required this.onTap, 
+    required this.onTap,
   });
 
   @override
@@ -23,19 +26,20 @@ class _CustomTabBarState extends ConsumerState<CustomTabBar> {
 
   @override
   Widget build(BuildContext context) {
+    final currentTabIndex = ref.watch(tabIndexProvider);
     return AppBar(
         backgroundColor: Color(0xFFF5F3F0),
         automaticallyImplyLeading: false,
-          leading: InkWell(
-          onTap: () {
-            context.pop();
-          },
+        leading: InkWell(
+            onTap: () {
+              context.pop();
+            },
             child: Image.asset(
-          'assets/images/ic_left_arrow.png',
-          color: Color(0xFF461C10),
-          height: 55.h,
-          width: 55.w,
-        )),
+              'assets/images/ic_left_arrow.png',
+              color: Color(0xFF461C10),
+              height: 55.h,
+              width: 55.w,
+            )),
         title: Text(
           widget.title,
           style: TextStyle(
@@ -47,29 +51,34 @@ class _CustomTabBarState extends ConsumerState<CustomTabBar> {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 57),
-            child: Container(
-              width: 158.w,
-              height: 48.h,
-              decoration: BoxDecoration(
-                color: Color(0xFF5CF97F),
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0x3F000000),
-                    blurRadius: 2,
-                    offset: Offset(0, 2),
-                    spreadRadius: 0,
-                  )
-                ],
-              ),
-              child: Center(
-                child: Text(
-                  'Order 1',
-                  style: TextStyle(
-                    color: const Color(0xFF414141),
-                    fontSize: 20,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w800,
+            child: InkWell(
+              onTap: () {
+                widget.onTap(1);
+              },
+              child: Container(
+                width: 158.w,
+                height: 48.h,
+                decoration: BoxDecoration(
+                  color: Color(0xFF5CF97F),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0x3F000000),
+                      blurRadius: 2,
+                      offset: Offset(0, 2),
+                      spreadRadius: 0,
+                    )
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    'Order 1',
+                    style: TextStyle(
+                      color: const Color(0xFF414141),
+                      fontSize: 20,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
               ),
@@ -82,12 +91,10 @@ class _CustomTabBarState extends ConsumerState<CustomTabBar> {
           indicatorSize: TabBarIndicatorSize.tab,
           labelColor: const Color(0xFF461C10),
           unselectedLabelColor: const Color(0xFFC0987C),
-          indicatorColor: Colors.transparent
-          ,
+          indicatorColor: Colors.transparent,
           dividerColor: Colors.transparent,
           labelStyle: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
-          unselectedLabelStyle:
-              TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
+          unselectedLabelStyle: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
           tabs: [
             _buildTab(
               iconPath: 'assets/images/ic_bar_chart.png',
@@ -167,10 +174,14 @@ class _CustomTabBarState extends ConsumerState<CustomTabBar> {
 
 class CustomTabBarCafeInfo extends ConsumerStatefulWidget {
   final String title;
-   final bool? onBackPress;
-  
-  const CustomTabBarCafeInfo(
-      {super.key, required this.title, required this.onTap,this.onBackPress,});            
+  final bool? onBackPress;
+
+  const CustomTabBarCafeInfo({
+    super.key,
+    required this.title,
+    required this.onTap,
+    this.onBackPress,
+  });
   final void Function(int val) onTap;
   @override
   ConsumerState<CustomTabBarCafeInfo> createState() => _CustomTabBarCafeInfoState();
@@ -181,19 +192,22 @@ class _CustomTabBarCafeInfoState extends ConsumerState<CustomTabBarCafeInfo> {
 
   @override
   Widget build(BuildContext context) {
+       final orders = ref.watch(todayOrdersProvider);
+       final items = orders.value?.getCombinedUniqueOrders;
+       final inProgressOrders = items?.where((order) => order.orderCompleted != 1).toList().length;
     return AppBar(
-      automaticallyImplyLeading: false,
-      leading: widget.onBackPress != null && widget.onBackPress! 
-          ? InkWell(
-              onTap: context.pop,
-              child: Image.asset(
-                'assets/images/ic_left_arrow.png',
-                color: Color(0xFF461C10),
-                height: 55.h,
-                width: 55.w,
-              ),
-            )
-          : null,
+        automaticallyImplyLeading: false,
+        leading: widget.onBackPress != null && widget.onBackPress!
+            ? InkWell(
+                onTap: context.pop,
+                child: Image.asset(
+                  'assets/images/ic_left_arrow.png',
+                  color: Color(0xFF461C10),
+                  height: 55.h,
+                  width: 55.w,
+                ),
+              )
+            : null,
         // leading: Image.asset(
         //           'assets/images/ic_left_arrow.png',
         //           color: Color(0xFF461C10),
@@ -212,28 +226,30 @@ class _CustomTabBarCafeInfoState extends ConsumerState<CustomTabBarCafeInfo> {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 57),
-            child: Container(
-              width: 158.w,
-              height: 48.h,
-              decoration: BoxDecoration(
-                color: Color(0xFF5CF97F),
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0x3F000000),
-                    blurRadius: 2,
-                    offset: Offset(0, 2),
-                    spreadRadius: 0,
-                  )
-                ],
-              ),
-              child: Center(
-                child: InkWell(
-                   onTap: () {
-                    //  context.navigateTo(Orders(isEdited: true,));
-                  },
+            child: InkWell(
+              onTap: () {
+                {
+                  context.navigateTo(CustomBottomNavBar(homescreen: true,));
+                }
+              },
+              child: Container(
+                width: 158.w,
+                height: 48.h,
+                decoration: BoxDecoration(
+                  color: Color(0xFF5CF97F),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0x3F000000),
+                      blurRadius: 2,
+                      offset: Offset(0, 2),
+                      spreadRadius: 0,
+                    )
+                  ],
+                ),
+                child: Center(
                   child: Text(
-                    'Order 1',
+                    'Orders: ${inProgressOrders}',
                     style: TextStyle(
                       color: const Color(0xFF414141),
                       fontSize: 20,
@@ -255,8 +271,7 @@ class _CustomTabBarCafeInfoState extends ConsumerState<CustomTabBarCafeInfo> {
           indicatorColor: Colors.transparent,
           dividerColor: Colors.transparent,
           labelStyle: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
-          unselectedLabelStyle:
-              TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
+          unselectedLabelStyle: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
           tabs: [
             _buildTab(
               label: 'Cafe information',

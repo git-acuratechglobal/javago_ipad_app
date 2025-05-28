@@ -28,4 +28,10 @@ class LocalStorageService {
   String getToken() {
     return _preferences.getString(_authTokenKey) ?? "";
   }
+
+
+  Future<void>clearSession()async{
+    _preferences.remove(_authTokenKey);
+  }
+
 }

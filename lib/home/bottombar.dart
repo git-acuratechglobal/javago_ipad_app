@@ -4,97 +4,135 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/home/account.dart';
 import 'package:java_go/home/cafeinfotabscreen.dart';
 import 'package:java_go/home/homescreen.dart';
-import 'package:java_go/home/notifiers/home_notifier.dart';
+
+
+
+final bottomBarTabProvider=StateProvider.autoDispose((ref)=>1);
 
 
 class CustomBottomNavBar extends ConsumerStatefulWidget {
-  const CustomBottomNavBar({super.key});
+ final bool? homescreen;
+  CustomBottomNavBar({super.key, this.homescreen = false});
 
   @override
   ConsumerState<CustomBottomNavBar> createState() => _CustomBottomNavBarState();
 }
 
 class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
-  int selectedIndex = 1;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
-    if (index == 1) { 
-    // ref.read(homeNotifierProvider.notifier).getOrders();
-  }
-
-    
-  }
 
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  void _onItemTapped(int index) {
+   ref.read(bottomBarTabProvider.notifier).update((_)=>index);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true,
-      body: IndexedStack(
-        index: selectedIndex,
-        children: [
-          CafeInfoTabScreen(),
-          Homescreen(),
-          Account(),
-        ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Container(
-        decoration: ShapeDecoration(
-          color: Colors.white,
-          shape: OvalBorder(
-            side: BorderSide(
-              width: 2,
-              color: const Color(0xFFC0987C),
+    final bottomBarTab=ref.watch(bottomBarTabProvider);
+    return Stack(
+      children: [
+        Scaffold(
+          extendBody: true,
+          body: IndexedStack(
+            index: bottomBarTab,
+            children: [
+              CafeInfoTabScreen(),
+              Homescreen(),
+              Account(),
+            ],
+          ),
+          // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+          // floatingActionButton: Container(
+          //   decoration: ShapeDecoration(
+          //     color: Colors.white,
+          //     shape: OvalBorder(
+          //       side: BorderSide(
+          //         width: 2,
+          //         color: const Color(0xFFC0987C),
+          //       ),
+          //     ),
+          //   ),
+          //   height: 89.h,
+          //   width: 89.w,
+          //   child: FloatingActionButton(
+          //     onPressed: () {
+          //       _onItemTapped(1);
+          //     },
+          //     backgroundColor: Colors.white,
+          //     shape: const CircleBorder(),
+          //     child: Image.asset(
+          //       'assets/images/ic_coffee_mug_bar.png',
+          //       width: 42.74,
+          //       height: 53.87,
+          //     ),
+          //   ),
+          // ),
+          bottomNavigationBar: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+            child: BottomAppBar(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildNavItem(
+                    label: 'Cafe Info',
+                    index: 0,
+                    selectedAsset: 'assets/images/ic_coffee_bar.png',
+                  ),
+                  _buildNavItem(
+                    label: 'Order',
+                    index: 1,
+                    verticalOffset: 30.0,
+                  ),
+                  _buildNavItem(
+                    label: 'Account',
+                    index: 2,
+                    selectedAsset: 'assets/images/ic_group_bar.png',
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-        height: 89.h,
-        width: 89.w,
-        child: FloatingActionButton(
-          onPressed: () {
-            _onItemTapped(1);
-          },
-          backgroundColor: Colors.white,
-          shape: const CircleBorder(),
-          child: Image.asset(
-            'assets/images/ic_coffee_mug_bar.png',
-            width: 42.74,
-            height: 53.87,
+        Positioned(
+          bottom: 70,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: Container(
+              decoration: ShapeDecoration(
+                color: Colors.white,
+                shape: OvalBorder(
+                  side: BorderSide(
+                    width: 2,
+                    color: const Color(0xFFC0987C),
+                  ),
+                ),
+              ),
+              height: 89.h,
+              width: 89.w,
+              child: FloatingActionButton(
+                onPressed: () {
+                  _onItemTapped(1);
+                },
+                backgroundColor: Colors.white,
+                shape: const CircleBorder(),
+                child: Image.asset(
+                  'assets/images/ic_coffee_mug_bar.png',
+                  width: 42.74,
+                  height: 53.87,
+                ),
+              ),
+            ),
           ),
         ),
-      ),
-      bottomNavigationBar: ClipRRect(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
-        child: BottomAppBar(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildNavItem(
-                label: 'Cafe Info',
-                index: 0,
-                selectedAsset: 'assets/images/ic_coffee_bar.png',
-              ),
-              _buildNavItem(
-                label: 'Order',
-                index: 1,
-                verticalOffset: 30.0,
-              ),
-              _buildNavItem(
-                label: 'Account',
-                index: 2,
-                selectedAsset: 'assets/images/ic_group_bar.png',
-              ),
-            ],
-          ),
-        ),
-      ),
+      ],
     );
   }
 
@@ -135,3 +173,16 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
     );
   }
 }
+  // void _onItemTapped(int index) {
+
+
+  //       ref.read(orderTabProvider.notifier).state = index;
+
+  //   // if (index == 1) {
+
+  //   // }
+  // }
+
+  // @override
+  // Widget build(BuildContext context) {
+  //  final  selectedIndex = ref.watch(orderTabProvider);

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:java_go/Theme/navigation.dart';
 import 'package:java_go/config/async_widget.dart';
-import 'package:java_go/config/button.dart';
+import 'package:java_go/config/common/button.dart';
 import 'package:java_go/home/notifiers/accept_orders.dart';
 import 'package:java_go/home/notifiers/view_order_provider.dart';
+
+import 'orders.dart';
 
 class InProgressScreen extends ConsumerStatefulWidget {
   const InProgressScreen({super.key});
@@ -19,8 +22,11 @@ class _CompletedScreenState extends ConsumerState<InProgressScreen> {
     final inProgressState = ref.watch(todayOrdersProvider);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
+
       backgroundColor: Color(0xFFF5F3F0),
       body: RefreshIndicator(
+        color:Color(0xFFC0987C),
         onRefresh: () async {
           ref.invalidate(todayOrdersProvider);
         },
@@ -32,10 +38,12 @@ class _CompletedScreenState extends ConsumerState<InProgressScreen> {
             },
             data: (data) {
               final orders = data.getCombinedUniqueOrders;
-
-              final inProgressOrders =
-                  orders.where((order) => order.status == 3 && order.orderCompleted == 0).toList();
-
+              final inProgressOrders = orders.where((order) => order.orderCompleted != 1).toList()
+                ..sort((a, b) {
+                  final aDateTime = a.orderPlacedAtDate ?? DateTime.fromMillisecondsSinceEpoch(0);
+                  final bDateTime = b.orderPlacedAtDate ?? DateTime.fromMillisecondsSinceEpoch(0);
+                  return bDateTime.compareTo(aDateTime);
+                });
               if (inProgressOrders.isEmpty) {
                 return Column(
                   children: [
@@ -54,7 +62,9 @@ class _CompletedScreenState extends ConsumerState<InProgressScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(right: 70),
+                    padding: const EdgeInsets.only(
+                      right: 70,
+                    ),
                     child: Align(
                       alignment: Alignment.topRight,
                       child: IconButton(
@@ -64,22 +74,50 @@ class _CompletedScreenState extends ConsumerState<InProgressScreen> {
                           icon: Icon(Icons.refresh)),
                     ),
                   ),
-                  for (final order in inProgressOrders)
-                    OrderWidget(
-                      customerName: order.isIndividualOrder == 1
-                          ? (order.name ?? '')
-                          : (order.requestCreatedByName ?? ''),
-                      orderNumber: (order.isIndividualOrder == 1)
-                          ? order.orderNumber ?? ''
-                          : order.requestUniqueId ?? '',
-                      peopleCount: order.isIndividualOrder == 1
-                          ? '1'
-                          : (order.orderNumber?.length.toString() ?? '1'),
-                      eta: order.orderTime ?? '',
-                      orderId: order.id,
-                      isIndividualOrder: order.isIndividualOrder == 1 ? 1 : 0,
-                      status: order.status,
+                  Padding(
+                    padding: const EdgeInsets.only(left: 50, right: 80, top: 0),
+                    child: GridView.builder(
+                      padding: EdgeInsets.symmetric(horizontal: 2, vertical: 0),
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        childAspectRatio: 1.6,
+                        crossAxisSpacing: 70,
+                        mainAxisSpacing: 0,
+                      ),
+                      itemCount: inProgressOrders.length,
+                      itemBuilder: (context, index) {
+                        final order = inProgressOrders[index];
+                        return InkWell(
+                          onTap: () {
+                            // context.navigateTo(Orders(
+                            //   isEdited: true,
+                            //   isIndividualOrder: order.isIndividualOrder == 1 ? 1 : 0,
+                            //   orderId: order.requestUniqueId ?? order.id.toString(),
+                            // ));
+                          },
+                          child: OrderWidget(
+                            customerName: order.isIndividualOrder == 1
+                                ? (order.name ?? '')
+                                : (order.requestCreatedByName ?? ''),
+                            orderNumber: order.isIndividualOrder == 1
+                                ? order.orderNumber ?? ''
+                                : order.requestUniqueId ?? '',
+                            peopleCount: order.isIndividualOrder == 1
+                                ? "1"
+                                : '${data.groupCoffeeRunOrders?[order.requestUniqueId ?? ""]?.length ?? 0}',
+                            eta: order.orderTime ?? '',
+                            orderId: order.isIndividualOrder == 1
+                                ? order.id.toString()
+                                : order.requestUniqueId,
+                            isIndividualOrder: order.isIndividualOrder == 1 ? 1 : 0,
+                            status: order.status,
+                          ),
+                        );
+                      },
                     ),
+                  ),
                   200.verticalSpace,
                 ],
               );
@@ -96,7 +134,7 @@ class OrderWidget extends ConsumerStatefulWidget {
   final String orderNumber;
   final String peopleCount;
   final String eta;
-  final int? orderId;
+  final String? orderId;
   final int isIndividualOrder;
   final int status;
 
@@ -118,7 +156,7 @@ class _OrderWidgetState extends ConsumerState<OrderWidget> {
   Widget build(BuildContext context) {
     final orderState = ref.watch(acceptOrdersProvider);
     return Padding(
-      padding: EdgeInsets.only(left: 30, top: 37),
+      padding: EdgeInsets.only(left: 30, top: 7),
       child: Container(
         padding: EdgeInsets.symmetric(
           vertical: 24,
@@ -152,13 +190,12 @@ class _OrderWidgetState extends ConsumerState<OrderWidget> {
                   ),
                 ),
                 18.horizontalSpace,
-                Expanded(
+                Flexible(
                   child: Text(
-                    'Order Number: ${widget.orderNumber}',
+                    '${widget.orderNumber}',
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 13.sp,
-                      color: Colors.white,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
@@ -196,11 +233,19 @@ class _OrderWidgetState extends ConsumerState<OrderWidget> {
                 isLoading:
                     orderState!.isLoading! && widget.orderId.toString() == orderState.orderId,
                 onClick: () async {
-                  ref
-                      .read(acceptOrdersProvider.notifier)
-                      .makeOrderComplete(widget.orderId.toString(), widget.isIndividualOrder, 1);
+                  if (widget.status == 1) {
+                    context.navigateTo(Orders(
+                      isEdited: true,
+                      isIndividualOrder: widget.isIndividualOrder == 1 ? 1 : 0,
+                      orderId: widget.orderId.toString(),
+                    ));
+                  } else {
+                    ref
+                        .read(acceptOrdersProvider.notifier)
+                        .makeOrderComplete(widget.orderId.toString(), widget.isIndividualOrder, 1);
+                  }
                 },
-                title: 'Complete',
+                title: widget.status == 1 ? 'View Order' : 'Complete Order',
               ),
             )
           ],

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:java_go/home/bottombar.dart';
 
 import 'package:java_go/home/item_availability.dart';
+import 'package:java_go/home/notifiers/view_order_provider.dart';
 
 import 'package:java_go/home/orderhistoryscreen.dart';
 
@@ -24,8 +26,8 @@ class _HomescreenState extends ConsumerState<Homescreen> with TickerProviderStat
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-    _tabControllerOrder = TabController(initialIndex: 1,length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
+    _tabControllerOrder = TabController(initialIndex: 1, length: 3, vsync: this);
   }
 
   @override
@@ -55,6 +57,7 @@ class _HomescreenState extends ConsumerState<Homescreen> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xFFF5F3F0),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(190),
@@ -111,7 +114,13 @@ class _CustomTabBarHomeScreenWidgetState extends ConsumerState<CustomTabBarHomeS
 
   @override
   Widget build(BuildContext context) {
+    final orders = ref.watch(todayOrdersProvider);
+    final items = orders.value?.getCombinedUniqueOrders;
+    final inProgressOrders = items?.where((order) => order.orderCompleted != 1).toList().length;
+
     return Scaffold(
+      resizeToAvoidBottomInset: false,
+
       backgroundColor: const Color(0xFFF5F3F0),
       appBar: AppBar(
         backgroundColor: const Color(0xFFF5F3F0),
@@ -129,8 +138,14 @@ class _CustomTabBarHomeScreenWidgetState extends ConsumerState<CustomTabBarHomeS
             padding: EdgeInsets.only(right: 57.w),
             child: InkWell(
               onTap: () {
-                // widget.onTabChanged(false, 0);
-                // widget.tabController.animateTo(0);
+
+
+                widget.tabControllerOrder.animateTo(1);
+                setState(
+                  () {
+                    _selectedOrderTabIndex = 1;
+                  },
+                );
               },
               child: Container(
                 width: 158.w,
@@ -147,9 +162,9 @@ class _CustomTabBarHomeScreenWidgetState extends ConsumerState<CustomTabBarHomeS
                     ),
                   ],
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'Order 1',
+                    "Orders: ${inProgressOrders}",
                     style: TextStyle(
                       color: Color(0xFF414141),
                       fontSize: 20,
@@ -172,6 +187,7 @@ class _CustomTabBarHomeScreenWidgetState extends ConsumerState<CustomTabBarHomeS
               setState(() {
                 _selectedOrderTabIndex = index;
               });
+
               widget.onTabChanged(true, index);
             },
             controller: widget.tabControllerOrder,

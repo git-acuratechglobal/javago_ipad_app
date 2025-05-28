@@ -1,0 +1,23 @@
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+String _$cafeInfoParamsNotifierHash() =>
+    r'a1b66da68a1e91d7c9aee3ccc3b9fc092123e418';
+
+/// See also [CafeInfoParamsNotifier].
+@ProviderFor(CafeInfoParamsNotifier)
+final cafeInfoParamsNotifierProvider =
+    NotifierProvider<CafeInfoParamsNotifier, CafeInfoParams>.internal(
+  CafeInfoParamsNotifier.new,
+  name: r'cafeInfoParamsNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$cafeInfoParamsNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$CafeInfoParamsNotifier = Notifier<CafeInfoParams>;
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

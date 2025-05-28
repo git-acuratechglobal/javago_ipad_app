@@ -4,8 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
 import 'package:java_go/config/common/widgets.dart';
 import 'package:java_go/home/account.dart';
-import 'package:java_go/sign_up/reviewscreen.dart';
-import 'package:java_go/sign_up/sign_up_page.dart';
+
+import '../auth/pages/sign_up/reviewscreen.dart';
+import '../auth/pages/sign_up/cafe_info_screen.dart';
 
 class CafeInformationScreen extends ConsumerStatefulWidget {
   final bool fromSettings;
@@ -46,7 +47,7 @@ class _CafeInformationScreenState extends ConsumerState<CafeInformationScreen> {
                         alignment: Alignment.topRight,
                         child: InkWell(
                           onTap: () {
-                            context.navigateTo(SignUpPage(
+                            context.navigateTo(CafeInfoScreen(
                               isEditmode: true,
                             ));
                           },

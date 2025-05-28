@@ -39,23 +39,23 @@ class AcceptOrders extends _$AcceptOrders {
     }
   }
 
-  Future<void> refundOrder(String orderId, int isIndividualOrder) async {
+  Future<void> refundOrder(String orderId, int isIndividualOrder,List<int> itemIds) async {
     state = state?.copyWith(isRefunding: true, orderId: orderId, error: "", message: "");
 
     try {
-      final result = await ref.read(authServiceProvider).orderRefund(orderId, isIndividualOrder);
+      final result = await ref.read(authServiceProvider).orderRefund(orderId, isIndividualOrder,itemIds.join(","));
 
       // Check if all items were refunded (nothing is marked available)
-      final unavailableItems = state?.unavailableItems ?? [];
-      final refundedAll = unavailableItems.every((item) => item.isSelected);
+      // final unavailableItems = state?.unavailableItems ?? [];
+      // final refundedAll = unavailableItems.every((item) => item.isSelected);
 
-      if (refundedAll) {
-        // All items refunded, mark as completed
-        await makeOrderComplete(orderId, isIndividualOrder, 2); // status 2 = completed
-      } else {
-        // Some refunded, rest maybe in progress
-        await makeOrderComplete(orderId, isIndividualOrder, 1); // status 1 = in progress
-      }
+      // if (refundedAll) {
+      //   // All items refunded, mark as completed
+      //   await makeOrderComplete(orderId, isIndividualOrder, 2); // status 2 = completed
+      // } else {
+      //   // Some refunded, rest maybe in progress
+      //   await makeOrderComplete(orderId, isIndividualOrder, 1); // status 1 = in progress
+      // }
 
       state = state?.copyWith(
         isRefunding: false,

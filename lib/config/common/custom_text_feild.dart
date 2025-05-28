@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CustomTextField extends StatelessWidget {
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final InputBorder? border;
   final InputBorder? enableBorder;
   final InputBorder? focusBorder;
@@ -23,10 +23,10 @@ class CustomTextField extends StatelessWidget {
   final int? minLines;
   final double? radius;
   final String? hintText;
-
+final TextInputType? textInputType;
   const CustomTextField({
     Key? key,
-    required this.controller,
+     this.controller,
     this.hintText,
     this.border,
     this.enableBorder,
@@ -46,6 +46,7 @@ class CustomTextField extends StatelessWidget {
     this.maxLines,
     this.minLines,
     this.radius,
+    this.textInputType
   }) : super(key: key);
 
   @override
@@ -74,7 +75,9 @@ class CustomTextField extends StatelessWidget {
                 cursorColor: Colors.black,
               ),
             ),
-            child: TextField(
+            child: TextFormField(
+              key: UniqueKey(),
+              keyboardType: textInputType,
               minLines: minLines,
               controller: controller,
               obscureText: isObscure ?? false,

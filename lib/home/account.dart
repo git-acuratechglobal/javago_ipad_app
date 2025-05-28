@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
+import 'package:java_go/home/bottombar.dart';
 import 'package:java_go/home/cafeinformationscreen.dart';
 import 'package:java_go/home/changepassword.dart';
+import 'package:java_go/home/notifiers/view_order_provider.dart';
+import 'package:java_go/service/local_storage_service.dart';
+
+import '../auth/pages/login/login_screen.dart';
 
 class Account extends ConsumerStatefulWidget {
   const Account({super.key});
@@ -16,6 +21,7 @@ class _AccountState extends ConsumerState<Account> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
         backgroundColor: Color(0xFFF5F3F0),
         appBar: PreferredSize(
             preferredSize: Size.fromHeight(50),
@@ -77,7 +83,12 @@ class _AccountState extends ConsumerState<Account> {
                 color: Color(0x33461C10),
               ),
               24.verticalSpace,
-              AccountWidget(imagePath: 'assets/images/logoutcurve.png', title: 'Logout'),
+              InkWell(
+                  onTap: (){
+                    ref.read(localStorageServiceProvider).clearSession();
+                    context.navigateAndRemoveUntil(LoginScreen());
+                  },
+                  child: AccountWidget(imagePath: 'assets/images/logoutcurve.png', title: 'Logout')),
               24.verticalSpace,
               24.verticalSpace,
             ],
@@ -127,7 +138,7 @@ class AppBarWidget extends ConsumerStatefulWidget {
   const AppBarWidget({
     super.key,
     required this.title,
-    this.myOrders =true,
+    this.myOrders = true,
     this.showBackButton = true,
   });
 
@@ -138,6 +149,9 @@ class AppBarWidget extends ConsumerStatefulWidget {
 class _AppBarWidgetState extends ConsumerState<AppBarWidget> {
   @override
   Widget build(BuildContext context) {
+    final orders = ref.watch(todayOrdersProvider);
+    final items = orders.value?.getCombinedUniqueOrders;
+    final inProgressOrders = items?.where((order) => order.orderCompleted != 1).toList().length;
     return AppBar(
         backgroundColor: Color(0xFFF5F3F0),
         automaticallyImplyLeading: false,
@@ -165,33 +179,41 @@ class _AppBarWidgetState extends ConsumerState<AppBarWidget> {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 57),
-            child: widget.myOrders? Container(
-              width: 158.w,
-              height: 48.h,
-              decoration: BoxDecoration(
-                color: Color(0xFF5CF97F),
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0x3F000000),
-                    blurRadius: 2,
-                    offset: Offset(0, 2),
-                    spreadRadius: 0,
+            child: widget.myOrders
+                ? InkWell(
+                    onTap: () {
+                      context.navigateTo(CustomBottomNavBar(
+                        homescreen: true,
+                      ));
+                    },
+                    child: Container(
+                        width: 158.w,
+                        height: 48.h,
+                        decoration: BoxDecoration(
+                          color: Color(0xFF5CF97F),
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0x3F000000),
+                              blurRadius: 2,
+                              offset: Offset(0, 2),
+                              spreadRadius: 0,
+                            )
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Orders: ${inProgressOrders}',
+                            style: TextStyle(
+                              color: const Color(0xFF414141),
+                              fontSize: 20,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        )),
                   )
-                ],
-              ),
-              child:  Center(
-                child: Text(
-                  'Order 1',
-                  style: TextStyle(
-                    color: const Color(0xFF414141),
-                    fontSize: 20,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              )
-            ):null,
+                : null,
           )
         ]);
   }

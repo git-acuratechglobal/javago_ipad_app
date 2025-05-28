@@ -172,3 +172,18 @@ class PreDefinedItem {
   factory PreDefinedItem.fromJson(Map<String, dynamic> json) => _$PreDefinedItemFromJson(json);
   Map<String, dynamic> toJson() => _$PreDefinedItemToJson(this);
 }
+
+class AddonItemModel {
+  final String id;
+  final String name;
+
+  AddonItemModel({required this.id, required this.name});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is AddonItemModel && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
+}

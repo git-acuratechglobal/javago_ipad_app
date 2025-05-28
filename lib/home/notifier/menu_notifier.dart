@@ -2,16 +2,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SizePrice {
   String size;
-  String price;
+  double ?price;
 
   SizePrice({required this.size, required this.price});
 }
 
 class SizePriceNotifier extends StateNotifier<List<SizePrice>> {
-  SizePriceNotifier() : super([SizePrice(size: '', price: '')]);
+  SizePriceNotifier() : super([SizePrice(size: '', price: null)]);
 
   void add() {
-    state = [...state, SizePrice(size: '', price: '')];
+    state = [...state, SizePrice(size: '', price: null)];
   }
 
   void remove(int index) {
@@ -27,7 +27,7 @@ class SizePriceNotifier extends StateNotifier<List<SizePrice>> {
     state = updated;
   }
 
-  void updatePrice(int index, String newPrice) {
+  void updatePrice(int index, double newPrice) {
     final updated = [...state];
     updated[index] = SizePrice(size: updated[index].size, price: newPrice);
     state = updated;
@@ -36,4 +36,4 @@ class SizePriceNotifier extends StateNotifier<List<SizePrice>> {
 
 
 final sizePriceProvider =
-    StateNotifierProvider<SizePriceNotifier, List<SizePrice>>((ref) => SizePriceNotifier());
+    StateNotifierProvider.autoDispose<SizePriceNotifier, List<SizePrice>>((ref) => SizePriceNotifier());

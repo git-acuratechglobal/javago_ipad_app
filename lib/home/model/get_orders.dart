@@ -148,7 +148,7 @@ class GetOrder {
         if (timestamp > 0) {
           order.orderPlacedAtDate = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
           order.orderDate = DateFormat('yyyy-MM-dd').format(order.orderPlacedAtDate!);
-          order.orderTime = DateFormat('HH:mm:ss').format(order.orderPlacedAtDate!);
+          order.orderTime = DateFormat('HH:mm').format(order.orderPlacedAtDate!);
         }
       } catch (e) {
         print('Error parsing orderPlacedAt: $e');

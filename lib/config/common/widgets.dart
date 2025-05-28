@@ -3,42 +3,79 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:java_go/Theme/navigation.dart';
+import 'package:java_go/auth/model/cafe_time_and_category.dart';
+import 'package:java_go/config/async_widget.dart';
+import 'package:java_go/config/common/extensions.dart';
+import 'package:java_go/home/menu_info_state.dart';
 import 'package:java_go/home/notifier/pagination_notifier.dart';
+import 'package:java_go/home/notifiers/menu_item_showing.dart';
 
-import 'package:java_go/sign_up/menu.dart';
+import '../../auth/model/cafe_model.dart';
+import '../../auth/model/cafetime_model.dart';
+
+final selectedItemIdProvider = StateProvider<int?>((ref) => null);
+final selectedIdsProvider = StateProvider<List<String>>((ref) => []);
 
 class CafeHoursScreen extends StatefulWidget {
-  const CafeHoursScreen({super.key});
-
+  const CafeHoursScreen({super.key, required this.onTimeChanged, this.initialCafeTime});
+  final void Function(List<CafeDayTime>) onTimeChanged;
+  final List<CafeTiming>? initialCafeTime;
   @override
   State<CafeHoursScreen> createState() => _CafeHoursScreenState();
 }
 
 class _CafeHoursScreenState extends State<CafeHoursScreen> {
   final List<String> days = [
+    'Sunday',
     'Monday',
     'Tuesday',
     'Wednesday',
     'Thursday',
     'Friday',
     'Saturday',
-    'Sunday'
   ];
 
   final Map<String, TimeOfDay> openingTimes = {};
   final Map<String, TimeOfDay> closingTimes = {};
 
-  // Track selected field (e.g., "Monday-open", "Tuesday-close")
   String? _selectedTimeField;
 
   @override
   void initState() {
     super.initState();
-    for (var day in days) {
+    _initializeTimes();
+    _notifyParent(); // Send initial values to parent
+  }
+
+  void _initializeTimes() {
+    for (var i = 0; i < days.length; i++) {
+      final day = days[i];
       openingTimes[day] = const TimeOfDay(hour: 9, minute: 0);
       closingTimes[day] = const TimeOfDay(hour: 22, minute: 0);
     }
+
+    if (widget.initialCafeTime != null) {
+      for (final timing in widget.initialCafeTime!) {
+        final dayIndex = timing.day;
+        if (dayIndex! >= 0 && dayIndex < days.length) {
+          final dayName = days[dayIndex];
+          openingTimes[dayName] = _parseTime(timing.openTime!);
+          closingTimes[dayName] = _parseTime(timing.closeTime!);
+        }
+      }
+    }
+  }
+
+  void _notifyParent() {
+    final result = days.map((day) {
+      return CafeDayTime(
+        day: day,
+        openingTime: openingTimes[day]!,
+        closingTime: closingTimes[day]!,
+      );
+    }).toList();
+
+    widget.onTimeChanged(result);
   }
 
   Future<void> _pickTime(BuildContext context, String day, bool isOpening) async {
@@ -58,14 +95,31 @@ class _CafeHoursScreenState extends State<CafeHoursScreen> {
         } else {
           closingTimes[day] = picked;
         }
+        _notifyParent(); // Callback after update
       });
     }
 
-    Future.delayed(Duration(milliseconds: 300), () {
+    Future.delayed(const Duration(milliseconds: 300), () {
       setState(() {
         _selectedTimeField = null;
       });
     });
+  }
+
+  TimeOfDay _parseTime(String time) {
+    try {
+      final parts = time.split(":");
+      if (parts.length >= 2) {
+        return TimeOfDay(
+          hour: int.parse(parts[0]),
+          minute: int.parse(parts[1]),
+        );
+      }
+    } catch (e) {
+      // Handle parsing errors
+    }
+    // Return default time if parsing fails
+    return const TimeOfDay(hour: 9, minute: 0);
   }
 
   @override
@@ -100,9 +154,10 @@ class _CafeHoursScreenState extends State<CafeHoursScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
                         decoration: BoxDecoration(
-                          color:
-                              _selectedTimeField == "$day-open" ? Colors.white : Colors.transparent,
-                          border: Border.all(color: Color(0xFF4C2F27)),
+                          color: _selectedTimeField == "$day-open"
+                              ? Colors.white
+                              : Colors.transparent,
+                          border: Border.all(color: const Color(0xFF4C2F27)),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -112,7 +167,7 @@ class _CafeHoursScreenState extends State<CafeHoursScreen> {
                             fontWeight: FontWeight.w500,
                             color: _selectedTimeField == "$day-open"
                                 ? Colors.black
-                                : Color(0xFF1B0701),
+                                : const Color(0xFF1B0701),
                           ),
                         ),
                       ),
@@ -128,7 +183,7 @@ class _CafeHoursScreenState extends State<CafeHoursScreen> {
                           color: _selectedTimeField == "$day-close"
                               ? Colors.white
                               : Colors.transparent,
-                          border: Border.all(color: Color(0xFF4C2F27)),
+                          border: Border.all(color: const Color(0xFF4C2F27)),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -138,7 +193,7 @@ class _CafeHoursScreenState extends State<CafeHoursScreen> {
                             fontWeight: FontWeight.w500,
                             color: _selectedTimeField == "$day-close"
                                 ? Colors.black
-                                : Color(0xFF1B0701),
+                                : const Color(0xFF1B0701),
                           ),
                         ),
                       ),
@@ -153,6 +208,210 @@ class _CafeHoursScreenState extends State<CafeHoursScreen> {
     );
   }
 }
+
+
+class CafeHoursScreen1 extends StatefulWidget {
+  const CafeHoursScreen1({super.key, required this.onTimeChanged, this.initialCafeTime});
+  final void Function(List<CafeDayTime>) onTimeChanged;
+  final List<CafeClickCollectTiming>? initialCafeTime;
+  @override
+  State<CafeHoursScreen1> createState() => _CafeHoursScreen1State();
+}
+
+class _CafeHoursScreen1State extends State<CafeHoursScreen1> {
+  final List<String> days = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+  ];
+
+  final Map<String, TimeOfDay> openingTimes = {};
+  final Map<String, TimeOfDay> closingTimes = {};
+
+  String? _selectedTimeField;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeTimes();
+    _notifyParent(); // Send initial values to parent
+  }
+
+  void _initializeTimes() {
+    // Initialize with default times first
+    for (var day in days) {
+      openingTimes[day] = const TimeOfDay(hour: 9, minute: 0);
+      closingTimes[day] = const TimeOfDay(hour: 22, minute: 0);
+    }
+
+    // Override with initial data if available
+    if (widget.initialCafeTime != null && widget.initialCafeTime!.isNotEmpty) {
+      for (var timing in widget.initialCafeTime!) {
+        final int dayIndex = int.tryParse(timing.day ?? "") ?? 0;
+        if (dayIndex >= 0 && dayIndex < days.length) {
+          final String dayName = days[dayIndex];
+
+          if (timing.startTime != null && timing.startTime!.isNotEmpty) {
+            openingTimes[dayName] = _parseTime(timing.startTime!);
+          }
+
+          if (timing.endTime != null && timing.endTime!.isNotEmpty) {
+            closingTimes[dayName] = _parseTime(timing.endTime!);
+          }
+        }
+      }
+    }
+  }
+
+  void _notifyParent() {
+    final result = days.map((day) {
+      return CafeDayTime(
+        day: day,
+        openingTime: openingTimes[day]!,
+        closingTime: closingTimes[day]!,
+      );
+    }).toList();
+
+    widget.onTimeChanged(result);
+  }
+
+  Future<void> _pickTime(BuildContext context, String day, bool isOpening) async {
+    setState(() {
+      _selectedTimeField = "$day-${isOpening ? 'open' : 'close'}";
+    });
+
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: isOpening ? openingTimes[day]! : closingTimes[day]!,
+    );
+
+    if (picked != null) {
+      setState(() {
+        if (isOpening) {
+          openingTimes[day] = picked;
+        } else {
+          closingTimes[day] = picked;
+        }
+        _notifyParent(); // Callback after update
+      });
+    }
+
+    Future.delayed(const Duration(milliseconds: 300), () {
+      setState(() {
+        _selectedTimeField = null;
+      });
+    });
+  }
+
+  TimeOfDay _parseTime(String time) {
+    try {
+      final parts = time.split(":");
+      if (parts.length >= 2) {
+        return TimeOfDay(
+          hour: int.parse(parts[0]),
+          minute: int.parse(parts[1]),
+        );
+      }
+    } catch (e) {
+      // Handle parsing errors
+    }
+    // Return default time if parsing fails
+    return const TimeOfDay(hour: 9, minute: 0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: days.length,
+        itemBuilder: (context, index) {
+          final day = days[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 100,
+                  child: Text(
+                    day,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w500, color: Color(0xFF1B0701)),
+                  ),
+                ),
+                const SizedBox(width: 37),
+                const Text(":"),
+                const SizedBox(width: 10),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => _pickTime(context, day, true),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: _selectedTimeField == "$day-open"
+                              ? Colors.white
+                              : Colors.transparent,
+                          border: Border.all(color: const Color(0xFF4C2F27)),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          openingTimes[day]!.format(context),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: _selectedTimeField == "$day-open"
+                                ? Colors.black
+                                : const Color(0xFF1B0701),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    const Text("-"),
+                    const SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: () => _pickTime(context, day, false),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: _selectedTimeField == "$day-close"
+                              ? Colors.white
+                              : Colors.transparent,
+                          border: Border.all(color: const Color(0xFF4C2F27)),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          closingTimes[day]!.format(context),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: _selectedTimeField == "$day-close"
+                                ? Colors.black
+                                : const Color(0xFF1B0701),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+
+
 
 final dropdownProvider = StateProvider<String?>((ref) => null);
 
@@ -175,6 +434,7 @@ class _DropdownState extends ConsumerState<Dropdown> {
     final selectedProperty = ref.watch(dropdownProvider);
 
     return DropdownButtonFormField<String>(
+      isExpanded: true,
       value: selectedProperty,
       hint: Text(
         widget.title,
@@ -313,196 +573,376 @@ class _ReviewtimingState extends State<Reviewtiming> {
   }
 }
 
-class ReviewItems extends ConsumerStatefulWidget {
-  const ReviewItems({super.key});
+class ReviewItems extends ConsumerWidget {
+  const ReviewItems({
+    super.key,
+  });
 
   @override
-  ConsumerState<ReviewItems> createState() => _ReviewItemsState();
-}
-
-class _ReviewItemsState extends ConsumerState<ReviewItems> {
-  final List<Map<String, dynamic>> allItems = List.generate(
-    19,
-    (index) => {
-      'image': 'assets/images/icetea.png',
-      'name': 'Ice Tea $index',
-      'category': 'Drinks',
-      'price': '£ 9.5',
-      'desc': 'Lorem Ipsum is simply dummy text $index',
-      'tag': 'Vegan',
-      'tagIcon': 'assets/images/vegan_java_go.png',
-    },
-  );
-
-  final int itemsPerPage = 5;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final currentPage = ref.watch(paginationProvider);
-    final startIndex = currentPage * itemsPerPage;
-    final endIndex = (startIndex + itemsPerPage).clamp(0, allItems.length);
-    final pageItems = allItems.sublist(startIndex, endIndex);
+    final menuItemAsync = ref.watch(showMenuItemssProvider);
 
-    final totalPages = (allItems.length / itemsPerPage).ceil();
+    return AsyncWidget(
+      value: menuItemAsync,
+      data: (menuItem) {
+        final data = menuItem.data;
+        final items = data?.data != null ? data?.data!.sortByLatest() : [];
+        final lastPage = int.tryParse(data?.lastPage.toString() ?? '1') ?? 1;
 
-    return Column(
-      children: [
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 15),
-          width: 1136.w,
-          height: 59.h,
-          decoration: BoxDecoration(color: Color(0xFF9B6842)),
-          child: Row(
+        // final selectedIdsNotifier =    ref.read(selectedItemIdProvider.notifier);
+        final selectedIds = ref.watch(selectedIdsProvider);
+        final allIds = items!.map((e) => e.id.toString()).toList();
+        if (selectedIds.isEmpty && allIds.isNotEmpty) {
+          Future.microtask(() {
+            ref.read(selectedIdsProvider.notifier).state = allIds;
+          });
+        }
+        return SingleChildScrollView(
+          child: Column(
             children: [
-              SizedBox(
-                width: 74.w,
-                child: ReviewItembarname(
-                  label: 'Images',
-                  color: Colors.white,
-                  fontSize: 16.sp,
+              // Header Row
+              11.verticalSpace,
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 15),
+                width: 1189.w,
+                height: 59.h,
+                decoration: const BoxDecoration(color: Color(0xFF9B6842)),
+                child: Row(
+                  children: [
+                    SizedBox(
+                        width: 74.w,
+                        child:
+                            Text('Images', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                    15.horizontalSpace,
+                    SizedBox(
+                        width: 121.w,
+                        child: Text('Item Name',
+                            style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                    15.horizontalSpace,
+                    SizedBox(
+                        width: 102.w,
+                        child: Text('Category',
+                            style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                    35.horizontalSpace,
+                    SizedBox(
+                        width: 110.w,
+                        child:
+                            Text('Price', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                    15.horizontalSpace,
+                    SizedBox(
+                        width: 198.w,
+                        child: Text('Description',
+                            style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                    10.horizontalSpace,
+                    SizedBox(
+                        width: 100.w,
+                        child:
+                            Text('Type', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                    15.horizontalSpace,
+                    SizedBox(
+                        width: 120.w,
+                        child:
+                            Text('Status', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                    15.horizontalSpace,
+                    SizedBox(
+                        width: 120.w,
+                        child: Text('Availability',
+                            style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                  ],
                 ),
               ),
-              15.horizontalSpace,
-              SizedBox(
-                width: 121.w,
-                child: ReviewItembarname(
-                  label: 'Item Name',
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                ),
-              ),
-              15.horizontalSpace,
-              SizedBox(
-                width: 102.w,
-                child: ReviewItembarname(
-                  label: 'Category',
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                ),
-              ),
-              15.horizontalSpace,
-              SizedBox(
-                width: 70.w,
-                child: ReviewItembarname(
-                  label: 'Price',
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                ),
-              ),
-              15.horizontalSpace,
-              SizedBox(
-                width: 198.w,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: ReviewItembarname(
-                    label: 'Description',
-                    color: Colors.white,
-                    fontSize: 16.sp,
-                  ),
-                ),
-              ),
-              10.horizontalSpace,
-              SizedBox(
-                width: 100.w,
-                child: ReviewItembarname(
-                  label: 'Type',
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                ),
-              ),
-              15.horizontalSpace,
-              SizedBox(
-                width: 120.w,
-                child: ReviewItembarname(
-                  label: 'Status',
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                ),
-              ),
-              15.horizontalSpace,
-              SizedBox(
-                width: 120.w,
-                child: ReviewItembarname(
-                  label: 'Availability',
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                ),
-              ),
-            ],
-          ),
-        ),
-        // 22.verticalSpace,
-        ListView.separated(
-          physics: NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemCount: pageItems.length,
-          itemBuilder: (context, index) {
-            final item = pageItems[index];
-            return Container(
-              margin: EdgeInsets.symmetric(vertical: 0.h, horizontal: 24.w),
-              padding: EdgeInsets.only(top:12.w,left:12.w,right:12.w),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.white,
-              ),
-              child: Row(
-                children: [
-                  9.horizontalSpace,
-                  // Image
-                  Image.asset(item['image'], height: 40.h, width: 40.w),
 
-                  55.horizontalSpace,
+              // Items List
+              ListView.separated(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: items.length,
+                separatorBuilder: (_, __) => 10.verticalSpace,
+                itemBuilder: (context, index) {
+                  final item = items[index];
 
-                  // Item details
-                  Flexible(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  // final selectedIds = ref.watch(selectedIdsProvider);
+                  // final selectedIdsNotifier = ref.read(selectedIdsProvider.notifier);
+                  // final idsToPass = selectedIds.isEmpty ? items.map((e) => e.id).toList() : [item.id];
+                  return Container(
+                    margin: EdgeInsets.symmetric(horizontal: 15.w),
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white,
+                    ),
+                    child: Row(
+                      spacing: 10,
                       children: [
-                        Text(item['name'],
-                            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500)),
+                        SizedBox(
+                          height: 40.h,
+                          width: 40.w,
+                          child: item.itemImage != null
+                              ? Image.network(item.itemImage!, fit: BoxFit.cover)
+                              : const Icon(Icons.image_not_supported),
+                        ),
+                        25.horizontalSpace,
+                        SizedBox(
+                            width: 100.w,
+                            child: Text(item.itemName ?? "-", overflow: TextOverflow.ellipsis)),
+                        25.horizontalSpace,
+                        SizedBox(
+                            width: 90.w,
+                            child: Text(item.itemCategory ?? "-", overflow: TextOverflow.ellipsis)),
+                        15.horizontalSpace,
+                        SizedBox(
+                            width: 90.w,
+                            child: Text(item.itemPrice ?? "-", overflow: TextOverflow.ellipsis)),
+                        15.horizontalSpace,
+                        SizedBox(
+                            width: 160.w,
+                            child:
+                                Text(item.itemDescription ?? "-", overflow: TextOverflow.ellipsis)),
+                        35.horizontalSpace,
+                        SizedBox(
+                          width: 50.w,
+                          child: Text(
+                            () {
+                              switch (item.itemType) {
+                                case 1:
+                                  return "Veg";
+                                case 2:
+                                  return "Non-Veg";
+                                case 3:
+                                  return "Vegan";
+                                default:
+                                  return "Unknown";
+                              }
+                            }(),
+                          ),
+                        ),
+                        15.horizontalSpace,
+                        StatusContainer(
+                          status: item.status,
+                          id: item.id,
+                        )
                       ],
                     ),
-                  ),
-                  68.horizontalSpace,
-                  Text(item['category'],
-                      style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500)),
-                  55.horizontalSpace,
-                  Flexible(child: Text(item['price'], style: TextStyle(fontSize: 15.sp))),
-                  45.horizontalSpace,
-                  Flexible(
-                      flex: 2,
-                      child: Text(item['desc'],
-                          style: TextStyle(fontSize: 16.sp), overflow: TextOverflow.ellipsis)),
-                  80.horizontalSpace,
-                  Row(
-                    children: [
-                      Image.asset(
-                        item['tagIcon'],
-                      ),
-                      6.horizontalSpace,
-                      Text(item['tag'],
-                          style: TextStyle(fontSize: 16.sp, overflow: TextOverflow.ellipsis)),
-                    ],
-                  ),
-                  98.horizontalSpace,
-                  // Status and actions
-                  const StatusContainer(),
-                ],
+                  );
+                },
               ),
-            );
-          },
-          separatorBuilder: (BuildContext context, int index) {
-            return 15.verticalSpace;
-          },
-        ),
-    
-        PageIndex(totalPages: totalPages),
-      ],
+              // Spacer(),
+              11.verticalSpace,
+              CustomPaginationBar(
+                currentPage: ref.watch(paginationProvider),
+                totalItems: data!.total ?? 0,
+                totalPages: (data.total! / data.perPage).ceil(),
+                itemsPerPage: data.perPage,
+                onPageChanged: (page) {
+                  ref.read(paginationProvider.notifier).state = page;
+                },
+                onItemsPerPageChanged: (value) {
+                  data.perPage = value;
+                  ref.read(paginationProvider.notifier).state = 1; // Reset to page 1
+                },
+              ),
+
+              164.verticalSpace
+            ],
+          ),
+        );
+      },
     );
   }
 }
+// Page Index
+// PageIndex(currentPage: currentPage, totalPages: lastPage),
+// const SizedBox(height: 8),
+// Row(
+//   mainAxisAlignment: MainAxisAlignment.center,
+//   children: [
+//     ElevatedButton(
+//       onPressed: currentPage > 1
+//           ? () => ref.read(paginationProvider.notifier).previousPage()
+//           : null,
+//       child: const Text('Previous'),
+//     ),
+//     const SizedBox(width: 20),
+//     ElevatedButton(
+//       onPressed: currentPage < lastPage
+//           ? () => ref.read(paginationProvider.notifier).nextPage(lastPage)
+//           : null,
+//       child: const Text('Next'),
+//     ),
+//   ],
+// ),
+// class ReviewItems extends ConsumerWidget {
+//   const ReviewItems({super.key});
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final currentPage = ref.watch(paginationProvider);
+//     final menuItemAsync = ref.watch(showMenuItemssProvider);
+
+//     return AsyncWidget(
+//       value: menuItemAsync,
+//       data: (menuItem) {
+//         final data = menuItem.data;
+//         final items = data?.data ?? [];
+//         final lastPage = data?.lastPage ?? 1;
+
+//         // ✅ Auto-store all item IDs when data loads
+//         final selectedIdsNotifier = ref.read(selectedIdsProvider.notifier);
+//         final selectedIds = ref.watch(selectedIdsProvider);
+//       final allIds = items.map((e) => e.id.toString()).toList();
+
+//         if (selectedIds.isEmpty && allIds.isNotEmpty) {
+//           Future.microtask(() {
+//             selectedIdsNotifier.state = allIds;
+//           });
+//         }
+
+//         return Column(
+//           children: [
+//             11.verticalSpace,
+//             Container(
+//               padding: EdgeInsets.symmetric(horizontal: 15),
+//               width: 1189.w,
+//               height: 59.h,
+//               decoration: const BoxDecoration(color: Color(0xFF9B6842)),
+//               child: Row(
+//                 children: [
+//                   SizedBox(
+//                       width: 74.w,
+//                       child: Text('Images', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+//                   15.horizontalSpace,
+//                   SizedBox(
+//                       width: 121.w,
+//                       child: Text('Item Name', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+//                   15.horizontalSpace,
+//                   SizedBox(
+//                       width: 102.w,
+//                       child: Text('Category', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+//                   35.horizontalSpace,
+//                   SizedBox(
+//                       width: 110.w,
+//                       child: Text('Price', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+//                   15.horizontalSpace,
+//                   SizedBox(
+//                       width: 198.w,
+//                       child: Text('Description', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+//                   10.horizontalSpace,
+//                   SizedBox(
+//                       width: 100.w,
+//                       child: Text('Type', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+//                   15.horizontalSpace,
+//                   SizedBox(
+//                       width: 120.w,
+//                       child: Text('Status', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+//                   15.horizontalSpace,
+//                   SizedBox(
+//                       width: 120.w,
+//                       child: Text('Availability', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+//                 ],
+//               ),
+//             ),
+
+//             // Items List
+//             ListView.separated(
+//               shrinkWrap: true,
+//               physics: const NeverScrollableScrollPhysics(),
+//               itemCount: items.length,
+//               separatorBuilder: (_, __) => 10.verticalSpace,
+//               itemBuilder: (context, index) {
+//                 final item = items[index];
+
+//                 return Container(
+//                   margin: EdgeInsets.symmetric(horizontal: 15.w),
+//                   padding: EdgeInsets.all(12),
+//                   decoration: BoxDecoration(
+//                     border: Border.all(color: Colors.grey.shade300),
+//                     borderRadius: BorderRadius.circular(8),
+//                     color: Colors.white,
+//                   ),
+//                   child: Row(
+//                     children: [
+//                       SizedBox(
+//                         height: 40.h,
+//                         width: 40.w,
+//                         child: item.itemImage != null
+//                             ? Image.network(item.itemImage!, fit: BoxFit.cover)
+//                             : const Icon(Icons.image_not_supported),
+//                       ),
+//                       25.horizontalSpace,
+//                       SizedBox(
+//                           width: 100.w,
+//                           child: Text(item.itemName ?? "-", overflow: TextOverflow.ellipsis)),
+//                       25.horizontalSpace,
+//                       SizedBox(
+//                           width: 90.w,
+//                           child: Text(item.itemCategory ?? "-", overflow: TextOverflow.ellipsis)),
+//                       15.horizontalSpace,
+//                       SizedBox(
+//                           width: 80.w,
+//                           child: Text(item.itemPrice ?? "-", overflow: TextOverflow.ellipsis)),
+//                       15.horizontalSpace,
+//                       SizedBox(
+//                           width: 170.w,
+//                           child: Text(item.itemDescription ?? "-", overflow: TextOverflow.ellipsis)),
+//                       35.horizontalSpace,
+//                       SizedBox(
+//                         width: 60.w,
+//                         child: Text(
+//                           () {
+//                             switch (item.itemType) {
+//                               case 1:
+//                                 return "Veg";
+//                               case 2:
+//                                 return "Non-Veg";
+//                               case 3:
+//                                 return "Vegan";
+//                               default:
+//                                 return "Unknown";
+//                             }
+//                           }(),
+//                         ),
+//                       ),
+//                       15.horizontalSpace,
+//                       StatusContainer(
+//                         status: item.status,
+//                         id: item.id ?? "",
+//                       )
+//                     ],
+//                   ),
+//                 );
+//               },
+//             ),
+
+//             // Page Index
+//             PageIndex(currentPage: currentPage, totalPages: lastPage),
+//             const SizedBox(height: 8),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 ElevatedButton(
+//                   onPressed: currentPage > 0
+//                       ? () => ref.read(paginationProvider.notifier).previousPage()
+//                       : null,
+//                   child: const Text('Previous'),
+//                 ),
+//                 const SizedBox(width: 20),
+//                 ElevatedButton(
+//                   onPressed: currentPage < lastPage - 1
+//                       ? () => ref.read(paginationProvider.notifier).nextPage(lastPage)
+//                       : null,
+//                   child: const Text('Next'),
+//                 ),
+//               ],
+//             ),
+//           ],
+//         );
+//       },
+//     );
+//   }
+// }
 
 class ReviewItembarname extends StatefulWidget {
   final String label;
@@ -530,151 +970,255 @@ class _ReviewItembarnameState extends State<ReviewItembarname> {
   }
 }
 
-class StatusContainer extends StatefulWidget {
-  const StatusContainer({super.key});
+class StatusContainer extends ConsumerStatefulWidget {
+  final int status;
+  final int id;
+  final bool? editOption;
+  StatusContainer({super.key, required this.id, required this.status, this.editOption = true});
 
   @override
-  State<StatusContainer> createState() => _StatusContainerState();
+  ConsumerState<StatusContainer> createState() => _StatusContainerState();
 }
 
-class _StatusContainerState extends State<StatusContainer> {
+class _StatusContainerState extends ConsumerState<StatusContainer> {
   bool _isSwitched = false;
 
   @override
+  void initState() {
+    super.initState();
+    _isSwitched = widget.status == 1;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-            width: 106.74,
-            height: 41.30,
-            decoration: ShapeDecoration(
-              color: _isSwitched ? const Color(0xFF1C8113) : Color(0xFFFD5555),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+    return Expanded(
+      child: Row(
+        spacing: 0,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+              padding: EdgeInsets.all(0),
+              width: 105.74,
+              height: 41.30,
+              decoration: ShapeDecoration(
+                color: _isSwitched ? const Color(0xFF1C8113) : Color(0xFFFD5555),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-            ),
-            child: Center(
-              child: _isSwitched
-                  ? Text(
-                      'Available',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
+              child: Center(
+                child: _isSwitched
+                    ? Text(
+                        'Available',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      )
+                    : Text(
+                        'Unavailable',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    )
-                  : Text(
-                      'Unavailable',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
+              )),
+          10.horizontalSpace,
+          CupertinoSwitch(
+            activeColor: const Color(0xFFC0987C),
+            trackColor: const Color(0xFF757575),
+            value: _isSwitched,
+            onChanged: (bool value) {
+              if (widget.editOption ?? false) {
+                // ref.read(updateAddonItemStatusProvider(widget.id,widget.status).notifier).updateAddonItemStatus(widget.id);
+              }
+              setState(() {
+                _isSwitched = value;
+              });
+            },
+          ),
+          (widget.editOption ?? false) ? 3.horizontalSpace : 2.horizontalSpace,
+          (widget.editOption ?? true)
+              ? Row(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        ref.read(selectedItemIdProvider.notifier).state = widget.id;
+                        ref.read(menuInfoTabStateProvider.notifier).updateMenuTab(1, widget.id);
+      
+                        //   MenuInfoScreen(
+                        //     id: widget.id,
+                        //     defaultTabIndex: 1, // opens 'Additional Options'
+      
+                        //   //  Items(id: widget.id ),
+                        // );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(0),
+                        width: 79.74,
+                        height: 42.30,
+                        decoration: ShapeDecoration(
+                          color: _isSwitched ? const Color(0xFF1C8113) : Color(0xFFFD5555),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Text(
+                            '   View Addons',
+                            style: TextStyle(
+                                fontSize: 13.sp, color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+                        ),
                       ),
                     ),
-            )),
-        32.horizontalSpace,
-        CupertinoSwitch(
-          activeColor: const Color(0xFFC0987C),
-          trackColor: const Color(0xFF757575),
-          value: _isSwitched,
-          onChanged: (bool value) {
-            setState(() {
-              _isSwitched = value;
-            });
-          },
-        ),
-        28.horizontalSpace,
-        InkWell(
-          onTap: () {
-            context.navigateTo(MenuScreen(isEditmode: true));
-          },
-          child: Image.asset(
-            'assets/images/edit_java_go.png',
-            height: 43.h,
-            width: 43.w,
-          ),
-        ),
-        28.horizontalSpace,
-        Image.asset(
-          'assets/images/delete_java_go.png',
-          height: 43.h,
-          width: 43.w,
-        )
-      ],
+                    2.horizontalSpace,
+                    InkWell(
+                      onTap: () {
+                        // context.navigateTo(MenuScreen(isEditmode: true));
+                      },
+                      child: Image.asset(
+                        'assets/images/edit_java_go.png',
+                        height: 43.h,
+                        width: 43.w,
+                      ),
+                    ),
+                  ],
+                )
+              : SizedBox(
+                  width: 65,
+                ),
+          if (widget.editOption ?? true) 8.horizontalSpace,
+          InkWell(
+            onTap: () async {
+              // await ref.read(deleteItemProvider.notifier).deleteItem(widget.id);
+            },
+            child: Image.asset(
+              'assets/images/delete_java_go.png',
+              height: 43.h,
+              width: 40.5,
+            ),
+          )
+        ],
+      ),
     );
   }
 }
 
-class PageIndex extends ConsumerWidget {
-  final int? totalPages;
-  const PageIndex({super.key, this.totalPages = 10});
+class CustomPaginationBar extends StatelessWidget {
+  final int currentPage;
+  final int totalItems;
+  final int totalPages;
+  final int itemsPerPage;
+  final void Function(int) onPageChanged;
+  final void Function(int) onItemsPerPageChanged;
+
+  const CustomPaginationBar({
+    super.key,
+    required this.currentPage,
+    required this.totalItems,
+    required this.totalPages,
+    required this.itemsPerPage,
+    required this.onPageChanged,
+    required this.onItemsPerPageChanged,
+  });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentPage = ref.watch(paginationProvider);
-    final notifier = ref.read(paginationProvider.notifier);
+  Widget build(BuildContext context) {
+    final start = ((currentPage - 1) * itemsPerPage) + 1;
+    final end = (start + itemsPerPage - 1).clamp(1, totalItems);
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 57),
+      padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Showing text
+          /// Showing range
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: ShapeDecoration(
-              color: Colors.white,
-              shape: RoundedRectangleBorder(
-                side: BorderSide(width: 1, color: Color(0xFF9B6842)),
-                borderRadius: BorderRadius.circular(7),
-              ),
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.brown),
+              borderRadius: BorderRadius.circular(8.r),
             ),
             child: Text(
-              'Showing ${currentPage + 1} to ${5} of 11 entries',
-              // 'Showing ${currentPage * 5 + 1} to ${(currentPage + 1) * 5 > 11 ? 11 : (currentPage + 1) * 5} of 11 entries',
-              style: TextStyle(
-                color: Color(0xFF9B6842),
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w500,
-              ),
+              "Showing $start to $end of $totalItems entries",
+              style: TextStyle(fontSize: 14.sp, color: Colors.brown),
             ),
           ),
 
-          // Page number buttons
+          /// Items per page dropdown
+          // Row(
+          //   children: [
+          //     Text(
+          //       "RESULTS:",
+          //       style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold, color: Colors.blue),
+          //     ),
+          //     SizedBox(width: 4.w),
+          //     Container(
+          //       height: 36.h,
+          //       padding: EdgeInsets.symmetric(horizontal: 8.w),
+          //       decoration: BoxDecoration(
+          //         border: Border.all(color: Colors.brown),
+          //         borderRadius: BorderRadius.circular(6.r),
+          //       ),
+          //       child: DropdownButton<int>(
+          //         value: itemsPerPage,
+          //         underline: const SizedBox(),
+          //         isDense: true,
+          //         items: [5, 10, 15, 20]
+          //             .map((value) => DropdownMenuItem<int>(
+          //                   value: value,
+          //                   child: Text('$value'),
+          //                 ))
+          //             .toList(),
+          //         onChanged: (value) {
+          //           if (value != null) {
+          //             onItemsPerPageChanged(value);
+          //           }
+          //         },
+          //       ),
+          //     ),
+          //   ],
+          // ),
+
+          /// Pagination buttons
           Row(
             children: [
               IconButton(
-                icon: Icon(Icons.arrow_back, color: Color(0xFF887A72)),
-                onPressed: () => notifier.previousPage(),
+                icon: Icon(Icons.arrow_back_ios_new_rounded, size: 16.sp),
+                onPressed: currentPage > 1 ? () => onPageChanged(currentPage - 1) : null,
               ),
-              for (int i = 0; i < totalPages!; i++) ...[
-                8.horizontalSpace,
-                InkWell(
-                  onTap: () => notifier.goToPage(i),
-                  child: Container(
-                    width: 31.84,
-                    height: 31.84,
-                    decoration: BoxDecoration(
-                      color: i == currentPage ? Color(0xFF461C10) : Color(0xFFEBEDEF),
-                      borderRadius: BorderRadius.circular(46),
-                    ),
-                    child: Center(
+              ...List.generate(
+                totalPages,
+                (index) {
+                  final page = index + 1;
+                  final isSelected = page == currentPage;
+                  return GestureDetector(
+                    onTap: () => onPageChanged(page),
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 4.w),
+                      padding: EdgeInsets.all(8.w),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isSelected ? Colors.brown : Colors.grey[200],
+                      ),
                       child: Text(
-                        '${i + 1}',
+                        '$page',
                         style: TextStyle(
-                          color: i == currentPage ? Colors.white : Color(0xFF887A72),
-                          fontSize: 19.sp,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 18.sp,
+                          color: isSelected ? Colors.white : Colors.black,
                         ),
                       ),
                     ),
-                  ),
-                ),
-              ],
-              8.horizontalSpace,
+                  );
+                },
+              ),
               IconButton(
-                icon: Icon(Icons.arrow_forward, color: Color(0xFF887A72)),
-                onPressed: () => notifier.nextPage(totalPages!),
+                icon: Icon(Icons.arrow_forward_ios_rounded, size: 16.sp),
+                onPressed: currentPage < totalPages ? () => onPageChanged(currentPage + 1) : null,
               ),
             ],
           ),
@@ -683,3 +1227,22 @@ class PageIndex extends ConsumerWidget {
     );
   }
 }
+
+// class PageIndex extends StatelessWidget {
+//   final int currentPage;
+//   final int totalPages;
+
+//   const PageIndex({
+//     super.key,
+//     required this.currentPage,
+//     required this.totalPages,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Text(
+//       'Page $currentPage of $totalPages',
+//       style: TextStyle(fontSize: 16.sp),
+//     );
+//   }
+// }

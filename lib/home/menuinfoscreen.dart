@@ -1,22 +1,74 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
+import 'package:java_go/config/async_widget.dart';
 import 'package:java_go/config/common/widgets.dart';
 import 'package:java_go/home/cafeinfotabscreen.dart';
 import 'package:java_go/home/menucategoryitemscreen.dart';
-import 'package:java_go/sign_up/menu.dart';
+import 'package:java_go/home/notifiers/add_option_items.dart';
+import 'package:java_go/home/menu_info_state.dart';
+
+final consolidatedOptionsProvider =
+    Provider.family<AsyncValue<List<dynamic>>, List<int>>((ref, ids) {
+  final allOptions = <dynamic>[];
+  final isLoading = <bool>[];
+  final errors = <Object?>[];
+  final uniqueNameMap = <String, dynamic>{};
+
+  for (final id in ids) {
+    final optionItemAsyncValue = ref.watch(optionalItemProvider(id));
+
+    optionItemAsyncValue.whenData((menuItem) {
+      final items = menuItem.data?.optionSizeCafeItems ?? [];
+      
+      for (final item in items) {
+        final name = item.addonSizeName ?? "-";
+        if (!uniqueNameMap.containsKey(name)) {
+          uniqueNameMap[name] = item;
+          allOptions.add(item);
+        }
+      }
+    });
+
+    if (optionItemAsyncValue.isLoading) {
+      isLoading.add(true);
+    }
+
+    if (optionItemAsyncValue.hasError) {
+      errors.add(optionItemAsyncValue.error);
+    }
+  }
+
+  if (isLoading.isNotEmpty) {
+    return const AsyncValue.loading();
+  }
+
+  if (errors.isNotEmpty) {
+    return AsyncValue.error(errors.first!, StackTrace.current);
+  }
+
+  return AsyncValue.data(allOptions);
+});
 
 class MenuInfoScreen extends ConsumerStatefulWidget {
-  const MenuInfoScreen({super.key});
+  final int? id;
+  final int defaultTabIndex;
+  const MenuInfoScreen({
+    super.key,
+    this.id,
+    this.defaultTabIndex = 0,
+  });
 
   @override
   ConsumerState<MenuInfoScreen> createState() => _MenuInfoScreenState();
 }
 
-class _MenuInfoScreenState extends ConsumerState<MenuInfoScreen> {
+class _MenuInfoScreenState extends ConsumerState<MenuInfoScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
   void _showDialog(BuildContext context) {
     showGeneralDialog(
       context: context,
@@ -39,7 +91,7 @@ class _MenuInfoScreenState extends ConsumerState<MenuInfoScreen> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: MenuCategoryItemScreen(),
+                  child: const MenuCategoryItemScreen(),
                 ),
               ),
             ),
@@ -59,136 +111,331 @@ class _MenuInfoScreenState extends ConsumerState<MenuInfoScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    final infotabdata = ref.read(menuInfoTabStateProvider);
+    _tabController = TabController(
+      initialIndex: infotabdata.tabIndex,
+      length: 2,
+      vsync: this,
+    );
+
+    ref.listenManual(menuInfoTabStateProvider, (previous, next) {
+      if (_tabController.index != next.tabIndex) {
+        _tabController.animateTo(next.tabIndex);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          62.verticalSpace,
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 57),
-            child: Row(
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      'RESULTS :',
-                      style: TextStyle(
-                        color: const Color(0xFF848484),
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
+    final selectedIds = ref.watch(selectedIdsProvider);
+    final selectedItemId = ref.watch(selectedItemIdProvider);
+    final infotabdata = ref.watch(menuInfoTabStateProvider);
+
+    final itemId = selectedItemId ??
+        (selectedIds.isNotEmpty ? int.tryParse(selectedIds.first) : infotabdata.id) ??
+        0;
+
+    return DefaultTabController(
+      initialIndex: infotabdata.tabIndex,
+      length: 2,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            62.verticalSpace,
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 57),
+              child: Row(
+                children: [
+                  Container(
+                    width: 370,
+                    height: 50,
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD9D9D9),
+                      borderRadius: BorderRadius.circular(11),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: TabBar(
+                        controller: _tabController,
+                        indicatorColor: Colors.transparent,
+                        dividerColor: Colors.transparent,
+                        overlayColor: MaterialStateProperty.all(Colors.transparent),
+                        indicator: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        labelColor: Colors.black,
+                        unselectedLabelColor: Colors.black,
+                        labelStyle: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15.sp,
+                        ),
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        tabs: const [
+                          Tab(text: 'Menu Items'),
+                          Tab(text: 'Additional Options'),
+                        ],
+                        onTap: (value) {
+                          ref.read(menuInfoTabStateProvider.notifier).updateMenuTab(value);
+                          ref.read(selectedItemIdProvider.notifier).state = null;
+                        },
                       ),
                     ),
-                    12.horizontalSpace,
-                    Container(
-                      height: 54.h,
-                      width: 110.w,
-                      child: Dropdown('10', Color(0xFF4C2F27)),
-                    ),
-                  ],
-                ),
-                Spacer(),
-                Padding(
-                  padding: const EdgeInsets.only(left: 45, right: 11),
-                  child: InkWell(
-                    onTap: () {
-                      //  ref.read(showMenuEditScreenProvider.notifier).state = true;
-                      context.navigateTo(CafeInfoAddTabScreen());
-                    },
-                    child: Container(
-                      width: 100,
-                      height: 40,
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
+                  ),
+                  const Spacer(),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 45, right: 11),
+                    child: InkWell(
+                      onTap: () {
+                        context.navigateTo(const CafeInfoAddTabScreen());
+                      },
+                      child: Container(
+                        width: 100,
+                        height: 40,
+                        decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           color: Colors.transparent,
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 1,
-                          )),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.add,
-                            weight: 700,
-                            color: Colors.black,
+                          border: Border.all(color: Colors.black, width: 1),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.add, color: Colors.black),
+                            8.horizontalSpace,
+                            Text(
+                              'Add',
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      _showDialog(context);
+                    },
+                    child: Container(
+                      width: 193.w,
+                      height: 41.h,
+                      decoration: ShapeDecoration(
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          side: const BorderSide(width: 1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Menu Category Order',
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w600,
                           ),
-                          8.horizontalSpace,
-                          Text(
-                            'Add',
-                            style: TextStyle(
-                                fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.black),
-                          )
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                InkWell(
-                  onTap: () {
-                    _showDialog(context);
-                  },
-                  child: Container(
-                    width: 193.w,
-                    height: 41.h,
-                    decoration: ShapeDecoration(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(width: 1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Menu Category Order',
-                        style: TextStyle(
+                  8.horizontalSpace,
+                  SizedBox(
+                    width: 212.26.w,
+                    height: 42.48.h,
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.all(5),
+                        suffixIcon: const Icon(Icons.search, color: Color(0xFF4C2F27)),
+                        hintText: "Search",
+                        hintStyle: TextStyle(
+                          color: const Color(0xFF7B7B7B),
                           fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        fillColor: const Color(0xFFF5F3F0),
+                        filled: true,
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Color(0xFF4C2F27)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.black),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                     ),
                   ),
-                ),
-                8.horizontalSpace,
-                SizedBox(
-                  width: 212.26.w,
-                  height: 42.48.h,
-                  child: TextField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      suffixIcon: Icon(
-                        Icons.search,
-                        color: Color(0xFF4C2F27),
-                      ),
-                      hintText: "Search",
-                      hintStyle: TextStyle(
-                        color: const Color(0xFF7B7B7B),
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      fillColor: Color(0xFFF5F3F0),
-                      filled: true,
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color(0xFF4C2F27),
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+            5.verticalSpace,
+            SizedBox(
+              height: 600.h,
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  const ReviewItems(),
+                  _buildAdditionalOptionsTab(),
+                ],
+              ),
+            ),
+            100.verticalSpace,
+          ],
+        ),
+      ),
+    );
+  }
 
-          ReviewItems(),
-          // PageIndex(),
-          100.verticalSpace
-        ],
+  Widget _buildAdditionalOptionsTab() {
+    final selectedIds = ref.watch(selectedIdsProvider);
+    final selectedItemId = ref.watch(selectedItemIdProvider);
+    final idsToShow = <int>[];
+
+    if (selectedItemId != null) {
+      idsToShow.add(selectedItemId);
+    } else {
+      for (final ids in selectedIds) {
+        final parsedId = int.tryParse(ids);
+        if (parsedId != null) {
+          idsToShow.add(parsedId);
+        }
+      }
+    }
+
+    if (idsToShow.isEmpty) {
+      return const Center(child: Text('No items selected'));
+    }
+    final consolidatedOptionsAsync = ref.watch(consolidatedOptionsProvider(idsToShow));
+
+    Future<void> _onRefresh() async {
+      for (final id in idsToShow) {
+        ref.invalidate(optionalItemProvider(id));
+      }
+    }
+
+    return Scaffold(
+      body: RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: AsyncWidget(
+          value: consolidatedOptionsAsync,
+          data: (items) {
+            return Column(
+              children: [
+          
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  width: 1189.w,
+                  height: 59.h,
+                  decoration: const BoxDecoration(color: Color(0xFF9B6842)),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                          width: 74.w,
+                          child: Text('', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                      15.horizontalSpace,
+                      SizedBox(
+                          width: 121.w,
+                          child: Text('Item Name',
+                              style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                      15.horizontalSpace,
+                      SizedBox(
+                          width: 102.w,
+                          child: Text('', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                      35.horizontalSpace,
+                      SizedBox(
+                          width: 110.w,
+                          child: Text('', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                      15.horizontalSpace,
+                      SizedBox(
+                          width: 198.w,
+                          child: Text('', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                      10.horizontalSpace,
+                      SizedBox(
+                          width: 170.w,
+                          child: Text('', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                      15.horizontalSpace,
+                      SizedBox(
+                          width: 120.w,
+                          child: Text('Status',
+                              style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                      15.horizontalSpace,
+                      SizedBox(
+                          width: 120.w,
+                          child: Text('Availability',
+                              style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    itemCount: items.length,
+                    separatorBuilder: (_, __) => 10.verticalSpace,
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      return Container(
+                        margin: EdgeInsets.symmetric(horizontal: 15.w),
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.white,
+                        ),
+                        child: Row(
+                          spacing: 0,
+                          children: [
+                            SizedBox(
+                              height: 40.h,
+                              width: 40.w,
+                            ),
+                            38.horizontalSpace,
+                            Expanded(
+                              child: Text(
+                                item.addonSizeName ?? "-",
+                              ),
+                            ),
+                            25.horizontalSpace,
+                            SizedBox(width: 90.w, child: Text('', overflow: TextOverflow.ellipsis)),
+                            15.horizontalSpace,
+                            SizedBox(width: 80.w, child: Text('', overflow: TextOverflow.ellipsis)),
+                            15.horizontalSpace,
+                            SizedBox(
+                                width: 150.w, child: Text('', overflow: TextOverflow.ellipsis)),
+                            35.horizontalSpace,
+                            SizedBox(
+                              width: 60.w,
+                              child: Text(
+                                '',
+                              ),
+                            ),
+                            15.horizontalSpace,
+                            StatusContainer(
+                              editOption: false,
+                              status: item.status ?? 1,
+                              id: item.addonSizeId ?? 0,
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                211.verticalSpace
+              ],
+            );
+          },
+        ),
       ),
     );
   }

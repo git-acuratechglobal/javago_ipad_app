@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
-import 'package:java_go/config/button.dart';
+import 'package:java_go/config/common/button.dart';
 
 import 'package:java_go/home/completed.dart';
 import 'package:java_go/home/inprogress.dart';
 import 'package:java_go/home/model/get_orders.dart';
 import 'package:java_go/home/notifiers/accept_orders.dart';
 import 'package:java_go/home/notifiers/view_order_provider.dart';
-import 'package:java_go/home/pending.dart';
 
 final unavailableItemsProvider = StateProvider<List<String>>((ref) => []);
 
@@ -30,12 +29,13 @@ class _ItemAvailabilityScreenState extends ConsumerState<ItemAvailabilityScreen>
       if (next?.message != null && next!.message!.isNotEmpty) {
         if (next.message == "Order marked processed successfully!" ||
             next.message == "Order marked completed successfully!") {
+          context.pop();
           ref.invalidate(todayOrdersProvider);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(next.message.toString()),
               backgroundColor: Colors.green,
-              duration: Duration(seconds: 3),
+              duration: Duration(seconds: 2),
             ),
           );
         } else if (next.message == "Refund processed and notifications sent.") {
@@ -86,6 +86,8 @@ class _ItemAvailabilityScreenState extends ConsumerState<ItemAvailabilityScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
+
       backgroundColor: const Color(0xFFF5F3F0),
       body: Column(
         children: [
@@ -101,7 +103,6 @@ class _ItemAvailabilityScreenState extends ConsumerState<ItemAvailabilityScreen>
             labelStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
             unselectedLabelStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
             tabs: const [
-              Tab(child: Text('Pending')),
               Tab(child: Text('In progress')),
               Tab(child: Text('Completed')),
             ],
@@ -116,7 +117,7 @@ class _ItemAvailabilityScreenState extends ConsumerState<ItemAvailabilityScreen>
           Expanded(
             child: TabBarView(
               controller: widget.tabController,
-              children: const [PendingScreen(), InProgressScreen(), CompletedScreen()],
+              children: const [ InProgressScreen(), CompletedScreen()],
             ),
           ),
         ],
@@ -250,9 +251,9 @@ class _OrderUnaviableDialogState extends ConsumerState<OrderUnaviableDialog> {
                       isLoading:
                           orderRefund!.isRefunding && orderRefund.unavailableItems!.isNotEmpty,
                       onClick: () {
-                        ref
-                            .read(acceptOrdersProvider.notifier)
-                            .refundOrder(widget.orderId, widget.isIndividualOrder);
+                        // ref
+                        //     .read(acceptOrdersProvider.notifier)
+                        //     .refundOrder(widget.orderId, widget.isIndividualOrder);
                       },
                       title: "Refund",
                     ),

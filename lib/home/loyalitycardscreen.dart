@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
 import 'package:java_go/config/common/widgets.dart';
-import 'package:java_go/sign_up/loyalitycard.dart';
-import 'package:java_go/sign_up/reviewscreen.dart';
+
+import '../auth/pages/sign_up/loyalitycard.dart';
+import '../auth/pages/sign_up/reviewscreen.dart';
 
 class LoyalityCardScreen2 extends StatefulWidget {
   const LoyalityCardScreen2({super.key});

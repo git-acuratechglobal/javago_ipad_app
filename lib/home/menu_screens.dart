@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
 import 'package:java_go/home/notifier/pagination_notifier.dart';
 
-import 'package:java_go/sign_up/menu.dart';
+import '../auth/pages/sign_up/menu.dart';
 
 class CafeHoursScreen extends StatefulWidget {
   const CafeHoursScreen({super.key});

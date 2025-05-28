@@ -4,6 +4,7 @@ import 'package:java_go/Theme/extension.dart';
 
 class Themes {
   static final lightTheme = ThemeData(
+
     useMaterial3: true,
     brightness: Brightness.light,
     fontFamily: "Poppins",
@@ -14,6 +15,7 @@ class Themes {
       bodyColor: Colors.black,
       displayColor: Colors.black,
     ),
+
       textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
             foregroundColor: Color(0xFFC0987C), // ok , cancel buttons
@@ -92,6 +94,7 @@ class Themes {
         fontWeight: FontWeight.w700,
       ),
     )),
+
   );
   static TextTheme get _textTheme {
     return Typography.englishLike2021.copyWith(

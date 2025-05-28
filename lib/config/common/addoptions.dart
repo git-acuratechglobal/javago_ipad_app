@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
 
@@ -9,218 +10,228 @@ import 'package:java_go/home/model/get_menu_items.dart';
 
 import 'package:java_go/home/notifier/add_options.dart';
 import 'package:java_go/home/notifiers/menu_items.dart';
+import 'package:collection/collection.dart';
 
-class Addoptions extends ConsumerWidget {
-  const Addoptions({super.key});
+import '../../home/param/item_param/item_param.dart';
+
+// class Addoptions extends ConsumerWidget {
+//   const Addoptions({super.key});
+//
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//
+//     return SingleChildScrollView(
+//       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+//       child:
+//     );
+//   }
+// }
+
+class CurrencyInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+
+    // Only allow digits and a single decimal point
+    final regExp = RegExp(r'^\d*\.?\d{0,2}$');
+    if (!regExp.hasMatch(newValue.text)) {
+      return oldValue;
+    }
+
+    return newValue;
+  }
+}
+
+class PriceTextField extends StatefulWidget {
+  final String labelText;
+  final String hintText;
+  final Function(double) onPriceChanged;
+  final double? initialValue;
+  final InputBorder? border;
+  final InputBorder? enableBorder;
+  final InputBorder? focusBorder;
+  final int? maxLines;
+  final double? radius;
+  final bool? readOnly;
+  const PriceTextField({
+    Key? key,
+    required this.labelText,
+    required this.hintText,
+    required this.onPriceChanged,
+    this.initialValue,
+    this.border,
+    this.enableBorder,
+    this.focusBorder,
+    this.maxLines,
+    this.radius,
+    this.readOnly,
+  }) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final menuItemState = ref.watch(menuItemsProvider);
+  State<PriceTextField> createState() => _PriceTextFieldState();
+}
 
-    final fields = ref.watch(optionFieldProvider);
-    final notifier = ref.read(optionFieldProvider.notifier);
+class _PriceTextFieldState extends State<PriceTextField> {
+  late TextEditingController _controller;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      child: AsyncWidget(
-          value: menuItemState,
-          data: (data) {
-            final items = menuItemState.value?.data;
-            final groupedOptions = items?.groupedOptions ?? {};
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 955.w,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Column(
-                    // crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: IconButton(
-                          onPressed: () {
-                            context.pop();
-                          },
-                          icon: const Icon(Icons.cancel_outlined),
-                          color: const Color(0xFF6A442E),
-                        ),
-                      ),
-                      Center(
-                        child: Text(
-                          'Add Options',
-                          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF461C10),
-                              ),
-                        ),
-                      ),
-                      43.verticalSpace,
-                      ...fields.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final key = entry.value;
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: Row(
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      5.horizontalSpace,
-                                      Text("Item Options",
-                                          style: TextStyle(
-                                            fontSize: 16.sp,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black,
-                                          )),
-                                    ],
-                                  ),
-                                  5.verticalSpace,
-                                  SizedBox(
-                                    width: 250.w,
-                                    child: GroupedDropdown(groupedOptions: groupedOptions),
-                                  ),
-                                ],
-                              ),
-                              56.horizontalSpace,
-                              CustomTextField(
-                                  labelText: 'Price',
-                                  hintText: '£ 8',
-                                  controller: TextEditingController()),
-                              55.horizontalSpace,
-                              CustomTextField(
-                                  labelText: 'Additional note',
-                                  controller: TextEditingController()),
-                              16.horizontalSpace,
-                              // Remove Button
-                              if (fields.length > 1 && index != 0)
-                                IconButton(
-                                  icon: Image.asset(
-                                    'assets/images/view.png',
-                                    height: 38.h,
-                                    width: 38.w,
-                                  ),
-                                  onPressed: () => notifier.removeField(key),
-                                ),
-                            ],
-                          ),
-                        );
-                      }),
-                      30.verticalSpace,
-                      InkWell(
-                        onTap: notifier.addField,
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Container(
-                            width: 200,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4),
-                              color: const Color(0xFF2C851F),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.add, color: Colors.white),
-                                8.horizontalSpace,
-                                Text(
-                                  'Add Another',
-                                  style: TextStyle(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                216.verticalSpace,
-                SizedBox(
-                  width: 167.29,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Your submit logic here
-                    },
-                    child: const Text('ADD'),
-                  ),
-                ),
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(
+        text:
+            widget.initialValue != null ? widget.initialValue.toString() : '');
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const Color brown = Color(0xFF5B3B2F); // Brown border color
+    final double effectiveRadius = widget.radius ?? 6.0;
+
+    return SizedBox(
+      width: 240.w,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.labelText,
+            style: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Theme(
+            data: Theme.of(context).copyWith(
+              textSelectionTheme: const TextSelectionThemeData(
+                cursorColor: Colors.black,
+              ),
+            ),
+            child: TextFormField(
+              enabled: widget.readOnly ?? false,
+              controller: _controller,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              maxLines: widget.maxLines ?? 1,
+              inputFormatters: [
+                CurrencyInputFormatter(),
               ],
-            );
-          }),
+              decoration: InputDecoration(
+                hintText: widget.hintText,
+                fillColor: const Color(0xFFF5F3F0),
+                counterText: '',
+                prefixText: '£ ',
+                border: widget.border ??
+                    OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(effectiveRadius),
+                      borderSide: const BorderSide(color: brown),
+                    ),
+                enabledBorder: widget.enableBorder ??
+                    OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(effectiveRadius),
+                      borderSide: const BorderSide(color: brown),
+                    ),
+                focusedBorder: widget.focusBorder ??
+                    OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(effectiveRadius),
+                      borderSide: const BorderSide(color: brown, width: 1),
+                    ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+              ),
+              onChanged: (String? value) {
+                try {
+                  final price = value != null && value.isNotEmpty
+                      ? double.parse(value)
+                      : 0.0;
+                  widget.onPriceChanged(price);
+                } catch (e) {
+                  // Handle parsing error - value remains unchanged in the state
+                  debugPrint('Invalid price input: $value');
+                }
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
 class GroupedDropdown extends StatelessWidget {
   final Map<String, List<OptionSize>> groupedOptions;
+  final String? selectedValue;
+  final ValueChanged<OptionSize?> onChanged;
+  final Set<int> disabledAddonSizeIds;
 
-  const GroupedDropdown({super.key, required this.groupedOptions});
+  const GroupedDropdown({
+    super.key,
+    required this.groupedOptions,
+    required this.onChanged,
+    required this.selectedValue,
+    this.disabledAddonSizeIds = const {},
+  });
 
   @override
   Widget build(BuildContext context) {
     final List<DropdownMenuItem<String>> items = [];
 
     groupedOptions.forEach((optionName, sizes) {
-      // Add a disabled header
       items.add(
         DropdownMenuItem<String>(
           enabled: false,
           child: Text(
             optionName,
-            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.grey),
           ),
         ),
       );
-      items.addAll(sizes.map((size) {
-        return DropdownMenuItem<String>(
-          value: size.addonSizeName,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 12),
-            child: Text(size.addonSizeName ?? ''),
-          ),
-        );
-      }));
+      items.addAll(
+        sizes
+            .where((size) => !disabledAddonSizeIds.contains(size.id))
+            .map((size) {
+          return DropdownMenuItem<String>(
+            value: size.id.toString(),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 12),
+              child: Text(size.addonSizeName ?? ''),
+            ),
+          );
+        }),
+      );
     });
+
     return DropdownButtonFormField<String>(
       isExpanded: true,
+      value: selectedValue,
       items: items,
-      onChanged: (value) {},
+      onChanged: (value) {
+        final selected = groupedOptions.values
+            .expand((e) => e)
+            .firstWhereOrNull((e) => e.id.toString() == value);
+        onChanged(selected);
+      },
       decoration: InputDecoration(
-        fillColor: Color(0xFFF5F3F0),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        fillColor: const Color(0xFFF5F3F0),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         hintText: 'Select Option',
         hintStyle: const TextStyle(color: Color(0xFF6A442E)),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(
-            color: Color(0xFF6A442E),
-            width: 1,
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(
-            color: Color(0xFF6A442E),
-            width: 1,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(
-            color: Color(0xFF6A442E),
-            width: 1,
-          ),
+          borderSide: const BorderSide(color: Color(0xFF6A442E)),
         ),
       ),
     );

@@ -3,21 +3,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
 import 'package:java_go/config/async_widget.dart';
-import 'package:java_go/config/button.dart';
+import 'package:java_go/config/common/button.dart';
 import 'package:java_go/home/model/get_orders.dart';
 import 'package:java_go/home/model/order_detail.dart';
 import 'package:java_go/home/notifiers/accept_orders.dart';
 import 'package:java_go/home/notifiers/order_details_provider.dart';
+import 'package:java_go/home/notifiers/view_order_provider.dart';
 
-final selectedOrdersProvider = StateProvider<List<String>>((ref) => []);
-final unavailableItemsProvider = StateProvider<List<String>>((ref) => []);
+import 'bottombar.dart';
+import 'cafeinfotabscreen.dart';
+
+final itemStatusProvider =
+    StateProvider.autoDispose<Map<String, String>>((ref) => {});
 
 class Orders extends ConsumerStatefulWidget {
   final bool isEdited;
   final String? orderId;
   final int isIndividualOrder;
   const Orders(
-      {super.key, required this.isEdited, required this.orderId, required this.isIndividualOrder});
+      {super.key,
+      required this.isEdited,
+      required this.orderId,
+      required this.isIndividualOrder});
 
   @override
   ConsumerState<Orders> createState() => _OrdersState();
@@ -56,199 +63,251 @@ class _OrdersState extends ConsumerState<Orders> {
         const begin = Offset(0.0, 1.0);
         const end = Offset.zero;
         const curve = Curves.easeIn;
-        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
         var offsetAnimation = animation.drive(tween);
 
         return SlideTransition(position: offsetAnimation, child: child);
       },
-    ).then((_) {
-      ref.read(selectedOrdersProvider.notifier).state = [];
-    });
-    ;
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final selectedOrders =
-        ref.watch(GetOrderDetailsProvider(widget.orderId ?? '', widget.isIndividualOrder));
-    return Scaffold(
-      backgroundColor: Color(0xFFF5F3F0),
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Color(0xFFF5F3F0),
-        leading: widget.isEdited
-            ? InkWell(
-                onTap: () {
-                  context.pop();
-                },
-                child: Image.asset(
-                  'assets/images/ic_left_arrow.png',
-                  color: Color(0xFF461C10),
-                  height: 55.h,
-                  width: 55.w,
-                ))
-            : null,
-        title: widget.isEdited
-            ? Text(
-                'Complete Order',
-                style: TextStyle(
-                  color: const Color(0xFF461C10),
-                  fontSize: 32,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                ),
-              )
-            : null,
-        centerTitle: true,
-        actions: [
-          Padding(
-              padding: EdgeInsets.only(right: 57),
-              child: widget.isEdited
-                  ? Container(
-                      width: 158.w,
-                      height: 48.h,
-                      decoration: BoxDecoration(
-                        color: Color(0xFF5CF97F),
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0x3F000000),
-                            blurRadius: 2,
-                            offset: Offset(0, 2),
-                            spreadRadius: 0,
-                          )
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Order 1',
-                          style: TextStyle(
-                            color: const Color(0xFF414141),
-                            fontSize: 20,
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
+    final selectedOrders = ref.watch(GetOrderDetailsProvider(
+        widget.orderId ?? '', widget.isIndividualOrder));
+    return AsyncWidget(
+        value: ref.watch(todayOrdersProvider),
+        data: (data) {
+          final inProgressOrders = data.getCombinedUniqueOrders
+              .where((order) => order.orderCompleted != 1)
+              .toList()
+              .length;
+          return Scaffold(
+            resizeToAvoidBottomInset: false,
+            backgroundColor: Color(0xFFF5F3F0),
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              backgroundColor: Color(0xFFF5F3F0),
+              leading: widget.isEdited
+                  ? InkWell(
+                      onTap: () {
+                        context.pop();
+                      },
+                      child: Image.asset(
+                        'assets/images/ic_left_arrow.png',
+                        color: Color(0xFF461C10),
+                        height: 55.h,
+                        width: 55.w,
+                      ))
+                  : null,
+              title: widget.isEdited
+                  ? Text(
+                      'Complete Order',
+                      style: TextStyle(
+                        color: const Color(0xFF461C10),
+                        fontSize: 32,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w600,
                       ),
                     )
-                  : null)
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: AsyncWidget(
-            value: selectedOrders,
-            data: (data) {
-              final order = data.orders;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  43.verticalSpace,
-                  Padding(
-                    padding: EdgeInsets.only(left: 82, right: 82),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          order!.first.customerName ?? '',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        Text(
-                          'Order Number: ${order.first.requestUniqueId ?? order.first.orderNumber} ',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  8.verticalSpace,
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 80),
-                    child: Divider(
-                      thickness: 1,
-                      color: Color(0xFFA0A0A0),
-                    ),
-                  ),
-                  26.verticalSpace,
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: order.first.requestUniqueId != null
-                        ? SizedBox(
-                            width: 444.w,
-                            child: ListView.separated(
-                              physics: const NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: order.length,
-                              padding: EdgeInsets.all(0),
-                              itemBuilder: (context, index) {
-                                final currentOrder = order[index];
-
-                                return detailedContainer(
-                                  order: currentOrder,
-                                  name: currentOrder.customerName ?? '',
-                                  price: ("TotalAmount: ${currentOrder.itemAmount.toString()}"),
-                                  label: currentOrder.itemName,
-                                  label2: currentOrder.addonSizes?.isNotEmpty == true
-                                      ? currentOrder.addonSizes!.first.addonName
-                                      : '',
-                                );
-                              },
-                              separatorBuilder: (BuildContext context, int index) {
-                                return 50.verticalSpace;
-                              },
+                  : null,
+              centerTitle: true,
+              actions: [
+                Padding(
+                    padding: EdgeInsets.only(right: 57),
+                    child: widget.isEdited
+                        ? Container(
+                            width: 158.w,
+                            height: 48.h,
+                            decoration: BoxDecoration(
+                              color: Color(0xFF5CF97F),
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0x3F000000),
+                                  blurRadius: 2,
+                                  offset: Offset(0, 2),
+                                  spreadRadius: 0,
+                                )
+                              ],
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Orders: ${inProgressOrders}',
+                                style: TextStyle(
+                                  color: const Color(0xFF414141),
+                                  fontSize: 20,
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
                             ),
                           )
-                        : detailedContainer(
-                            name: order.first.customerName ?? '',
-                            price: ("TotalAmount: ${order.first.itemAmount.toString()}"),
-                            orderList: order,
-                          ),
-                  ),
-                  23.verticalSpace,
-                ],
-              );
-            }),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: 40.h),
-        child: InkWell(
-          onTap: () {
-            _showDialog(context);
-          },
-          child: Container(
-            width: 288.w,
-            height: 45.h,
-            decoration: BoxDecoration(
-              color: Color(0xFF5CF97F),
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0x3F000000),
-                  blurRadius: 2,
-                  offset: Offset(0, 2),
-                  spreadRadius: 0,
-                ),
+                        : null)
               ],
             ),
-            child: Center(
-              child: Text(
-                'Order complete',
-                style: TextStyle(
-                  color: const Color(0xFF414141),
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+            body: SingleChildScrollView(
+              child: AsyncWidget(
+                  value: selectedOrders,
+                  data: (data) {
+                    final order = data.orders;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        43.verticalSpace,
+                        Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(left: 82, right: 82),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    order!.first.customerName ?? '',
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Order Number: ${order.first.requestUniqueId ?? order.first.orderNumber} ',
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        8.verticalSpace,
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 80),
+                          child: Divider(
+                            thickness: 1,
+                            color: Color(0xFFA0A0A0),
+                          ),
+                        ),
+                        26.verticalSpace,
+                        SizedBox(
+                          height: 600,
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: order.first.requestUniqueId != null
+                                    ? ListView.separated(
+                                        scrollDirection: Axis.horizontal,
+                                        // physics: const NeverScrollableScrollPhysics(),
+                                        shrinkWrap: true,
+                                        itemCount: data
+                                            .groupOrdersByCustomer()
+                                            .keys
+                                            .length,
+                                        padding: EdgeInsets.all(0),
+                                        itemBuilder: (context, index) {
+                                          final customerName = data
+                                              .groupOrdersByCustomer()
+                                              .keys
+                                              .elementAt(index);
+                                          final customerOrders =
+                                              data.groupOrdersByCustomer()[
+                                                  customerName]!;
+                                          return detailedContainer(
+                                            name: customerOrders
+                                                    .first.customerName ??
+                                                '',
+                                            price:
+                                                ("Total amount: £ ${order.first.itemAmount.toString()}"),
+                                            orderList: customerOrders,
+                                          );
+                                        },
+                                        separatorBuilder:
+                                            (BuildContext context, int index) {
+                                          return 50.verticalSpace;
+                                        },
+                                      )
+                                    : detailedContainer(
+                                        name: order.first.customerName ?? '',
+                                        price:
+                                            ("Total amount: £ ${order.first.itemAmount.toString()}"),
+                                        orderList: order,
+                                      ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        23.verticalSpace,
+                      ],
+                    );
+                  }),
             ),
-          ),
-        ),
-      ),
-    );
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerDocked,
+            floatingActionButton: AsyncWidget(
+                value: ref.watch(GetOrderDetailsProvider(
+                    widget.orderId ?? '', widget.isIndividualOrder)),
+                data: (data) {
+                  final statusMap = ref.watch(itemStatusProvider);
+                  final isButtonEnabled = data.orders?.every((order) =>
+                      statusMap.containsKey(order.itemName) &&
+                      (statusMap[order.itemName] == "complete" ||
+                          statusMap[order.itemName] == "unavailable"));
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: 40.h),
+                    child: InkWell(
+                      onTap: isButtonEnabled != null && isButtonEnabled
+                          ? () async {
+                              final hasUnavailable =
+                                  statusMap.values.contains("unavailable");
+                              if (hasUnavailable) {
+                                _showDialog(context);
+                              } else {
+                                ref
+                                    .read(acceptOrdersProvider.notifier)
+                                    .makeOrderComplete(
+                                        widget.orderId.toString(),
+                                        widget.isIndividualOrder,
+                                        1);
+                              }
+                            }
+                          : null,
+                      child: Container(
+                        width: 288.w,
+                        height: 45.h,
+                        decoration: BoxDecoration(
+                          color: isButtonEnabled != null && isButtonEnabled
+                              ? const Color(0xFF5CF97F)
+                              : const Color(0xFFE0E0E0),
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0x3F000000),
+                              blurRadius: 2,
+                              offset: Offset(0, 2),
+                              spreadRadius: 0,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Process Order',
+                            style: TextStyle(
+                              color: const Color(0xFF414141),
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+          );
+        });
   }
 }
 
@@ -259,97 +318,108 @@ Widget detailedContainer(
     String? label2,
     Order? order,
     List<Order>? orderList}) {
-  return Padding(
-    padding: EdgeInsets.symmetric(
-      horizontal: 68,
-    ),
-    child: Container(
-      padding: EdgeInsets.symmetric(vertical: 24),
-      width: 300.w,
-      decoration: ShapeDecoration(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-        shadows: [
-          BoxShadow(
-            color: Color(0x3F000000),
-            blurRadius: 2,
-            offset: Offset(0, 2),
-            spreadRadius: 0,
-          )
-        ],
-      ),
-      child: Column(
-        children: [
-          4.verticalSpace,
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  name ?? '',
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w400,
-                  ),
+  return Column(
+    children: [
+      Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 68,
+        ),
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 24),
+          width: 350.w,
+          decoration: ShapeDecoration(
+            color: Colors.white,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+            shadows: [
+              BoxShadow(
+                color: Color(0x3F000000),
+                blurRadius: 2,
+                offset: Offset(0, 2),
+                spreadRadius: 0,
+              )
+            ],
+          ),
+          child: Column(
+            children: [
+              4.verticalSpace,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: 100.w,
+                      child: Text(
+                        overflow: TextOverflow.ellipsis,
+                        name ?? '',
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                    if (orderList != null && orderList.isNotEmpty)
+                      Text(
+                        'Total amount : £ ${orderList.fold(0, (sum, item) => sum + (item.itemAmount ?? 0))}',
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      )
+                    else
+                      Text(
+                        price ?? '',
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                  ],
                 ),
-                if (orderList != null && orderList.isNotEmpty)
-                  Text(
-                    'Total amount : ${orderList.fold(0, (sum, item) => sum + (item.itemAmount ?? 0))}',
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  )
-                else
-                  Text(
-                    price ?? '',
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(right: 4, left: 24),
-            child: Divider(
-              thickness: 1,
-              color: const Color(0xFFA0A0A0),
-            ),
-          ),
-          if (orderList != null && orderList.isNotEmpty)
-            ListView.separated(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              itemBuilder: (BuildContext context, int index) {
-                final order = orderList[index];
-                print(order.addonSizes);
-                return OrderDetailCard(
+              ),
+              Padding(
+                padding: EdgeInsets.only(right: 4, left: 24),
+                child: Divider(
+                  thickness: 1,
+                  color: const Color(0xFFA0A0A0),
+                ),
+              ),
+              if (orderList != null && orderList.isNotEmpty)
+                ListView.separated(
+                  physics: NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  itemBuilder: (BuildContext context, int index) {
+                    final order = orderList[index];
+                    print(order.addonSizes);
+                    return OrderDetailCard(
+                      order: order,
+                      unavailableItems: [],
+                      label: order.itemName ?? '',
+                      label2: (order.addonSizes != null &&
+                              order.addonSizes!.isNotEmpty)
+                          ? order.addonSizes!.first.addonName ?? ""
+                          : '',
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return Divider();
+                  },
+                  itemCount: orderList.length,
+                )
+              else
+                OrderDetailCard(
                   order: order,
                   unavailableItems: [],
-                  label: order.itemName ?? '',
-                  label2: (order.addonSizes != null && order.addonSizes!.isNotEmpty)
-                      ? order.addonSizes!.first.addonName ?? ""
-                      : '',
-                );
-              },
-              separatorBuilder: (BuildContext context, int index) {
-                return Divider();
-              },
-              itemCount: orderList.length,
-            )
-          else
-            OrderDetailCard(
-              order: order,
-              unavailableItems: [],
-              label: label ?? '',
-              label2: label2 ?? '',
-            ),
-        ],
+                  label: label ?? '',
+                  label2: label2 ?? '',
+                ),
+            ],
+          ),
+        ),
       ),
-    ),
+    ],
   );
 }
 
@@ -389,50 +459,44 @@ class OrderDetailCard extends ConsumerStatefulWidget {
   final String label;
   final String label2;
   final String? label3;
-  List<UnaviableItems> unavailableItems;
+  final List<UnaviableItems> unavailableItems;
   final Order? order;
-  OrderDetailCard(
-      {super.key,
-      required this.label,
-      required this.label2,
-      this.label3,
-      required this.unavailableItems,
-      this.order});
+
+  OrderDetailCard({
+    super.key,
+    required this.label,
+    required this.label2,
+    this.label3,
+    required this.unavailableItems,
+    this.order,
+  });
+
   @override
   ConsumerState<OrderDetailCard> createState() => _OrderDetailCardState();
 }
 
 class _OrderDetailCardState extends ConsumerState<OrderDetailCard> {
-  void _toggleSelection(bool? value) {
-    final selected = ref.read(selectedOrdersProvider.notifier);
-    final label = widget.label;
+  late String itemName;
 
-    if (value == true && !selected.state.contains(label)) {
-      selected.state = [...selected.state, label];
-      final selectedItems = widget.unavailableItems.map((e) {
-        e.isSelected = true;
-        e.status = 0;
-        return e;
-      }).toList();
+  @override
+  void initState() {
+    super.initState();
+    itemName = widget.order?.itemName ?? widget.label;
+  }
 
-      // ref.read(acceptOrdersProvider.notifier).makeAvailable(selectedItems);
-    } else if (value == false && selected.state.contains(label)) {
-      selected.state = selected.state.where((item) => item != label).toList();
-
-      final selectedItems = widget.unavailableItems.map((e) {
-        e.isSelected = true;
-        e.status = 1;
-        return e;
-      }).toList();
-
-      // ref.read(acceptOrdersProvider.notifier).makeAvailable(selectedItems);
-    }
+  void _updateSelection(String status) {
+    final statusMap = ref.read(itemStatusProvider);
+    ref.read(itemStatusProvider.notifier).state = {
+      ...statusMap,
+      itemName: status,
+    };
   }
 
   @override
   Widget build(BuildContext context) {
-    final selectedOrders = ref.watch(selectedOrdersProvider);
-    final isChecked = selectedOrders.contains(widget.label);
+    final statusMap = ref.watch(itemStatusProvider);
+    final selectedStatus = statusMap[itemName];
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -442,46 +506,102 @@ class _OrderDetailCardState extends ConsumerState<OrderDetailCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               21.verticalSpace,
-              Text(widget.label, style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400)),
+              SizedBox(
+                width: 200.w,
+                child: Row(
+                  children: [
+                    Text("${widget.order?.itemQuantity} x "),
+                    Text(
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        "${widget.label} ",
+                        style: TextStyle(
+                            fontSize: 16.sp, fontWeight: FontWeight.w400)),
+                    Text("(${widget.order?.itemSize ?? ""})"),
+                    Text("   £ ${widget.order?.itemAmount}")
+                  ],
+                ),
+              ),
               18.verticalSpace,
-              Text(widget.label2, style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400)),
-
-              // if (widget.label3 != null) ...[
-              //   8.verticalSpace,
-              //   Text(widget.label3!,
-              //       style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400)
-              // ),
-              // ],
+              if (widget.label2.isNotEmpty)
+                Text("Item Addons:",
+                    style: TextStyle(
+                        fontSize: 11.sp, fontWeight: FontWeight.w400)),
+              Text(
+                widget.label2,
+                style: TextStyle(fontSize: 10),
+              ),
             ],
           ),
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Checkbox(
-                activeColor: const Color(0xFF7B7B7B),
-                checkColor: const Color(0xFFF5F3F0),
-                value: isChecked,
-                onChanged: (value) {
-                  setState(() {
-                    _toggleSelection(!isChecked);
-                  });
-                  if (value == true) {
-                    ref
-                        .read(acceptOrdersProvider.notifier)
-                        .makeUnAvailable(widget.order?.itemId ?? 0, 0);
-                  }
-                }),
-            Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: Text(
-                isChecked ? 'Unavailable' : '',
-                style: TextStyle(
-                  color: const Color(0xFFE23131),
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600,
+            Row(
+              children: [
+                Text(
+                  "Process",
+                  style: TextStyle(fontSize: 10),
                 ),
-              ),
+                Theme(
+                  data: Theme.of(context).copyWith(
+                    unselectedWidgetColor:
+                        Colors.grey, // Color when not selected
+                    radioTheme: RadioThemeData(
+                      fillColor:
+                          WidgetStateProperty.resolveWith<Color>((states) {
+                        if (states.contains(WidgetState.selected)) {
+                          return Colors.red; // Selected color
+                        }
+                        return Colors.grey; // Unselected color
+                      }),
+                      overlayColor:
+                          WidgetStateProperty.all(Colors.red.withOpacity(0.1)),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                  child: Radio<String>(
+                    value: "complete",
+                    groupValue: selectedStatus,
+                    onChanged: (val) {
+                      if (val != null) _updateSelection(val);
+                    },
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Text(
+                  "Unavailable",
+                  style: TextStyle(fontSize: 10),
+                ),
+                Theme(
+                  data: Theme.of(context).copyWith(
+                    unselectedWidgetColor:
+                        Colors.grey, // Color when not selected
+                    radioTheme: RadioThemeData(
+                      fillColor:
+                          WidgetStateProperty.resolveWith<Color>((states) {
+                        if (states.contains(WidgetState.selected)) {
+                          return Colors.red; // Selected color
+                        }
+                        return Colors.grey; // Unselected color
+                      }),
+                      overlayColor:
+                          WidgetStateProperty.all(Colors.red.withOpacity(0.1)),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                  child: Radio<String>(
+                    value: "unavailable",
+                    groupValue: selectedStatus,
+                    onChanged: (val) {
+                      if (val != null) _updateSelection(val);
+                    },
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -529,13 +649,36 @@ class RefundPopWidget extends ConsumerWidget {
               width: 200.w,
               height: 50.h,
               child: PrimaryButton(
-                isLoading: orderRefund!.isRefunding,
+                isLoading: orderRefund!.isRefunding || orderRefund.isLoading!,
                 onClick: () {
-                  ref.read(acceptOrdersProvider.notifier).refundOrder(
-                        orderId,
-                        isIndividualOrder,
-                      );
-                  // ref.read(acceptOrdersProvider.notifier).refundOrder(orderId, isIndividualOrder);
+                  final allOrders = ref
+                          .read(GetOrderDetailsProvider(
+                              orderId, isIndividualOrder))
+                          .value
+                          ?.orders ??
+                      [];
+
+                  final statusMap = ref.read(itemStatusProvider);
+
+                  final unavailableItemIds = allOrders
+                      .where(
+                          (order) => statusMap[order.itemName] == 'unavailable')
+                      .map((order) => order.itemId)
+                      .whereType<int>()
+                      .toList();
+
+                  if (unavailableItemIds.isNotEmpty) {
+                    ref.read(acceptOrdersProvider.notifier).refundOrder(
+                          orderId,
+                          isIndividualOrder,
+                          unavailableItemIds,
+                        );
+                  }
+                  ref
+                      .read(acceptOrdersProvider.notifier)
+                      .makeOrderComplete(orderId, isIndividualOrder, 1);
+                  ref.read(bottomBarTabProvider.notifier).update((_) => 0);
+                  ref.read(cafeInfoTabScreenProvider.notifier).update((_) => 1);
                 },
                 title: "Refund",
               ),
@@ -546,7 +689,8 @@ class RefundPopWidget extends ConsumerWidget {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(9)),
                 ),
                 onPressed: () => Navigator.pop(context),
                 child: const Text(

@@ -6,7 +6,7 @@ part of 'accept_orders.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$acceptOrdersHash() => r'45e73c36b6a0f2f1d6f4fcb016f77c7b2746ad73';
+String _$acceptOrdersHash() => r'f71e9e38125c4cb775244855889222198fdeccb8';
 
 /// See also [AcceptOrders].
 @ProviderFor(AcceptOrders)

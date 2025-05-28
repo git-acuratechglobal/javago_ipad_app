@@ -1,87 +1,104 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:java_go/config/async_widget.dart';
+import 'package:java_go/home/notifiers/cafe_stats_provider.dart';
 
-class StatsScreen extends StatefulWidget {
+class StatsScreen extends ConsumerStatefulWidget {
   StatsScreen({super.key});
 
   @override
-  State<StatsScreen> createState() => _StatsScreenState();
+  ConsumerState<StatsScreen> createState() => _StatsScreenState();
 }
 
-class _StatsScreenState extends State<StatsScreen> {
+class _StatsScreenState extends ConsumerState<StatsScreen> {
   final List<StatsItem> statsData = [
     StatsItem(
-      title: 'TOTAL NUMBER OF',
-      subtitle: 'All Orders',
-      count: '400+',
+      title: 'Orders today',
+      count: '10',
       imagePath: 'assets/images/ic_stats_image.png',
       frameIconPath: 'assets/images/ic_frame.png',
     ),
     StatsItem(
-      title: 'TOTAL SALES IN USD',
-      subtitle: 'Sales',
-      count: '\$25K',
+      title: 'Orders this week',
+      count: '400+',
       imagePath: 'assets/images/ic_stats_image.png',
       frameIconPath: 'assets/images/ic_frame2.png',
     ),
     StatsItem(
-      title: 'TOTAL SALES IN USD',
-      subtitle: 'Sales',
-      count: '\$25K',
+      title: 'Total from orders today',
+      count: '\£ 25',
       imagePath: 'assets/images/ic_stats_image.png',
       frameIconPath: 'assets/images/ic_frame3.png',
     ),
     StatsItem(
-      title: 'TOTAL SALES IN USD',
-      subtitle: 'Sales',
-      count: '\$25K',
+      title: 'Total from orders this week',
+      count: '\£ 300',
       imagePath: 'assets/images/ic_stats_image.png',
-      frameIconPath: 'assets/images/ic_frame4.png',
+      frameIconPath: 'assets/images/ic_frame3.png',
     ),
-    // Add more items as needed
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F3F0),
-      body: GridView.builder(
-        shrinkWrap: true,
-        padding: EdgeInsets.symmetric(horizontal: 180, vertical: 0),
-        itemCount: statsData.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 160,
-          childAspectRatio: 1.37,
-        ),
-        itemBuilder: (context, index) {
-          return StatsCard(item: statsData[index]);
-        },
-      ),
-    );
+        backgroundColor: const Color(0xFFF5F3F0),
+        body: AsyncWidget(
+            value: ref.watch(getCafeStatsProvider),
+            data: (data) {
+              final List<StatsItem> updatedStats = [
+                statsData[0].copyWith(count: '${data.todayOrder}'),
+                statsData[1].copyWith(count: '${data.allOrder}'),
+                statsData[2].copyWith(count: '£ ${data.todayRevenue}'),
+                statsData[3].copyWith(count: '£ ${data.allRevenue}'),
+              ];
+              return GridView.builder(
+                shrinkWrap: true,
+                padding: EdgeInsets.symmetric(horizontal: 180, vertical: 0),
+                itemCount: updatedStats.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 160,
+                  childAspectRatio: 1.37,
+                ),
+                itemBuilder: (context, index) {
+                  return StatsCard(item: updatedStats[index]);
+                },
+              );
+            }));
   }
 }
 
 class StatsItem {
   final String title;
-  final String subtitle;
+
   final String count;
   final String imagePath;
   final String frameIconPath;
 
   StatsItem({
     required this.title,
-    required this.subtitle,
     required this.count,
     required this.imagePath,
     required this.frameIconPath,
   });
+  StatsItem copyWith({String? count}) {
+    return StatsItem(
+      title: title,
+      count: count ?? this.count,
+      imagePath: imagePath,
+      frameIconPath: frameIconPath,
+    );
+  }
 }
 
 class StatsCard extends StatefulWidget {
   final StatsItem item;
-  const StatsCard({super.key, required this.item});
+  const StatsCard({
+    super.key,
+    required this.item,
+  });
 
   @override
   State<StatsCard> createState() => _StatsCardState();
@@ -123,18 +140,6 @@ class _StatsCardState extends State<StatsCard> {
                           fontSize: 18.sp,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      TextSpan(
-                        text: '\n',
-                      ),
-                      TextSpan(
-                        text: widget.item.subtitle,
-                        style: TextStyle(
-                          color: const Color(0xFF461C10),
-                          fontSize: 25.sp,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
