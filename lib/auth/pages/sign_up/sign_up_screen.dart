@@ -18,8 +18,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   bool _isPasswordVisible = false;
   bool _isConfrmPassVisible=false;
    final _fkey=GlobalKey<FormState>();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final  _passwordController = TextEditingController();
+  final  _confirmPasswordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     final validate = ref.read(validatorsProvider);
@@ -45,7 +45,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 hint: 'Enter your email',
                 iconPath: 'assets/images/email.png',
                 validator: (val) =>validate.validateEmail(val!),
-                onChanged: (val)=>auth.updateEmail(email: val),
+                onSaved: (val)=>auth.updateEmail(email: val),
               ),
               37.verticalSpace,
               AppTextField(
@@ -58,7 +58,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   toggle: () {
                     setState(() => _isPasswordVisible = !_isPasswordVisible);
                   },
-                  onChanged: (val) =>auth.updatePassword(password: val)),
+                  onSaved: (val) =>auth.updatePassword(password: val)),
               37.verticalSpace,
               AppTextField(
                   validator: (value) => validate.validateConfirmPassword(

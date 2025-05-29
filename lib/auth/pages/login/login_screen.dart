@@ -5,6 +5,7 @@ import 'package:java_go/Theme/navigation.dart';
 import 'package:java_go/config/common/button.dart';
 import 'package:java_go/config/validator.dart';
 import 'package:java_go/home/bottombar.dart';
+import 'package:java_go/service/local_storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../notifier/auth_notifier.dart';
 import '../../state/auth_state/auth_state.dart';
@@ -33,13 +34,53 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           case AsyncData<AuthState?> data when data.value != null:
             final authState = data.value;
             final controller = ref.read(cafePageControllerProvider);
+            final saveUserLogin = ref.read(localStorageServiceProvider);
+            final shouldReturnToReview = ref.read(returnToReviewProvider);
             if (authState?.authEvent == AuthEvent.login) {
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.setBool('isLoggedIn', true);
-              if (context.mounted) {
-                context.navigateAndRemoveUntil(CustomBottomNavBar());
-                return;
+              final profile = authState?.cafeModel;
+              final controller = ref.read(cafePageControllerProvider);
+              if (profile?.signupCompleted == 0) {
+                context.navigateTo(CafeSteps());
+                Future.delayed(Duration(milliseconds: 300), () {
+                  if (controller.hasClients) {
+                    controller.jumpToPage(0);
+                  }
+                });
+              } else if (profile?.profileCompleted == 0) {
+                context.navigateTo(CafeSteps());
+                Future.delayed(Duration(milliseconds: 300), () {
+                  if (controller.hasClients) {
+                    controller.jumpToPage(1);
+                  }
+                });
+              } else if (profile?.menuCompleted == 0) {
+                context.navigateTo(CafeSteps());
+                Future.delayed(Duration(milliseconds: 300), () {
+                  if (controller.hasClients) {
+                    controller.jumpToPage(3);
+                  }
+                });
+              } else if (profile?.loyaltyCompleted == 0) {
+                context.navigateTo(CafeSteps());
+                Future.delayed(Duration(milliseconds: 300), () {
+                  if (controller.hasClients) {
+                    controller.jumpToPage(4);
+                  }
+                });
+              } else if (profile?.isPublished == 0) {
+                context.navigateTo(CafeSteps());
+                Future.delayed(Duration(milliseconds: 300), () {
+                  if (controller.hasClients) {
+                    controller.jumpToPage(6);
+                  }
+                });
+              } else {
+                if (context.mounted) {
+                  saveUserLogin.setUserLoginSaved(true);
+                  context.navigateAndRemoveUntil(CustomBottomNavBar());
+                }
               }
+
               return;
             }
             if (authState?.authEvent == AuthEvent.signUp) {
@@ -52,6 +93,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               return;
             }
             if (authState?.authEvent == AuthEvent.addCafeInfo) {
+              // if (shouldReturnToReview) {
+              //   ref.read(returnToReviewProvider.notifier).state = false;
+              //   controller.animateToPage(
+              //     5,
+              //     duration: const Duration(milliseconds: 300),
+              //     curve: Curves.easeInOut,
+              //   );
+              // } else {
+                if (controller.hasClients) {
+                  controller.nextPage(
+                    duration: Duration(milliseconds: 250),
+                    curve: Curves.bounceIn,
+                  );
+                }
+
+                return;
+              // }
+            }
+            if (authState?.authEvent == AuthEvent.updateClickAndCollect) {
               if (controller.hasClients) {
                 controller.nextPage(
                   duration: Duration(milliseconds: 250),
@@ -60,6 +120,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               }
 
               return;
+            }
+            if (authState?.authEvent == AuthEvent.publishCafe) {
+              saveUserLogin.setUserLoginSaved(true);
+              context.navigateAndRemoveUntil(CustomBottomNavBar());
             }
 
           case AsyncError error:

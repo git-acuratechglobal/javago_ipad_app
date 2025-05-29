@@ -20,7 +20,10 @@ _CafeInfoParams _$CafeInfoParamsFromJson(Map<String, dynamic> json) =>
       coffeeRoast: json['coffee_roast'] as String,
       coffeeOriginCountry: json['coffee_origin_country'] as String,
       speciallityCoffee: (json['speciallity_coffee'] as num).toInt(),
-      image: json['image'] as String,
+      image: json['image'] as String?,
+      cafeTimes: (json['cafeTimes'] as List<dynamic>?)
+          ?.map((e) => CafeDayTime.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$CafeInfoParamsToJson(_CafeInfoParams instance) =>
@@ -38,6 +41,7 @@ Map<String, dynamic> _$CafeInfoParamsToJson(_CafeInfoParams instance) =>
       'coffee_origin_country': instance.coffeeOriginCountry,
       'speciallity_coffee': instance.speciallityCoffee,
       'image': instance.image,
+      'cafeTimes': instance.cafeTimes,
     };
 
 // **************************************************************************
@@ -45,7 +49,7 @@ Map<String, dynamic> _$CafeInfoParamsToJson(_CafeInfoParams instance) =>
 // **************************************************************************
 
 String _$cafeInfoParamsNotifierHash() =>
-    r'a1b66da68a1e91d7c9aee3ccc3b9fc092123e418';
+    r'84330c4a08fa76ea3d21f241addc17c24b1b53a3';
 
 /// See also [CafeInfoParamsNotifier].
 @ProviderFor(CafeInfoParamsNotifier)

@@ -51,9 +51,13 @@ class ImagePickerForm extends FormField<XFile> {
                         ),
                       )
                     else if (image != null && image.trim().isNotEmpty)
-                      ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: NetworkImageWidget(imageUrl: image))
+                      SizedBox(
+                        width: 418.w,
+                        height: 304.h,
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: NetworkImageWidget(imageUrl: image)),
+                      )
                     else
                       Column(
                         children: [

@@ -17,30 +17,32 @@ void main() async {
     DeviceOrientation.landscapeRight,
   ]);
   final prefs = await SharedPreferences.getInstance();
-  runApp( ProviderScope(
+  runApp(
+    ProviderScope(
       overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
+        sharedPreferencesProvider.overrideWithValue(prefs),
       ],
-            child: MyApp(),
-    ),);
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends ConsumerWidget {
-
-  const MyApp({super.key, });
+  const MyApp({
+    super.key,
+  });
 
   @override
-  Widget build(BuildContext context,WidgetRef ref) {
-     final isLoggedIn=ref.watch(localStorageServiceProvider).getToken();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isLoggedIn =
+        ref.watch(localStorageServiceProvider).getUserLoginSaved();
     return ScreenUtilInit(
         designSize: Size(1194, 834),
         builder: (context, child) {
           return MaterialApp(
             title: 'JAVA GO',
             theme: Themes.lightTheme,
-            home:
-            // isLoggedIn.isNotEmpty ?  CustomBottomNavBar() :
-            const LoginScreen(),
+            home: isLoggedIn ? CustomBottomNavBar() : const LoginScreen(),
             debugShowCheckedModeBanner: false,
           );
         });

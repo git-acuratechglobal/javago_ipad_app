@@ -3,8 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:java_go/Theme/navigation.dart';
 import 'package:java_go/auth/model/cafe_time_and_category.dart';
+import 'package:java_go/auth/pages/steps/stepper_widget.dart';
 import 'package:java_go/config/async_widget.dart';
+import 'package:java_go/config/common/button.dart';
 import 'package:java_go/config/common/extensions.dart';
 import 'package:java_go/home/menu_info_state.dart';
 import 'package:java_go/home/notifier/pagination_notifier.dart';
@@ -12,12 +15,14 @@ import 'package:java_go/home/notifiers/menu_item_showing.dart';
 
 import '../../auth/model/cafe_model.dart';
 import '../../auth/model/cafetime_model.dart';
+import '../../auth/pages/sign_up/menu.dart';
 
 final selectedItemIdProvider = StateProvider<int?>((ref) => null);
 final selectedIdsProvider = StateProvider<List<String>>((ref) => []);
 
 class CafeHoursScreen extends StatefulWidget {
-  const CafeHoursScreen({super.key, required this.onTimeChanged, this.initialCafeTime});
+  const CafeHoursScreen(
+      {super.key, required this.onTimeChanged, this.initialCafeTime});
   final void Function(List<CafeDayTime>) onTimeChanged;
   final List<CafeTiming>? initialCafeTime;
   @override
@@ -44,7 +49,9 @@ class _CafeHoursScreenState extends State<CafeHoursScreen> {
   void initState() {
     super.initState();
     _initializeTimes();
-    _notifyParent(); // Send initial values to parent
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _notifyParent();
+    });
   }
 
   void _initializeTimes() {
@@ -78,7 +85,8 @@ class _CafeHoursScreenState extends State<CafeHoursScreen> {
     widget.onTimeChanged(result);
   }
 
-  Future<void> _pickTime(BuildContext context, String day, bool isOpening) async {
+  Future<void> _pickTime(
+      BuildContext context, String day, bool isOpening) async {
     setState(() {
       _selectedTimeField = "$day-${isOpening ? 'open' : 'close'}";
     });
@@ -141,7 +149,9 @@ class _CafeHoursScreenState extends State<CafeHoursScreen> {
                   child: Text(
                     day,
                     style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500, color: Color(0xFF1B0701)),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF1B0701)),
                   ),
                 ),
                 const SizedBox(width: 37),
@@ -152,7 +162,8 @@ class _CafeHoursScreenState extends State<CafeHoursScreen> {
                     GestureDetector(
                       onTap: () => _pickTime(context, day, true),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 10),
                         decoration: BoxDecoration(
                           color: _selectedTimeField == "$day-open"
                               ? Colors.white
@@ -178,7 +189,8 @@ class _CafeHoursScreenState extends State<CafeHoursScreen> {
                     GestureDetector(
                       onTap: () => _pickTime(context, day, false),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 10),
                         decoration: BoxDecoration(
                           color: _selectedTimeField == "$day-close"
                               ? Colors.white
@@ -209,11 +221,15 @@ class _CafeHoursScreenState extends State<CafeHoursScreen> {
   }
 }
 
-
 class CafeHoursScreen1 extends StatefulWidget {
-  const CafeHoursScreen1({super.key, required this.onTimeChanged, this.initialCafeTime});
+  const CafeHoursScreen1(
+      {super.key,
+      required this.onTimeChanged,
+      this.initialCafeTime,
+      required this.restrictCafeTime});
   final void Function(List<CafeDayTime>) onTimeChanged;
   final List<CafeClickCollectTiming>? initialCafeTime;
+  final List<CafeTiming> restrictCafeTime;
   @override
   State<CafeHoursScreen1> createState() => _CafeHoursScreen1State();
 }
@@ -238,7 +254,9 @@ class _CafeHoursScreen1State extends State<CafeHoursScreen1> {
   void initState() {
     super.initState();
     _initializeTimes();
-    _notifyParent(); // Send initial values to parent
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _notifyParent();
+    });
   }
 
   void _initializeTimes() {
@@ -279,25 +297,54 @@ class _CafeHoursScreen1State extends State<CafeHoursScreen1> {
     widget.onTimeChanged(result);
   }
 
-  Future<void> _pickTime(BuildContext context, String day, bool isOpening) async {
+  Future<void> _pickTime(
+      BuildContext context, String day, bool isOpening) async {
     setState(() {
       _selectedTimeField = "$day-${isOpening ? 'open' : 'close'}";
     });
 
+    final TimeOfDay initial =
+        isOpening ? openingTimes[day]! : closingTimes[day]!;
+
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: isOpening ? openingTimes[day]! : closingTimes[day]!,
+      initialTime: initial,
     );
 
     if (picked != null) {
-      setState(() {
-        if (isOpening) {
-          openingTimes[day] = picked;
-        } else {
-          closingTimes[day] = picked;
-        }
-        _notifyParent(); // Callback after update
-      });
+      final int dayIndex = days.indexOf(day);
+      final restrict = widget.restrictCafeTime.firstWhere(
+        (e) => e.day == dayIndex,
+        orElse: () => CafeTiming(
+          day: dayIndex,
+          openTime: "00:00",
+          closeTime: "23:59",
+        ),
+      );
+
+      final TimeOfDay min = _parseTime(restrict.openTime ?? "");
+      final TimeOfDay max = _parseTime(restrict.closeTime ?? "");
+
+      final bool isValid = _isTimeWithinRange(picked, min, max);
+
+      if (!isValid) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Please select a time between ${min.format(context)} and ${max.format(context)}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else {
+        setState(() {
+          if (isOpening) {
+            openingTimes[day] = picked;
+          } else {
+            closingTimes[day] = picked;
+          }
+          _notifyParent();
+        });
+      }
     }
 
     Future.delayed(const Duration(milliseconds: 300), () {
@@ -305,6 +352,13 @@ class _CafeHoursScreen1State extends State<CafeHoursScreen1> {
         _selectedTimeField = null;
       });
     });
+  }
+
+  bool _isTimeWithinRange(TimeOfDay selected, TimeOfDay min, TimeOfDay max) {
+    final selectedMinutes = selected.hour * 60 + selected.minute;
+    final minMinutes = min.hour * 60 + min.minute;
+    final maxMinutes = max.hour * 60 + max.minute;
+    return selectedMinutes >= minMinutes && selectedMinutes <= maxMinutes;
   }
 
   TimeOfDay _parseTime(String time) {
@@ -342,7 +396,9 @@ class _CafeHoursScreen1State extends State<CafeHoursScreen1> {
                   child: Text(
                     day,
                     style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500, color: Color(0xFF1B0701)),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF1B0701)),
                   ),
                 ),
                 const SizedBox(width: 37),
@@ -353,7 +409,8 @@ class _CafeHoursScreen1State extends State<CafeHoursScreen1> {
                     GestureDetector(
                       onTap: () => _pickTime(context, day, true),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 10),
                         decoration: BoxDecoration(
                           color: _selectedTimeField == "$day-open"
                               ? Colors.white
@@ -379,7 +436,8 @@ class _CafeHoursScreen1State extends State<CafeHoursScreen1> {
                     GestureDetector(
                       onTap: () => _pickTime(context, day, false),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 10),
                         decoration: BoxDecoration(
                           color: _selectedTimeField == "$day-close"
                               ? Colors.white
@@ -410,9 +468,6 @@ class _CafeHoursScreen1State extends State<CafeHoursScreen1> {
   }
 }
 
-
-
-
 final dropdownProvider = StateProvider<String?>((ref) => null);
 
 class Dropdown extends ConsumerStatefulWidget {
@@ -438,7 +493,8 @@ class _DropdownState extends ConsumerState<Dropdown> {
       value: selectedProperty,
       hint: Text(
         widget.title,
-        style: TextStyle(color: widget.color, fontSize: 16.sp, fontWeight: FontWeight.w500),
+        style: TextStyle(
+            color: widget.color, fontSize: 16.sp, fontWeight: FontWeight.w500),
       ),
       icon: Icon(Icons.keyboard_arrow_down_outlined),
       decoration: InputDecoration(
@@ -482,22 +538,23 @@ class _DropdownState extends ConsumerState<Dropdown> {
 }
 
 class Reviewtiming extends StatefulWidget {
-  const Reviewtiming({super.key});
+  const Reviewtiming({super.key, required this.timings});
+  final List<CafeTiming> timings;
 
   @override
   State<Reviewtiming> createState() => _ReviewtimingState();
 }
 
 class _ReviewtimingState extends State<Reviewtiming> {
-  final List<String> days = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday'
-  ];
+  final Map<int, String> dayNames = {
+    0: 'Sunday',
+    1: 'Monday',
+    2: 'Tuesday',
+    3: 'Wednesday',
+    4: 'Thursday',
+    5: 'Friday',
+    6: 'Saturday',
+  };
 
   final Map<String, TimeOfDay> openingTimes = {};
   final Map<String, TimeOfDay> closingTimes = {};
@@ -505,10 +562,23 @@ class _ReviewtimingState extends State<Reviewtiming> {
   @override
   void initState() {
     super.initState();
-    for (var day in days) {
-      openingTimes[day] = const TimeOfDay(hour: 9, minute: 0);
-      closingTimes[day] = const TimeOfDay(hour: 22, minute: 0);
+
+    for (int i = 0; i <= 6; i++) {
+      final dayName = dayNames[i]!;
+
+      final timing = widget.timings.firstWhere(
+        (e) => e.day == i,
+        orElse: () => CafeTiming(openTime: "09:00", closeTime: "22:00"),
+      );
+
+      openingTimes[dayName] = _parseTime(timing.openTime ?? "09:00");
+      closingTimes[dayName] = _parseTime(timing.closeTime ?? "22:00");
     }
+  }
+
+  TimeOfDay _parseTime(String time) {
+    final parts = time.split(':');
+    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
   }
 
   @override
@@ -519,9 +589,10 @@ class _ReviewtimingState extends State<Reviewtiming> {
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         padding: EdgeInsets.zero,
-        itemCount: days.length,
+        itemCount: dayNames.length,
         itemBuilder: (context, index) {
-          final day = days[index];
+          final day = dayNames.values.toList()[index];
+
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -539,29 +610,23 @@ class _ReviewtimingState extends State<Reviewtiming> {
                 ),
                 const Text(":"),
                 const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () {},
-                  child: Text(
-                    openingTimes[day]!.format(context),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF1B0701),
-                    ),
+                Text(
+                  openingTimes[day]!.format(context),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF1B0701),
                   ),
                 ),
                 const SizedBox(width: 10),
                 const Text("-"),
                 const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () {},
-                  child: Text(
-                    closingTimes[day]!.format(context),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF1B0701),
-                    ),
+                Text(
+                  closingTimes[day]!.format(context),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF1B0701),
                   ),
                 ),
               ],
@@ -574,15 +639,12 @@ class _ReviewtimingState extends State<Reviewtiming> {
 }
 
 class ReviewItems extends ConsumerWidget {
-  const ReviewItems({
-    super.key,
-  });
-
+  const ReviewItems({super.key, this.isFromSignUp = false});
+  final bool isFromSignUp;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentPage = ref.watch(paginationProvider);
     final menuItemAsync = ref.watch(showMenuItemssProvider);
-
+    final controller=ref.watch(cafePageControllerProvider);
     return AsyncWidget(
       value: menuItemAsync,
       data: (menuItem) {
@@ -598,157 +660,257 @@ class ReviewItems extends ConsumerWidget {
             ref.read(selectedIdsProvider.notifier).state = allIds;
           });
         }
-        return SingleChildScrollView(
-          child: Column(
-            children: [
-              // Header Row
-              11.verticalSpace,
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                width: 1189.w,
-                height: 59.h,
-                decoration: const BoxDecoration(color: Color(0xFF9B6842)),
-                child: Row(
+        return  Stack(
+          children: [
+            SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    SizedBox(
-                        width: 74.w,
-                        child:
-                            Text('Images', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
-                    15.horizontalSpace,
-                    SizedBox(
-                        width: 121.w,
-                        child: Text('Item Name',
-                            style: TextStyle(color: Colors.white, fontSize: 16.sp))),
-                    15.horizontalSpace,
-                    SizedBox(
-                        width: 102.w,
-                        child: Text('Category',
-                            style: TextStyle(color: Colors.white, fontSize: 16.sp))),
-                    35.horizontalSpace,
-                    SizedBox(
-                        width: 110.w,
-                        child:
-                            Text('Price', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
-                    15.horizontalSpace,
-                    SizedBox(
-                        width: 198.w,
-                        child: Text('Description',
-                            style: TextStyle(color: Colors.white, fontSize: 16.sp))),
-                    10.horizontalSpace,
-                    SizedBox(
-                        width: 100.w,
-                        child:
-                            Text('Type', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
-                    15.horizontalSpace,
-                    SizedBox(
-                        width: 120.w,
-                        child:
-                            Text('Status', style: TextStyle(color: Colors.white, fontSize: 16.sp))),
-                    15.horizontalSpace,
-                    SizedBox(
-                        width: 120.w,
-                        child: Text('Availability',
-                            style: TextStyle(color: Colors.white, fontSize: 16.sp))),
+                    // Header Row
+                    11.verticalSpace,
+                    if (isFromSignUp)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                          padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                          child: InkWell(
+                            onTap: () {
+                              context.navigateTo(
+                                const MenuScreen(
+                                  isEditmode: true,
+                                  fromAdd: true,
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 140,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Color(0xFF9B6842),
+                                border:
+                                Border.all(color: Color(0xFF9B6842), width: 1),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 5),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.add, color: Colors.white),
+                                    8.horizontalSpace,
+                                    Text(
+                                      'Add Items',
+                                      style: TextStyle(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      width: 1189.w,
+                      height: 59.h,
+                      decoration: const BoxDecoration(color: Color(0xFF9B6842)),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                              width: 74.w,
+                              child: Text('Images',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16.sp))),
+                          15.horizontalSpace,
+                          SizedBox(
+                              width: 121.w,
+                              child: Text('Item Name',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16.sp))),
+                          15.horizontalSpace,
+                          SizedBox(
+                              width: 102.w,
+                              child: Text('Category',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16.sp))),
+                          35.horizontalSpace,
+                          SizedBox(
+                              width: 110.w,
+                              child: Text('Price',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16.sp))),
+                          15.horizontalSpace,
+                          SizedBox(
+                              width: 198.w,
+                              child: Text('Description',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16.sp))),
+                          10.horizontalSpace,
+                          SizedBox(
+                              width: 100.w,
+                              child: Text('Type',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16.sp))),
+                          15.horizontalSpace,
+                          SizedBox(
+                              width: 120.w,
+                              child: Text('Status',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16.sp))),
+                          15.horizontalSpace,
+                          SizedBox(
+                              width: 120.w,
+                              child: Text('Availability',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16.sp))),
+                        ],
+                      ),
+                    ),
+
+                    // Items List
+                    if (items.isEmpty) ...[
+                      100.verticalSpace,
+                      Text("No items Added yet!")
+                    ] else
+                      ListView.separated(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: items.length,
+                        separatorBuilder: (_, __) => 10.verticalSpace,
+                        itemBuilder: (context, index) {
+                          final item = items[index];
+
+                          // final selectedIds = ref.watch(selectedIdsProvider);
+                          // final selectedIdsNotifier = ref.read(selectedIdsProvider.notifier);
+                          // final idsToPass = selectedIds.isEmpty ? items.map((e) => e.id).toList() : [item.id];
+                          return Container(
+                            margin: EdgeInsets.symmetric(horizontal: 10.w),
+                            padding: EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.white,
+                            ),
+                            child: Row(
+                              spacing: 10,
+                              children: [
+                                SizedBox(
+                                  height: 40.h,
+                                  width: 40.w,
+                                  child: item.itemImage != null
+                                      ? Image.network(item.itemImage!,
+                                      fit: BoxFit.cover)
+                                      : const Icon(Icons.image_not_supported),
+                                ),
+                                25.horizontalSpace,
+                                SizedBox(
+                                    width: 100.w,
+                                    child: Text(item.itemName ?? "-",
+                                        overflow: TextOverflow.ellipsis)),
+                                25.horizontalSpace,
+                                SizedBox(
+                                    width: 90.w,
+                                    child: Text(item.itemCategory ?? "-",
+                                        overflow: TextOverflow.ellipsis)),
+                                15.horizontalSpace,
+                                SizedBox(
+                                    width: 90.w,
+                                    child: Text(item.itemPrice ?? "-",
+                                        overflow: TextOverflow.ellipsis)),
+                                15.horizontalSpace,
+                                SizedBox(
+                                    width: 160.w,
+                                    child: Text(item.itemDescription ?? "-",
+                                        overflow: TextOverflow.ellipsis)),
+                                35.horizontalSpace,
+                                SizedBox(
+                                  width: 50.w,
+                                  child: Text(
+                                        () {
+                                      switch (item.itemType) {
+                                        case 1:
+                                          return "Veg";
+                                        case 2:
+                                          return "Non-Veg";
+                                        case 3:
+                                          return "Vegan";
+                                        default:
+                                          return "Unknown";
+                                      }
+                                    }(),
+                                  ),
+                                ),
+                                15.horizontalSpace,
+                                StatusContainer(
+                                  status: item.status,
+                                  id: item.id,
+                                  editOption: isFromSignUp,
+                                )
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    // Spacer(),
+                    11.verticalSpace,
+                    CustomPaginationBar(
+                      currentPage: ref.watch(paginationProvider),
+                      totalItems: data!.total ?? 0,
+                      totalPages: (data.perPage == 0 || data.total == null)
+                          ? 1
+                          : ((data.total! / data.perPage).ceil()),
+                      itemsPerPage: data.perPage,
+                      onPageChanged: (page) {
+                        ref.read(paginationProvider.notifier).state = page;
+                      },
+                      onItemsPerPageChanged: (value) {
+                        data.perPage = value;
+                        ref.read(paginationProvider.notifier).state =
+                        1; // Reset to page 1
+                      },
+                    ),
+
+                    164.verticalSpace
                   ],
                 ),
               ),
 
-              // Items List
-              ListView.separated(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: items.length,
-                separatorBuilder: (_, __) => 10.verticalSpace,
-                itemBuilder: (context, index) {
-                  final item = items[index];
-
-                  // final selectedIds = ref.watch(selectedIdsProvider);
-                  // final selectedIdsNotifier = ref.read(selectedIdsProvider.notifier);
-                  // final idsToPass = selectedIds.isEmpty ? items.map((e) => e.id).toList() : [item.id];
-                  return Container(
-                    margin: EdgeInsets.symmetric(horizontal: 15.w),
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.white,
-                    ),
-                    child: Row(
-                      spacing: 10,
-                      children: [
-                        SizedBox(
-                          height: 40.h,
-                          width: 40.w,
-                          child: item.itemImage != null
-                              ? Image.network(item.itemImage!, fit: BoxFit.cover)
-                              : const Icon(Icons.image_not_supported),
-                        ),
-                        25.horizontalSpace,
-                        SizedBox(
-                            width: 100.w,
-                            child: Text(item.itemName ?? "-", overflow: TextOverflow.ellipsis)),
-                        25.horizontalSpace,
-                        SizedBox(
-                            width: 90.w,
-                            child: Text(item.itemCategory ?? "-", overflow: TextOverflow.ellipsis)),
-                        15.horizontalSpace,
-                        SizedBox(
-                            width: 90.w,
-                            child: Text(item.itemPrice ?? "-", overflow: TextOverflow.ellipsis)),
-                        15.horizontalSpace,
-                        SizedBox(
-                            width: 160.w,
-                            child:
-                                Text(item.itemDescription ?? "-", overflow: TextOverflow.ellipsis)),
-                        35.horizontalSpace,
-                        SizedBox(
-                          width: 50.w,
-                          child: Text(
-                            () {
-                              switch (item.itemType) {
-                                case 1:
-                                  return "Veg";
-                                case 2:
-                                  return "Non-Veg";
-                                case 3:
-                                  return "Vegan";
-                                default:
-                                  return "Unknown";
-                              }
-                            }(),
-                          ),
-                        ),
-                        15.horizontalSpace,
-                        StatusContainer(
-                          status: item.status,
-                          id: item.id,
-                        )
-                      ],
-                    ),
-                  );
-                },
+            if(isFromSignUp)
+            Positioned(
+              right: 50,
+              bottom: 10,
+              child: SizedBox(
+                width: 55,
+                height: 53,
+                child: PrimaryButton(
+                  backgroundColor: const Color(0xFFC0987C),
+                  onClick: () {
+                    if(items.isNotEmpty){
+                      if (controller.hasClients) {
+                        controller.nextPage(
+                          duration: Duration(milliseconds: 250),
+                          curve: Curves.bounceIn,
+                        );
+                        return;
+                      }
+                    }
+                    context.showSnackBar("Please add 1 or more cafe menu item");
+                  },
+                  isIconButton: true,
+                ),
               ),
-              // Spacer(),
-              11.verticalSpace,
-              CustomPaginationBar(
-                currentPage: ref.watch(paginationProvider),
-                totalItems: data!.total ?? 0,
-                totalPages: (data.total! / data.perPage).ceil(),
-                itemsPerPage: data.perPage,
-                onPageChanged: (page) {
-                  ref.read(paginationProvider.notifier).state = page;
-                },
-                onItemsPerPageChanged: (value) {
-                  data.perPage = value;
-                  ref.read(paginationProvider.notifier).state = 1; // Reset to page 1
-                },
-              ),
-
-              164.verticalSpace
-            ],
-          ),
+            )
+          ],
         );
+
+
+
       },
     );
   }
@@ -949,7 +1111,10 @@ class ReviewItembarname extends StatefulWidget {
   final Color color;
   final double fontSize;
   const ReviewItembarname(
-      {super.key, required this.label, required this.color, required this.fontSize});
+      {super.key,
+      required this.label,
+      required this.color,
+      required this.fontSize});
   @override
   State<ReviewItembarname> createState() => _ReviewItembarnameState();
 }
@@ -974,7 +1139,11 @@ class StatusContainer extends ConsumerStatefulWidget {
   final int status;
   final int id;
   final bool? editOption;
-  StatusContainer({super.key, required this.id, required this.status, this.editOption = true});
+  StatusContainer(
+      {super.key,
+      required this.id,
+      required this.status,
+      this.editOption = true});
 
   @override
   ConsumerState<StatusContainer> createState() => _StatusContainerState();
@@ -1001,7 +1170,8 @@ class _StatusContainerState extends ConsumerState<StatusContainer> {
               width: 105.74,
               height: 41.30,
               decoration: ShapeDecoration(
-                color: _isSwitched ? const Color(0xFF1C8113) : Color(0xFFFD5555),
+                color:
+                    _isSwitched ? const Color(0xFF1C8113) : Color(0xFFFD5555),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -1045,13 +1215,16 @@ class _StatusContainerState extends ConsumerState<StatusContainer> {
                   children: [
                     InkWell(
                       onTap: () {
-                        ref.read(selectedItemIdProvider.notifier).state = widget.id;
-                        ref.read(menuInfoTabStateProvider.notifier).updateMenuTab(1, widget.id);
-      
+                        ref.read(selectedItemIdProvider.notifier).state =
+                            widget.id;
+                        ref
+                            .read(menuInfoTabStateProvider.notifier)
+                            .updateMenuTab(1, widget.id);
+
                         //   MenuInfoScreen(
                         //     id: widget.id,
                         //     defaultTabIndex: 1, // opens 'Additional Options'
-      
+
                         //   //  Items(id: widget.id ),
                         // );
                       },
@@ -1060,7 +1233,9 @@ class _StatusContainerState extends ConsumerState<StatusContainer> {
                         width: 79.74,
                         height: 42.30,
                         decoration: ShapeDecoration(
-                          color: _isSwitched ? const Color(0xFF1C8113) : Color(0xFFFD5555),
+                          color: _isSwitched
+                              ? const Color(0xFF1C8113)
+                              : Color(0xFFFD5555),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -1070,7 +1245,9 @@ class _StatusContainerState extends ConsumerState<StatusContainer> {
                           child: Text(
                             '   View Addons',
                             style: TextStyle(
-                                fontSize: 13.sp, color: Colors.white, fontWeight: FontWeight.bold),
+                                fontSize: 13.sp,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -1128,8 +1305,9 @@ class CustomPaginationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final start = ((currentPage - 1) * itemsPerPage) + 1;
-    final end = (start + itemsPerPage - 1).clamp(1, totalItems);
+    final start = totalItems == 0 ? 0 : ((currentPage - 1) * itemsPerPage) + 1;
+    final end =
+        totalItems == 0 ? 0 : (start + itemsPerPage - 1).clamp(1, totalItems);
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
@@ -1189,7 +1367,9 @@ class CustomPaginationBar extends StatelessWidget {
             children: [
               IconButton(
                 icon: Icon(Icons.arrow_back_ios_new_rounded, size: 16.sp),
-                onPressed: currentPage > 1 ? () => onPageChanged(currentPage - 1) : null,
+                onPressed: currentPage > 1
+                    ? () => onPageChanged(currentPage - 1)
+                    : null,
               ),
               ...List.generate(
                 totalPages,
@@ -1218,7 +1398,9 @@ class CustomPaginationBar extends StatelessWidget {
               ),
               IconButton(
                 icon: Icon(Icons.arrow_forward_ios_rounded, size: 16.sp),
-                onPressed: currentPage < totalPages ? () => onPageChanged(currentPage + 1) : null,
+                onPressed: currentPage < totalPages
+                    ? () => onPageChanged(currentPage + 1)
+                    : null,
               ),
             ],
           ),

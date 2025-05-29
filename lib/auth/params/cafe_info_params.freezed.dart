@@ -31,7 +31,8 @@ mixin _$CafeInfoParams {
   String get coffeeOriginCountry;
   @JsonKey(name: 'speciallity_coffee')
   int get speciallityCoffee;
-  String get image;
+  String? get image;
+  List<CafeDayTime>? get cafeTimes;
 
   /// Create a copy of CafeInfoParams
   /// with the given fields replaced by the non-null parameter values.
@@ -69,7 +70,8 @@ mixin _$CafeInfoParams {
                 other.coffeeOriginCountry == coffeeOriginCountry) &&
             (identical(other.speciallityCoffee, speciallityCoffee) ||
                 other.speciallityCoffee == speciallityCoffee) &&
-            (identical(other.image, image) || other.image == image));
+            (identical(other.image, image) || other.image == image) &&
+            const DeepCollectionEquality().equals(other.cafeTimes, cafeTimes));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -88,11 +90,12 @@ mixin _$CafeInfoParams {
       coffeeRoast,
       coffeeOriginCountry,
       speciallityCoffee,
-      image);
+      image,
+      const DeepCollectionEquality().hash(cafeTimes));
 
   @override
   String toString() {
-    return 'CafeInfoParams(name: $name, phone: $phone, address: $address, postcode: $postcode, latitude: $latitude, longitude: $longitude, categories: $categories, bio: $bio, coffeeOrigin: $coffeeOrigin, coffeeRoast: $coffeeRoast, coffeeOriginCountry: $coffeeOriginCountry, speciallityCoffee: $speciallityCoffee, image: $image)';
+    return 'CafeInfoParams(name: $name, phone: $phone, address: $address, postcode: $postcode, latitude: $latitude, longitude: $longitude, categories: $categories, bio: $bio, coffeeOrigin: $coffeeOrigin, coffeeRoast: $coffeeRoast, coffeeOriginCountry: $coffeeOriginCountry, speciallityCoffee: $speciallityCoffee, image: $image, cafeTimes: $cafeTimes)';
   }
 }
 
@@ -115,7 +118,8 @@ abstract mixin class $CafeInfoParamsCopyWith<$Res> {
       @JsonKey(name: 'coffee_roast') String coffeeRoast,
       @JsonKey(name: 'coffee_origin_country') String coffeeOriginCountry,
       @JsonKey(name: 'speciallity_coffee') int speciallityCoffee,
-      String image});
+      String? image,
+      List<CafeDayTime>? cafeTimes});
 }
 
 /// @nodoc
@@ -143,7 +147,8 @@ class _$CafeInfoParamsCopyWithImpl<$Res>
     Object? coffeeRoast = null,
     Object? coffeeOriginCountry = null,
     Object? speciallityCoffee = null,
-    Object? image = null,
+    Object? image = freezed,
+    Object? cafeTimes = freezed,
   }) {
     return _then(_self.copyWith(
       name: null == name
@@ -194,10 +199,14 @@ class _$CafeInfoParamsCopyWithImpl<$Res>
           ? _self.speciallityCoffee
           : speciallityCoffee // ignore: cast_nullable_to_non_nullable
               as int,
-      image: null == image
+      image: freezed == image
           ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
+      cafeTimes: freezed == cafeTimes
+          ? _self.cafeTimes
+          : cafeTimes // ignore: cast_nullable_to_non_nullable
+              as List<CafeDayTime>?,
     ));
   }
 }
@@ -218,7 +227,9 @@ class _CafeInfoParams implements CafeInfoParams {
       @JsonKey(name: 'coffee_roast') required this.coffeeRoast,
       @JsonKey(name: 'coffee_origin_country') required this.coffeeOriginCountry,
       @JsonKey(name: 'speciallity_coffee') required this.speciallityCoffee,
-      required this.image});
+      this.image,
+      final List<CafeDayTime>? cafeTimes})
+      : _cafeTimes = cafeTimes;
   factory _CafeInfoParams.fromJson(Map<String, dynamic> json) =>
       _$CafeInfoParamsFromJson(json);
 
@@ -251,7 +262,16 @@ class _CafeInfoParams implements CafeInfoParams {
   @JsonKey(name: 'speciallity_coffee')
   final int speciallityCoffee;
   @override
-  final String image;
+  final String? image;
+  final List<CafeDayTime>? _cafeTimes;
+  @override
+  List<CafeDayTime>? get cafeTimes {
+    final value = _cafeTimes;
+    if (value == null) return null;
+    if (_cafeTimes is EqualUnmodifiableListView) return _cafeTimes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   /// Create a copy of CafeInfoParams
   /// with the given fields replaced by the non-null parameter values.
@@ -293,7 +313,9 @@ class _CafeInfoParams implements CafeInfoParams {
                 other.coffeeOriginCountry == coffeeOriginCountry) &&
             (identical(other.speciallityCoffee, speciallityCoffee) ||
                 other.speciallityCoffee == speciallityCoffee) &&
-            (identical(other.image, image) || other.image == image));
+            (identical(other.image, image) || other.image == image) &&
+            const DeepCollectionEquality()
+                .equals(other._cafeTimes, _cafeTimes));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -312,11 +334,12 @@ class _CafeInfoParams implements CafeInfoParams {
       coffeeRoast,
       coffeeOriginCountry,
       speciallityCoffee,
-      image);
+      image,
+      const DeepCollectionEquality().hash(_cafeTimes));
 
   @override
   String toString() {
-    return 'CafeInfoParams(name: $name, phone: $phone, address: $address, postcode: $postcode, latitude: $latitude, longitude: $longitude, categories: $categories, bio: $bio, coffeeOrigin: $coffeeOrigin, coffeeRoast: $coffeeRoast, coffeeOriginCountry: $coffeeOriginCountry, speciallityCoffee: $speciallityCoffee, image: $image)';
+    return 'CafeInfoParams(name: $name, phone: $phone, address: $address, postcode: $postcode, latitude: $latitude, longitude: $longitude, categories: $categories, bio: $bio, coffeeOrigin: $coffeeOrigin, coffeeRoast: $coffeeRoast, coffeeOriginCountry: $coffeeOriginCountry, speciallityCoffee: $speciallityCoffee, image: $image, cafeTimes: $cafeTimes)';
   }
 }
 
@@ -341,7 +364,8 @@ abstract mixin class _$CafeInfoParamsCopyWith<$Res>
       @JsonKey(name: 'coffee_roast') String coffeeRoast,
       @JsonKey(name: 'coffee_origin_country') String coffeeOriginCountry,
       @JsonKey(name: 'speciallity_coffee') int speciallityCoffee,
-      String image});
+      String? image,
+      List<CafeDayTime>? cafeTimes});
 }
 
 /// @nodoc
@@ -369,7 +393,8 @@ class __$CafeInfoParamsCopyWithImpl<$Res>
     Object? coffeeRoast = null,
     Object? coffeeOriginCountry = null,
     Object? speciallityCoffee = null,
-    Object? image = null,
+    Object? image = freezed,
+    Object? cafeTimes = freezed,
   }) {
     return _then(_CafeInfoParams(
       name: null == name
@@ -420,10 +445,14 @@ class __$CafeInfoParamsCopyWithImpl<$Res>
           ? _self.speciallityCoffee
           : speciallityCoffee // ignore: cast_nullable_to_non_nullable
               as int,
-      image: null == image
+      image: freezed == image
           ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
+      cafeTimes: freezed == cafeTimes
+          ? _self._cafeTimes
+          : cafeTimes // ignore: cast_nullable_to_non_nullable
+              as List<CafeDayTime>?,
     ));
   }
 }

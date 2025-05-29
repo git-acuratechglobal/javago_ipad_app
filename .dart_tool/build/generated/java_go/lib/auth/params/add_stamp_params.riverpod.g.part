@@ -1,0 +1,23 @@
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+String _$addStampParamsNotifierHash() =>
+    r'581dd126d3af3fe315a4e7e84ca0f9bed10ea409';
+
+/// See also [AddStampParamsNotifier].
+@ProviderFor(AddStampParamsNotifier)
+final addStampParamsNotifierProvider =
+    NotifierProvider<AddStampParamsNotifier, AddStampParams>.internal(
+  AddStampParamsNotifier.new,
+  name: r'addStampParamsNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$addStampParamsNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$AddStampParamsNotifier = Notifier<AddStampParams>;
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

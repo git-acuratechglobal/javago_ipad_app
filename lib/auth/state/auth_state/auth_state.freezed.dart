@@ -17,6 +17,7 @@ T _$identity<T>(T value) => value;
 mixin _$AuthState {
   AuthEvent get authEvent;
   String? get response;
+  CafeModel? get cafeModel;
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.
@@ -33,15 +34,17 @@ mixin _$AuthState {
             (identical(other.authEvent, authEvent) ||
                 other.authEvent == authEvent) &&
             (identical(other.response, response) ||
-                other.response == response));
+                other.response == response) &&
+            (identical(other.cafeModel, cafeModel) ||
+                other.cafeModel == cafeModel));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, authEvent, response);
+  int get hashCode => Object.hash(runtimeType, authEvent, response, cafeModel);
 
   @override
   String toString() {
-    return 'AuthState(authEvent: $authEvent, response: $response)';
+    return 'AuthState(authEvent: $authEvent, response: $response, cafeModel: $cafeModel)';
   }
 }
 
@@ -50,7 +53,7 @@ abstract mixin class $AuthStateCopyWith<$Res> {
   factory $AuthStateCopyWith(AuthState value, $Res Function(AuthState) _then) =
       _$AuthStateCopyWithImpl;
   @useResult
-  $Res call({AuthEvent authEvent, String? response});
+  $Res call({AuthEvent authEvent, String? response, CafeModel? cafeModel});
 }
 
 /// @nodoc
@@ -67,6 +70,7 @@ class _$AuthStateCopyWithImpl<$Res> implements $AuthStateCopyWith<$Res> {
   $Res call({
     Object? authEvent = null,
     Object? response = freezed,
+    Object? cafeModel = freezed,
   }) {
     return _then(_self.copyWith(
       authEvent: null == authEvent
@@ -77,6 +81,10 @@ class _$AuthStateCopyWithImpl<$Res> implements $AuthStateCopyWith<$Res> {
           ? _self.response
           : response // ignore: cast_nullable_to_non_nullable
               as String?,
+      cafeModel: freezed == cafeModel
+          ? _self.cafeModel
+          : cafeModel // ignore: cast_nullable_to_non_nullable
+              as CafeModel?,
     ));
   }
 }
@@ -84,12 +92,14 @@ class _$AuthStateCopyWithImpl<$Res> implements $AuthStateCopyWith<$Res> {
 /// @nodoc
 
 class _AuthState implements AuthState {
-  const _AuthState({required this.authEvent, this.response});
+  const _AuthState({required this.authEvent, this.response, this.cafeModel});
 
   @override
   final AuthEvent authEvent;
   @override
   final String? response;
+  @override
+  final CafeModel? cafeModel;
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.
@@ -107,15 +117,17 @@ class _AuthState implements AuthState {
             (identical(other.authEvent, authEvent) ||
                 other.authEvent == authEvent) &&
             (identical(other.response, response) ||
-                other.response == response));
+                other.response == response) &&
+            (identical(other.cafeModel, cafeModel) ||
+                other.cafeModel == cafeModel));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, authEvent, response);
+  int get hashCode => Object.hash(runtimeType, authEvent, response, cafeModel);
 
   @override
   String toString() {
-    return 'AuthState(authEvent: $authEvent, response: $response)';
+    return 'AuthState(authEvent: $authEvent, response: $response, cafeModel: $cafeModel)';
   }
 }
 
@@ -127,7 +139,7 @@ abstract mixin class _$AuthStateCopyWith<$Res>
       __$AuthStateCopyWithImpl;
   @override
   @useResult
-  $Res call({AuthEvent authEvent, String? response});
+  $Res call({AuthEvent authEvent, String? response, CafeModel? cafeModel});
 }
 
 /// @nodoc
@@ -144,6 +156,7 @@ class __$AuthStateCopyWithImpl<$Res> implements _$AuthStateCopyWith<$Res> {
   $Res call({
     Object? authEvent = null,
     Object? response = freezed,
+    Object? cafeModel = freezed,
   }) {
     return _then(_AuthState(
       authEvent: null == authEvent
@@ -154,6 +167,10 @@ class __$AuthStateCopyWithImpl<$Res> implements _$AuthStateCopyWith<$Res> {
           ? _self.response
           : response // ignore: cast_nullable_to_non_nullable
               as String?,
+      cafeModel: freezed == cafeModel
+          ? _self.cafeModel
+          : cafeModel // ignore: cast_nullable_to_non_nullable
+              as CafeModel?,
     ));
   }
 }

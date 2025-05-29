@@ -16,7 +16,10 @@ _CafeInfoParams _$CafeInfoParamsFromJson(Map<String, dynamic> json) =>
       coffeeRoast: json['coffee_roast'] as String,
       coffeeOriginCountry: json['coffee_origin_country'] as String,
       speciallityCoffee: (json['speciallity_coffee'] as num).toInt(),
-      image: json['image'] as String,
+      image: json['image'] as String?,
+      cafeTimes: (json['cafeTimes'] as List<dynamic>?)
+          ?.map((e) => CafeDayTime.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$CafeInfoParamsToJson(_CafeInfoParams instance) =>
@@ -34,4 +37,5 @@ Map<String, dynamic> _$CafeInfoParamsToJson(_CafeInfoParams instance) =>
       'coffee_origin_country': instance.coffeeOriginCountry,
       'speciallity_coffee': instance.speciallityCoffee,
       'image': instance.image,
+      'cafeTimes': instance.cafeTimes,
     };

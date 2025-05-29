@@ -1,26 +1,31 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../model/cafe_model.dart';
+import '../model/cafetime_model.dart';
+
 part 'cafe_info_params.freezed.dart';
 part 'cafe_info_params.g.dart';
 
 @freezed
 abstract class CafeInfoParams with _$CafeInfoParams {
-  const factory CafeInfoParams({
-    required String name,
-    required String phone,
-    required String address,
-    required String postcode,
-    required double latitude,
-    required double longitude,
-    required String categories,
-    required String bio,
-    @JsonKey(name: 'coffee_origin') required String coffeeOrigin,
-    @JsonKey(name: 'coffee_roast') required String coffeeRoast,
-    @JsonKey(name: 'coffee_origin_country') required String coffeeOriginCountry,
-    @JsonKey(name: 'speciallity_coffee') required int speciallityCoffee,
-    required String image,
-  }) = _CafeInfoParams;
+  const factory CafeInfoParams(
+      {required String name,
+      required String phone,
+      required String address,
+      required String postcode,
+      required double latitude,
+      required double longitude,
+      required String categories,
+      required String bio,
+      @JsonKey(name: 'coffee_origin') required String coffeeOrigin,
+      @JsonKey(name: 'coffee_roast') required String coffeeRoast,
+      @JsonKey(name: 'coffee_origin_country')
+      required String coffeeOriginCountry,
+      @JsonKey(name: 'speciallity_coffee') required int speciallityCoffee,
+      String? image,
+      List<CafeDayTime>? cafeTimes,
+      }) = _CafeInfoParams;
 
   factory CafeInfoParams.fromJson(Map<String, dynamic> json) =>
       _$CafeInfoParamsFromJson(json);
@@ -66,4 +71,25 @@ class CafeInfoParamsNotifier extends _$CafeInfoParamsNotifier {
   void updateSpecialityCoffee(int value) =>
       state = state.copyWith(speciallityCoffee: value);
   void updateImage(String image) => state = state.copyWith(image: image);
+
+  void updateFromCafeModel(CafeModel? model) {
+    state = CafeInfoParams(
+      name: model?.cafeName ?? '',
+      phone: model?.phone ?? '',
+      address: model?.address ?? '',
+      postcode: model?.postcode ?? '',
+      latitude: model?.latitude ?? 0.0,
+      longitude: model?.longitude ?? 0.0,
+      categories: model?.cafeFilter ?? '',
+      bio: model?.bio ?? '',
+      coffeeOrigin: model?.cafeManagement?.coffeeOrigin ?? '',
+      coffeeRoast: model?.cafeManagement?.coffeeRoast ?? '',
+      coffeeOriginCountry: model?.cafeManagement?.coffeeOriginCountry ?? '',
+      speciallityCoffee: model?.cafeManagement?.speciallityCoffee ?? 0,
+    );
+  }
+
+  void updateCafeHours(List<CafeDayTime> cafeHours) {
+    state = state.copyWith(cafeTimes: cafeHours);
+  }
 }

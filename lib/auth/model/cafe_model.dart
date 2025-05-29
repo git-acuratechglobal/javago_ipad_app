@@ -58,8 +58,8 @@ class CafeModel {
   final String? bannerImage;
   final String? address;
   final String? postcode;
-  final int? latitude;
-  final int? longitude;
+  final double? latitude;
+  final double? longitude;
   final String? website;
   final dynamic otp;
 
@@ -143,14 +143,14 @@ class CafeModel {
 @JsonSerializable()
 class CafeClickCollectTiming {
   CafeClickCollectTiming({
-    required this.id,
+     this.id,
     required this.cafeId,
     required this.day,
     required this.startTime,
     required this.endTime,
     required this.isActive,
-    required this.createdAt,
-    required this.updatedAt,
+     this.createdAt,
+     this.updatedAt,
   });
 
   final int? id;

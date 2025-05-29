@@ -111,29 +111,29 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFFF5F3F0),
-        // leading: widget.isEditmode
-        //     ? InkWell(
-        //         onTap: () => context.pop(),
-        //         child: Image.asset(
-        //           'assets/images/ic_left_arrow.png',
-        //           color: const Color(0xFF461C10),
-        //           height: 55.h,
-        //           width: 55.w,
-        //         ),
-        //       )
-        //     : null,
-        // title: widget.isEditmode
-        //     ? Text(
-        //         widget.fromAdd! ? "Add Item" : 'Menu',
-        //         style: const TextStyle(
-        //           color: Color(0xFF461C10),
-        //           fontSize: 32,
-        //           fontFamily: 'Poppins',
-        //           fontWeight: FontWeight.w600,
-        //         ),
-        //       )
-        //     : null,
-        // centerTitle: true,
+        leading: widget.isEditmode
+            ? InkWell(
+                onTap: () => context.pop(),
+                child: Image.asset(
+                  'assets/images/ic_left_arrow.png',
+                  color: const Color(0xFF461C10),
+                  height: 55.h,
+                  width: 55.w,
+                ),
+              )
+            : null,
+        title: widget.isEditmode
+            ? Text(
+                widget.fromAdd! ? "Add Item" : 'Menu',
+                style: const TextStyle(
+                  color: Color(0xFF461C10),
+                  fontSize: 32,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w600,
+                ),
+              )
+            : null,
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -667,6 +667,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
             ),
             41.verticalSpace,
             // Addons Title
+            if(items?.addons!=null&&items!.addons!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 10),
               child: Text(

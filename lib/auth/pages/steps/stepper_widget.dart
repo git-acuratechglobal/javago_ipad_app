@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../config/common/widgets.dart';
+import '../../../home/loyalitycardscreen.dart';
 import '../sign_up/click_and_collect.dart';
 import '../sign_up/loyalitycard.dart';
 import '../sign_up/menu.dart';
@@ -11,8 +13,9 @@ import '../sign_up/reviewscreen.dart';
 import '../sign_up/cafe_info_screen.dart';
 import '../sign_up/sign_up_screen.dart';
 
+final returnToReviewProvider = StateProvider<bool>((ref) => false);
 final cafePageControllerProvider = Provider<PageController>((ref) {
-  final controller = PageController(initialPage: 1);
+  final controller = PageController(initialPage: 0);
 
   ref.onDispose(() {
     controller.dispose();
@@ -34,10 +37,14 @@ class _CafeStepsState extends ConsumerState<CafeSteps> {
     SignUpScreen(),
     CafeInfoScreen(isEditmode: false,),
     ClickAndCollect(isFromSignup: true),
-   SelectManually(),
-    LoyalityCardScreen(isEditMode: false),
-    Reviewscreen(),
-    Publishscreen()
+    ReviewItems(isFromSignUp: true,),
+    LoyalityCardScreen2(
+      isOpenFromSignup: true,
+    ),
+    Reviewscreen(
+      isOpenFromSignup: true,
+    ),
+    Publishscreen(),
   ];
 
   @override
@@ -63,13 +70,16 @@ class _CafeStepsState extends ConsumerState<CafeSteps> {
         child: StepperWidget(
           activeStep: currentPageIndex,
           onStepTapped: (int tappedIndex) {
-            if (tappedIndex < currentPageIndex) {
+            if(tappedIndex==0){
+              return;
+            }
+            // if (tappedIndex < currentPageIndex) {
               pageController.animateToPage(
                 tappedIndex,
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
               );
-            }
+            // }
           },
         ),
       ),
@@ -96,10 +106,11 @@ class _StepperWidgetState extends State<StepperWidget> {
     List<({int index, String name})> stepTitles = [
       (index: 1, name: 'Account'),
       (index: 2, name: 'Cafe'),
-      (index: 3, name: 'Menu'),
-      (index: 4, name: 'Loyalty card'),
-      (index: 5, name: 'Review'),
-      (index: 6, name: 'Publish')
+      (index: 3, name: 'Click and collect'),
+      (index: 4, name: 'Menu'),
+      (index: 5, name: 'Loyalty card'),
+      (index: 6, name: 'Review'),
+      (index: 7, name: 'Publish')
     ];
 
     return EasyStepper(

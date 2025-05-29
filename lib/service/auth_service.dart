@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:java_go/auth/model/cafe_time_and_category.dart';
+import 'package:java_go/auth/model/stamp_suggestion.dart';
+import 'package:java_go/auth/params/add_stamp_params.dart';
 import 'package:java_go/home/model/cafe_stats_model.dart';
 import 'package:java_go/home/model/get_menu_items.dart';
 import 'package:java_go/home/model/get_orders.dart';
@@ -14,6 +17,7 @@ import 'package:java_go/service/local_storage_service.dart';
 
 import '../auth/model/cafe_model.dart';
 import '../auth/model/cafetime_model.dart';
+import '../auth/model/getStamp.dart';
 import '../auth/params/cafe_info_params.dart';
 
 final authServiceProvider = Provider<AuthService>((ref) {
@@ -44,7 +48,6 @@ class AuthService {
     });
   }
 
-
   Future<String> signUp(String? email, String? password) async {
     return await asyncGuard(() async {
       if (email == null || email.isEmpty) {
@@ -65,14 +68,27 @@ class AuthService {
     });
   }
 
-
   Future<String> addCafeInfo({required CafeInfoParams cafeInfoParams}) async {
     final token = await getTokens();
     return await asyncGuard(() async {
-      print(cafeInfoParams.toJson());
+      final rawMap = Map<String, dynamic>.from(cafeInfoParams.toJson());
+      final formDataMap = <String, dynamic>{};
+      rawMap.forEach((key, value) {
+        if (value != null && key != 'cafeTimes') {
+          formDataMap[key] = value;
+        }
+      });
+      if (formDataMap['image']!=null) {
+        formDataMap['image'] = await MultipartFile.fromFile(
+          formDataMap['image'],
+          filename: formDataMap['image'].split('/').last,
+        );
+      }
+
+      final formData = FormData.fromMap(formDataMap);
       final response = await _dio.post(
         '/update-cafe-information',
-        data: FormData.fromMap(cafeInfoParams.toJson()),
+        data: formData,
         options: Options(
           headers: {
             'x-access-token': '$token',
@@ -82,10 +98,12 @@ class AuthService {
       );
 
       print(response.data['token']);
-      return response.data['message'] ;
+      return response.data['message'];
     });
   }
-  Future<String> updateCafeInfo({required CafeInfoParams cafeInfoParams}) async {
+
+  Future<String> updateCafeInfo(
+      {required CafeInfoParams cafeInfoParams}) async {
     final token = await getTokens();
     return await asyncGuard(() async {
       final response = await _dio.post(
@@ -100,13 +118,15 @@ class AuthService {
       );
 
       print(response.data['token']);
-      return response.data['message'] ;
+      return response.data['message'];
     });
   }
 
 
-  Future<CafeTimeAndCategory> getCafeTimeAndCategory() async {
 
+
+
+  Future<CafeTimeAndCategory> getCafeTimeAndCategory() async {
     return await asyncGuard(() async {
       final response = await _dio.get(
         '/get-cafe-information-suggestions',
@@ -124,8 +144,6 @@ class AuthService {
       return CafeTimeAndCategory.fromJson(ordersJson);
     });
   }
-
-
 
   Future<GetOrdersResponse> getOrders() async {
     final token = await getTokens();
@@ -527,11 +545,11 @@ class AuthService {
     });
   }
 
-  Future<CafeModel> getCafeData() async {
+  Future<CafeModel?> getCafeData() async {
     return asyncGuard(() async {
       final token = await getTokens();
       if (token == null || token.isEmpty) {
-        throw Exception("Authorization failed: Token is missing.");
+        return null;
       }
       final response = await _dio.get(
         "/profile",
@@ -569,10 +587,12 @@ class AuthService {
     });
   }
 
-
   Future<String> updateClickAndCollect(
-      {required int clickAndCollect, required int maxOrders}) async {
+      { int ?clickAndCollect,  int? maxOrders}) async {
     return asyncGuard(() async {
+      if(clickAndCollect!=null&&maxOrders==null){
+        throw Exception("Please choose max Order");
+      }
       final token = await getTokens();
       if (token == null || token.isEmpty) {
         throw Exception("Authorization failed: Token is missing.");
@@ -580,9 +600,41 @@ class AuthService {
       final response = await _dio.post(
         "/update-click-collect",
         data: FormData.fromMap({
-          "click_and_collect": clickAndCollect,
+          "click_and_collect": clickAndCollect??0,
           "max_orders_click_collect": maxOrders
         }),
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+      final message = response.data['message'];
+
+      return message;
+    });
+  }
+  Future<String> updateCafeHours(
+      {required List<CafeDayTime> cafeTimes}) async {
+    return asyncGuard(() async {
+      final token = await getTokens();
+      if (token == null || token.isEmpty) {
+        throw Exception("Authorization failed: Token is missing.");
+      }
+      final Map<String, dynamic> formMap = {};
+
+      for (int i = 0; i < cafeTimes.length; i++) {
+        final dayTime = cafeTimes[i];
+
+        formMap['cafe[$i][open_time]'] = dayTime.openTimeFormatted;
+        formMap['cafe[$i][close_time]'] = dayTime.closeTimeFormatted;
+        formMap['cafe[$i][is_active]'] = dayTime.isActive;
+      }
+
+      final response = await _dio.post(
+        "/update-cafe-hours",
+        data: FormData.fromMap(formMap),
         options: Options(
           headers: {
             'x-access-token': '$token',
@@ -608,8 +660,8 @@ class AuthService {
       for (int i = 0; i < cafeTimes.length; i++) {
         final dayTime = cafeTimes[i];
 
-        formMap['cafe[$i][open_time]'] = formatTime(dayTime.openingTime);
-        formMap['cafe[$i][close_time]'] = formatTime(dayTime.closingTime);
+        formMap['cafe[$i][open_time]'] = dayTime.openTimeFormatted;
+        formMap['cafe[$i][close_time]'] = dayTime.closeTimeFormatted;
         formMap['cafe[$i][is_active]'] = dayTime.isActive;
       }
 
@@ -628,6 +680,94 @@ class AuthService {
       return message;
     });
   }
+
+  Future<GetStamp> getStamp() async {
+    final token = await getTokens();
+    if (token == null || token.isEmpty) {
+      throw Exception("Authorization failed: Token is missing.");
+    }
+    print('Token used for Authorization: $token');
+
+    return await asyncGuard(() async {
+      final response = await _dio.get(
+        '/get-loyalty-stamp',
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+      print('Response Headers: ${response.headers}');
+      print('Response Data: ${response.data}');
+
+      final dynamic ordersJson = response.data;
+      return GetStamp.fromJson(ordersJson);
+    });
+  }
+
+  Future<StampSuggestion> stampSuggestion() async {
+    final token = await getTokens();
+    if (token == null || token.isEmpty) {
+      throw Exception("Authorization failed: Token is missing.");
+    }
+    print('Token used for Authorization: $token');
+
+    return await asyncGuard(() async {
+      final response = await _dio.get(
+        '/get-loyalty-stamp-suggestions',
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+      print('Response Headers: ${response.headers}');
+      print('Response Data: ${response.data}');
+
+      final dynamic ordersJson = response.data['data'];
+      return StampSuggestion.fromJson(ordersJson);
+    });
+  }
+
+  Future<String> addStamp({required AddStampParams addStampParams}) async {
+    final token = await getTokens();
+    return await asyncGuard(() async {
+      final response = await _dio.post(
+        '/add-loyalty-stamp',
+        data: FormData.fromMap(addStampParams.toJson()),
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      print(response.data['token']);
+      return response.data['message'] ?? "Register successful.";
+    });
+  }
+
+  Future<String> publish() async {
+    final token = await getTokens();
+    return await asyncGuard(() async {
+      final response = await _dio.get(
+        '/update-publishing-status',
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      print(response.data['token']);
+      return response.data['message'] ?? "Register successful.";
+    });
+  }
+
 
   Future<void> saveTokens(String tokens) async {
     await _localStorageService.setToken(tokens);

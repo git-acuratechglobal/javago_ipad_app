@@ -3,7 +3,7 @@
 // **************************************************************************
 
 String _$cafeInfoParamsNotifierHash() =>
-    r'a1b66da68a1e91d7c9aee3ccc3b9fc092123e418';
+    r'84330c4a08fa76ea3d21f241addc17c24b1b53a3';
 
 /// See also [CafeInfoParamsNotifier].
 @ProviderFor(CafeInfoParamsNotifier)

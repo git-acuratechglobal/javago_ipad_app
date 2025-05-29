@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
+import 'package:java_go/auth/notifier/cafe_data_notifier/cafe_data_notifier.dart';
+import 'package:java_go/config/async_widget.dart';
+import 'package:java_go/config/common/cache_network_image.dart';
 import 'package:java_go/config/common/widgets.dart';
 import 'package:java_go/home/account.dart';
 
@@ -28,208 +31,212 @@ class _CafeInformationScreenState extends ConsumerState<CafeInformationScreen> {
                 title: 'My Profile',
               ))
           : null,
-      body: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 47, vertical: 44),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    'Emily’s cafe',
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineLarge
-                        ?.copyWith(color: Color(0xFF694233), fontWeight: FontWeight.w600),
-                  ),
-                  Expanded(
-                    child: Align(
-                        alignment: Alignment.topRight,
-                        child: InkWell(
-                          onTap: () {
-                            context.navigateTo(CafeInfoScreen(
-                              isEditmode: true,
-                            ));
-                          },
-                          child: EditContainer(
-                            title: 'Edit Profile',
-                            icon: (Icons.add_circle_outline),
-                          ),
-                        )),
-                  )
-                ],
-              ),
-              Row(
-                children: [
-                  SizedBox(
-                      width: 423.w, height: 282.h, child: Image.asset('assets/images/cafe.png')),
-                  60.horizontalSpace,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Phone Number',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                color: Color(0xFF694233),
-                              )),
-                      11.verticalSpace,
-                      Text(
-                        '07 123456789',
-                        style: TextStyle(
-                          color: const Color(0xFF1B0701),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      72.verticalSpace,
-                      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text('Categories',
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  color: Color(0xFF694233),
-                                )),
-                        11.verticalSpace,
-                        Text(
-                          'Bubble \n Vegan \n Smoothie',
-                          style: TextStyle(
-                            color: const Color(0xFF1B0701),
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ])
-                    ],
-                  ),
-                  70.horizontalSpace,
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 180),
-                    child: Column(
+      body: AsyncWidget(value: ref.watch(getCafeInfoProvider), data: (data){
+        return SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 47, vertical: 44),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      data?.cafeName??"",
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineLarge
+                          ?.copyWith(color: Color(0xFF694233), fontWeight: FontWeight.w600),
+                    ),
+                    Expanded(
+                      child: Align(
+                          alignment: Alignment.topRight,
+                          child: InkWell(
+                            onTap: () {
+                              context.navigateTo(CafeInfoScreen(
+                                isEditmode: true,
+                              ));
+                            },
+                            child: EditContainer(
+                              title: 'Edit Profile',
+                              icon: (Icons.add_circle_outline),
+                            ),
+                          )),
+                    )
+                  ],
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                        width: 423.w, height: 282.h, child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: NetworkImageWidget(imageUrl: data?.bannerImage??""))),
+                    60.horizontalSpace,
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Address',
+                        Text('Phone Number',
                             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  color: Color(0xFF694233),
-                                )),
+                              color: Color(0xFF694233),
+                            )),
                         11.verticalSpace,
                         Text(
-                          '21438 Ingomar, 34 Street, Barnet, EN5 2EH.',
+                          data?.phone??"",
                           style: TextStyle(
                             color: const Color(0xFF1B0701),
-                            fontSize: 16.sp,
+                            fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
-                        )
+                        ),
+                        72.verticalSpace,
+                        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text('Categories',
+                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                color: Color(0xFF694233),
+                              )),
+                          11.verticalSpace,
+                          Text(
+                            'Bubble \n Vegan \n Smoothie',
+                            style: TextStyle(
+                              color: const Color(0xFF1B0701),
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ])
                       ],
                     ),
-                  ),
-                ],
-              ),
-              67.verticalSpace,
-              Text(
-                'Bio',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: Color(0xFF694233),
+                    70.horizontalSpace,
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 180),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Address',
+                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                color: Color(0xFF694233),
+                              )),
+                          11.verticalSpace,
+                          Text(
+                           data?.address??"",
+                            style: TextStyle(
+                              color: const Color(0xFF1B0701),
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-              ),
-              SizedBox(
-                width: 996,
-                height: 77,
-                child: Text(
-                  "Cafe bio/ description Lorem Ipsum is simply dummy text of the  printing and typesetting industry. Cafe bio/ description Lorem  Ipsum is simply dummy text of the printing and typesetting  industry. Cafe bio/ description Lorem Ipsum is simply dummy text of the     printing and typesetting industry.  ",
-                  style: TextStyle(
-                    color: const Color(0xFF727272),
-                    fontSize: 16,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
+                  ],
+                ),
+                67.verticalSpace,
+                Text(
+                  'Bio',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: Color(0xFF694233),
                   ),
                 ),
-              ),
-              17.verticalSpace,
-              Text(
-                'Cafe Hours',
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                    ?.copyWith(color: Color(0xFF694233), fontWeight: FontWeight.w600),
-              ),
-              Row(
-                children: [
-                  SizedBox(
-                    height: 300.h,
-                    width: 350.w,
-                    child: Reviewtiming(),
+                SizedBox(
+                  width: 996,
+                  height: 77,
+                  child: Text(
+                    data?.bio??"",
+                    style: TextStyle(
+                      color: const Color(0xFF727272),
+                      fontSize: 16,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                  Column(
-                    children: [
-                      Text(
-                        'Coffee Origin',
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineSmall
-                            ?.copyWith(color: Color(0xFF694233), fontWeight: FontWeight.w600),
-                      ),
-                      CustomContainer(
-                        label: 'Single Origin',
-                        containerWidth: 227.w,
-                        containerHeight: 30.h,
-                        borderColor: Colors.black,
-                      ),
-                      88.verticalSpace,
-                      Column(children: [
+                ),
+                17.verticalSpace,
+                Text(
+                  'Cafe Hours',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall
+                      ?.copyWith(color: Color(0xFF694233), fontWeight: FontWeight.w600),
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      height: 300.h,
+                      width: 350.w,
+                      child: Reviewtiming(timings: data?.timing??[],),
+                    ),
+                    Column(
+                      children: [
                         Text(
-                          'Country of Origin',
+                          'Coffee Origin',
                           style: Theme.of(context)
                               .textTheme
                               .headlineSmall
                               ?.copyWith(color: Color(0xFF694233), fontWeight: FontWeight.w600),
                         ),
                         CustomContainer(
-                          label: 'Single Origin',
+                          label:data?.cafeManagement?.coffeeOrigin,
                           containerWidth: 227.w,
                           containerHeight: 30.h,
                           borderColor: Colors.black,
                         ),
-                        140.verticalSpace,
-                      ])
-                    ],
-                  ),
-                  130.horizontalSpace,
-                  Column(
-                    children: [
-                      Text(
-                        'Coffee Roast',
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineSmall
-                            ?.copyWith(color: Color(0xFF694233), fontWeight: FontWeight.w600),
-                      ),
-                      CustomContainer(
-                        label: 'Medium',
-                        containerWidth: 227.w,
-                        containerHeight: 30.h,
-                        borderColor: Colors.black,
-                      ),
-                      88.verticalSpace,
-                      Column(children: [
+                        88.verticalSpace,
+                        Column(children: [
+                          Text(
+                            'Country of Origin',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(color: Color(0xFF694233), fontWeight: FontWeight.w600),
+                          ),
+                          CustomContainer(
+                            label: data?.cafeManagement?.coffeeOriginCountry??"",
+                            containerWidth: 227.w,
+                            containerHeight: 30.h,
+                            borderColor: Colors.black,
+                          ),
+                          140.verticalSpace,
+                        ])
+                      ],
+                    ),
+                    130.horizontalSpace,
+                    Column(
+                      children: [
                         Text(
-                          'Specialty Coffee',
+                          'Coffee Roast',
                           style: Theme.of(context)
                               .textTheme
                               .headlineSmall
                               ?.copyWith(color: Color(0xFF694233), fontWeight: FontWeight.w600),
                         ),
                         CustomContainer(
-                          label: 'Yes',
+                          label: data?.cafeManagement?.coffeeRoast??"",
                           containerWidth: 227.w,
                           containerHeight: 30.h,
                           borderColor: Colors.black,
                         ),
-                        140.verticalSpace,
-                      ])
-                    ],
-                  )
-                ],
-              ),
-            ],
-          )),
+                        88.verticalSpace,
+                        Column(children: [
+                          Text(
+                            'Specialty Coffee',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(color: Color(0xFF694233), fontWeight: FontWeight.w600),
+                          ),
+                          CustomContainer(
+                            label: data?.cafeManagement?.speciallityCoffee==1?"Yes":"No",
+                            containerWidth: 227.w,
+                            containerHeight: 30.h,
+                            borderColor: Colors.black,
+                          ),
+                          140.verticalSpace,
+                        ])
+                      ],
+                    )
+                  ],
+                ),
+              ],
+            ));
+      })
     );
   }
 }

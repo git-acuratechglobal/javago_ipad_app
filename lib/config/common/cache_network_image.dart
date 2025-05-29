@@ -51,7 +51,7 @@ class NetworkImageWidget extends StatelessWidget {
             color: backgroundColor ?? Colors.white,
             child: Center(
               child: LoadingAnimationWidget.twistingDots(
-                  size: loadingWidgetSize, rightDotColor: Color(0xFF005FF2), leftDotColor: Color(0xFFD7ED5D)),
+                  size: loadingWidgetSize, rightDotColor: Color(0xFF461C10), leftDotColor: Color(0xFF461C10)),
             ),
           );
         },

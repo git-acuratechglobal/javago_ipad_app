@@ -2,11 +2,11 @@
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getCafeInfoHash() => r'b7a3e11f9bdc2f7d0e7b7d73ddfb0bc5f6e21825';
+String _$getCafeInfoHash() => r'3e7d3763fd79df5a7891da8c31b99abdd929dd7d';
 
 /// See also [getCafeInfo].
 @ProviderFor(getCafeInfo)
-final getCafeInfoProvider = AutoDisposeFutureProvider<CafeModel>.internal(
+final getCafeInfoProvider = AutoDisposeFutureProvider<CafeModel?>.internal(
   getCafeInfo,
   name: r'getCafeInfoProvider',
   debugGetCreateSourceHash:
@@ -17,7 +17,7 @@ final getCafeInfoProvider = AutoDisposeFutureProvider<CafeModel>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef GetCafeInfoRef = AutoDisposeFutureProviderRef<CafeModel>;
+typedef GetCafeInfoRef = AutoDisposeFutureProviderRef<CafeModel?>;
 String _$getCafeTimeAndCategoryHash() =>
     r'88e55aad7612171d0a5a657b038c5095fd7fcb26';
 

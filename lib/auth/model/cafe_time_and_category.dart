@@ -55,37 +55,37 @@ class CafeFilter {
   Map<String, dynamic> toJson() => _$CafeFilterToJson(this);
 }
 
-@JsonSerializable()
-class CafeTiming {
-  @JsonKey(name: "id")
-  int? id;
-  @JsonKey(name: "day")
-  int? day;
-  @JsonKey(name: "open_time")
-  String? openTime;
-  @JsonKey(name: "close_time")
-  String? closeTime;
-  @JsonKey(name: "cafe_id")
-  int? cafeId;
-  @JsonKey(name: "is_active")
-  int? isActive;
-  @JsonKey(name: "created_at")
-  int? createdAt;
-  @JsonKey(name: "updated_at")
-  int? updatedAt;
+  @JsonSerializable()
+  class CafeTiming {
+    @JsonKey(name: "id")
+    int? id;
+    @JsonKey(name: "day")
+    int? day;
+    @JsonKey(name: "open_time")
+    String? openTime;
+    @JsonKey(name: "close_time")
+    String? closeTime;
+    @JsonKey(name: "cafe_id")
+    int? cafeId;
+    @JsonKey(name: "is_active")
+    int? isActive;
+    @JsonKey(name: "created_at")
+    int? createdAt;
+    @JsonKey(name: "updated_at")
+    int? updatedAt;
 
-  CafeTiming({
-    this.id,
-    this.day,
-    this.openTime,
-    this.closeTime,
-    this.cafeId,
-    this.isActive,
-    this.createdAt,
-    this.updatedAt,
-  });
+    CafeTiming({
+      this.id,
+      this.day,
+      this.openTime,
+      this.closeTime,
+      this.cafeId,
+      this.isActive,
+      this.createdAt,
+      this.updatedAt,
+    });
 
-  factory CafeTiming.fromJson(Map<String, dynamic> json) => _$CafeTimingFromJson(json);
+    factory CafeTiming.fromJson(Map<String, dynamic> json) => _$CafeTimingFromJson(json);
 
-  Map<String, dynamic> toJson() => _$CafeTimingToJson(this);
-}
+    Map<String, dynamic> toJson() => _$CafeTimingToJson(this);
+  }
