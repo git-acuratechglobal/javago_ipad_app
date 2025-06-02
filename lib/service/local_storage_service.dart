@@ -21,18 +21,15 @@ class LocalStorageService {
 
   static const String _authTokenKey = "token";
   static const String _userLoginSaved = "user";
+
+  static const String _stripAccountId = "accountId";
+
   Future<void> setToken(String token) async {
     await _preferences.setString(_authTokenKey, token);
   }
 
   String getToken() {
     return _preferences.getString(_authTokenKey) ?? "";
-  }
-
-
-  Future<void>clearSession()async{
-    _preferences.remove(_authTokenKey);
-    _preferences.remove(_userLoginSaved);
   }
 
   Future<void> setUserLoginSaved(bool isLoginSaved) async {
@@ -43,4 +40,16 @@ class LocalStorageService {
     return _preferences.getBool(_userLoginSaved) ?? false;
   }
 
+  Future<void> setStripAccountId(String accountId) async {
+    await _preferences.setString(_stripAccountId, accountId);
+  }
+
+  String? getStripAccountId() {
+    return _preferences.getString(_stripAccountId);
+  }
+
+  Future<void> clearSession() async {
+    _preferences.remove(_authTokenKey);
+    _preferences.remove(_userLoginSaved);
+  }
 }

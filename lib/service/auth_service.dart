@@ -78,7 +78,7 @@ class AuthService {
           formDataMap[key] = value;
         }
       });
-      if (formDataMap['image']!=null) {
+      if (formDataMap['image'] != null) {
         formDataMap['image'] = await MultipartFile.fromFile(
           formDataMap['image'],
           filename: formDataMap['image'].split('/').last,
@@ -121,10 +121,6 @@ class AuthService {
       return response.data['message'];
     });
   }
-
-
-
-
 
   Future<CafeTimeAndCategory> getCafeTimeAndCategory() async {
     return await asyncGuard(() async {
@@ -228,7 +224,7 @@ class AuthService {
     print('Token used for Authorization: $token');
 
     return await asyncGuard(() async {
-      final response = await _dio.get(
+      final response = await _dio.post(
         '/update-addon-item-status/$id',
         data: FormData.fromMap({
           'status': status,
@@ -437,7 +433,7 @@ class AuthService {
     });
   }
 
-  Future<String> makeAvailable(int itemId, int status) async {
+  Future<String> updateMenuItemStatus(int itemId, int status) async {
     final token = await getTokens();
     if (token == null || token.isEmpty) {
       throw Exception("Authorization failed: Token is missing.");
@@ -588,9 +584,9 @@ class AuthService {
   }
 
   Future<String> updateClickAndCollect(
-      { int ?clickAndCollect,  int? maxOrders}) async {
+      {int? clickAndCollect, int? maxOrders}) async {
     return asyncGuard(() async {
-      if(clickAndCollect!=null&&maxOrders==null){
+      if (clickAndCollect != null && maxOrders == null) {
         throw Exception("Please choose max Order");
       }
       final token = await getTokens();
@@ -600,7 +596,7 @@ class AuthService {
       final response = await _dio.post(
         "/update-click-collect",
         data: FormData.fromMap({
-          "click_and_collect": clickAndCollect??0,
+          "click_and_collect": clickAndCollect ?? 0,
           "max_orders_click_collect": maxOrders
         }),
         options: Options(
@@ -615,8 +611,8 @@ class AuthService {
       return message;
     });
   }
-  Future<String> updateCafeHours(
-      {required List<CafeDayTime> cafeTimes}) async {
+
+  Future<String> updateCafeHours({required List<CafeDayTime> cafeTimes}) async {
     return asyncGuard(() async {
       final token = await getTokens();
       if (token == null || token.isEmpty) {
@@ -768,6 +764,71 @@ class AuthService {
     });
   }
 
+  Future<Map<String, double>?> getLatLngFromZipcode(
+      {required String address, required String zipcode}) async {
+    return asyncGuard(() async {
+      final apiKey = "AIzaSyBsfvNpOntelAz6fvlZw7IYsDxvfm4l0dg";
+      final fullAddress = '$address, $zipcode';
+      final url =
+          'https://maps.googleapis.com/maps/api/geocode/json?address=$fullAddress&key=$apiKey';
+      final response = await _dio.get(url);
+      final location = response.data['results'][0]['geometry']['location'];
+      return {
+        'lat': location['lat'],
+        'lng': location['lng'],
+      };
+    });
+  }
+
+  Future<String> createStripAccount() async {
+    final token = await getTokens();
+    return await asyncGuard(() async {
+      final response = await _dio.post(
+        '/stripe/create-account',
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+      await _localStorageService.setStripAccountId(response.data['account_id']);
+      if (response.data['account_id'] != null) {
+        final response1 = await _dio.post(
+          '/stripe/onboarding-link',
+          data: FormData.fromMap({"account_id": response.data['account_id']}),
+          options: Options(
+            headers: {
+              'x-access-token': '$token',
+              'Accept': 'application/json',
+            },
+          ),
+        );
+        return response1.data['url'];
+      }
+
+      return "";
+    });
+  }
+
+  Future<bool> stripAccountStatus() async {
+    final token = await getTokens();
+    final accountId = await getStripAccountId();
+    return await asyncGuard(() async {
+      final response = await _dio.post(
+        '/stripe/account-status',
+        data: FormData.fromMap({'account_id': accountId}),
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      return response.data['success'];
+    });
+  }
 
   Future<void> saveTokens(String tokens) async {
     await _localStorageService.setToken(tokens);
@@ -775,6 +836,10 @@ class AuthService {
 
   Future<String?> getTokens() async {
     return await _localStorageService.getToken();
+  }
+
+  Future<String?> getStripAccountId() async {
+    return await _localStorageService.getStripAccountId();
   }
 }
 

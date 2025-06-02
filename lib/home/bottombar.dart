@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/home/account.dart';
@@ -24,6 +25,10 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
   @override
   void initState() {
     super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      // _onItemTapped(1);
+    });
+
   }
 
   void _onItemTapped(int index) {

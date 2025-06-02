@@ -2,10 +2,17 @@ import 'package:easy_stepper/easy_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:java_go/Theme/navigation.dart';
+import 'package:java_go/config/widgets/common_message_popup.dart';
+import 'package:java_go/home/notifier/cafe_info_notifier/cafe_info_notifier.dart';
+import 'package:java_go/home/state/cafe_info_state/cafe_info_state.dart';
 
 import '../../../config/common/widgets.dart';
+import '../../../home/bottombar.dart';
 import '../../../home/loyalitycardscreen.dart';
+import '../../../service/local_storage_service.dart';
 import '../sign_up/click_and_collect.dart';
+import '../sign_up/connect_strip_web_view.dart';
 import '../sign_up/loyalitycard.dart';
 import '../sign_up/menu.dart';
 import '../sign_up/publishscreen.dart';
@@ -22,6 +29,7 @@ final cafePageControllerProvider = Provider<PageController>((ref) {
   });
   return controller;
 });
+
 class CafeSteps extends ConsumerStatefulWidget {
   const CafeSteps({super.key});
 
@@ -30,14 +38,17 @@ class CafeSteps extends ConsumerStatefulWidget {
 }
 
 class _CafeStepsState extends ConsumerState<CafeSteps> {
-
   int currentPageIndex = 0;
 
   late List<Widget> cafesteps = [
     SignUpScreen(),
-    CafeInfoScreen(isEditmode: false,),
+    CafeInfoScreen(
+      isFromSignUp: true,
+    ),
     ClickAndCollect(isFromSignup: true),
-    ReviewItems(isFromSignUp: true,),
+    ReviewItems(
+      isFromSignUp: true,
+    ),
     LoyalityCardScreen2(
       isOpenFromSignup: true,
     ),
@@ -46,6 +57,76 @@ class _CafeStepsState extends ConsumerState<CafeSteps> {
     ),
     Publishscreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    ref.listenManual(cafeInfoNotifierProvider, (previous, next) async {
+      switch (next) {
+        case AsyncData<CafeInfoState?> data when data.value != null:
+          final cafeState = data.value;
+          final controller = ref.read(cafePageControllerProvider);
+          final saveUserLogin = ref.read(localStorageServiceProvider);
+          final shouldReturnToReview = ref.read(returnToReviewProvider);
+
+          if (cafeState?.cafeEvent == CafeEvent.addCafeInfo) {
+            // if (shouldReturnToReview) {
+            //   ref.read(returnToReviewProvider.notifier).state = false;
+            //   controller.animateToPage(
+            //     5,
+            //     duration: const Duration(milliseconds: 300),
+            //     curve: Curves.easeInOut,
+            //   );
+            // } else {
+            if (controller.hasClients) {
+              controller.nextPage(
+                duration: Duration(milliseconds: 250),
+                curve: Curves.bounceIn,
+              );
+            }
+
+            return;
+            // }
+          }
+          if (cafeState?.cafeEvent == CafeEvent.updateClickAndCollect) {
+            if (controller.hasClients) {
+              controller.nextPage(
+                duration: Duration(milliseconds: 250),
+                curve: Curves.bounceIn,
+              );
+            }
+
+            return;
+          }
+          if (cafeState?.cafeEvent == CafeEvent.createStripAccount) {
+            final url = cafeState?.response;
+            context.navigateTo(CustomWebView(
+              initialUrl: url,
+            ));
+          }
+          if (cafeState?.cafeEvent == CafeEvent.stripAccountStatus) {
+            context.pop();
+          }
+
+          if (cafeState?.cafeEvent == CafeEvent.publishCafe) {
+            await CommonPopUp.showMessageDialog(context,
+                message:
+                    "Your cafe has been sent for Admin Approval. Thank you!",
+            onPressed: (){
+              context.pop();
+            }
+            );
+            saveUserLogin.setUserLoginSaved(true);
+            context.navigateAndRemoveUntil(CustomBottomNavBar());
+          }
+
+        case AsyncError error:
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error.error.toString())),
+          );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,22 +151,23 @@ class _CafeStepsState extends ConsumerState<CafeSteps> {
         child: StepperWidget(
           activeStep: currentPageIndex,
           onStepTapped: (int tappedIndex) {
-            if(tappedIndex==0){
+            if (tappedIndex == 0) {
               return;
             }
-            // if (tappedIndex < currentPageIndex) {
+            if (tappedIndex < currentPageIndex) {
               pageController.animateToPage(
                 tappedIndex,
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
               );
-            // }
+            }
           },
         ),
       ),
     );
   }
 }
+
 class StepperWidget extends StatefulWidget {
   final int activeStep;
   final Function(int)? onStepTapped;

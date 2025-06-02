@@ -6,6 +6,7 @@ import 'package:java_go/config/async_widget.dart';
 import 'package:java_go/config/common/button.dart';
 import 'package:java_go/home/model/get_orders.dart';
 import 'package:java_go/home/model/order_detail.dart';
+import 'package:java_go/home/notifier/order_notifier/order_notifier.dart';
 import 'package:java_go/home/notifiers/accept_orders.dart';
 import 'package:java_go/home/notifiers/order_details_provider.dart';
 import 'package:java_go/home/notifiers/view_order_provider.dart';
@@ -267,7 +268,7 @@ class _OrdersState extends ConsumerState<Orders> {
                                 _showDialog(context);
                               } else {
                                 ref
-                                    .read(acceptOrdersProvider.notifier)
+                                    .read(orderNotifierProvider.notifier)
                                     .makeOrderComplete(
                                         widget.orderId.toString(),
                                         widget.isIndividualOrder,
@@ -399,7 +400,7 @@ Widget detailedContainer(
                       label: order.itemName ?? '',
                       label2: (order.addonSizes != null &&
                               order.addonSizes!.isNotEmpty)
-                          ? order.addonSizes!.first.addonName ?? ""
+                          ? order.addonSizes!.first.addonSizeName ?? ""
                           : '',
                     );
                   },
@@ -524,7 +525,7 @@ class _OrderDetailCardState extends ConsumerState<OrderDetailCard> {
               ),
               18.verticalSpace,
               if (widget.label2.isNotEmpty)
-                Text("Item Addons:",
+                Text("Additional option:",
                     style: TextStyle(
                         fontSize: 11.sp, fontWeight: FontWeight.w400)),
               Text(
@@ -622,7 +623,7 @@ class RefundPopWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final orderRefund = ref.watch(acceptOrdersProvider);
+    final orderRefund = ref.watch(orderNotifierProvider);
     return Column(
       children: [
         26.verticalSpace,
@@ -649,7 +650,7 @@ class RefundPopWidget extends ConsumerWidget {
               width: 200.w,
               height: 50.h,
               child: PrimaryButton(
-                isLoading: orderRefund!.isRefunding || orderRefund.isLoading!,
+                isLoading: orderRefund.isLoading,
                 onClick: () {
                   final allOrders = ref
                           .read(GetOrderDetailsProvider(
@@ -666,19 +667,11 @@ class RefundPopWidget extends ConsumerWidget {
                       .map((order) => order.itemId)
                       .whereType<int>()
                       .toList();
-
-                  if (unavailableItemIds.isNotEmpty) {
-                    ref.read(acceptOrdersProvider.notifier).refundOrder(
-                          orderId,
-                          isIndividualOrder,
-                          unavailableItemIds,
-                        );
-                  }
                   ref
-                      .read(acceptOrdersProvider.notifier)
-                      .makeOrderComplete(orderId, isIndividualOrder, 1);
-                  ref.read(bottomBarTabProvider.notifier).update((_) => 0);
-                  ref.read(cafeInfoTabScreenProvider.notifier).update((_) => 1);
+                      .read(orderNotifierProvider.notifier)
+                      .makeOrderRefundOrComplete(
+                          orderId, isIndividualOrder, 1, unavailableItemIds);
+
                 },
                 title: "Refund",
               ),

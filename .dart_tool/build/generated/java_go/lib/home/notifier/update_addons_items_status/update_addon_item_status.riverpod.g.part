@@ -1,0 +1,23 @@
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+String _$updateAddonItemStatusHash() =>
+    r'c2f39824df33deecbd69191ace8329843321d57b';
+
+/// See also [UpdateAddonItemStatus].
+@ProviderFor(UpdateAddonItemStatus)
+final updateAddonItemStatusProvider =
+    AutoDisposeAsyncNotifierProvider<UpdateAddonItemStatus, String?>.internal(
+  UpdateAddonItemStatus.new,
+  name: r'updateAddonItemStatusProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$updateAddonItemStatusHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$UpdateAddonItemStatus = AutoDisposeAsyncNotifier<String?>;
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

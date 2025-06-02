@@ -20,11 +20,5 @@ enum AuthEvent {
   signUp,
   forgotPassword,
   restPassword,
-  addCafeInfo,
-  updateClickAndCollect,
-  updateCafeInfo,
-  updateDisplayName,
-  updateProfileImage,
-  publishCafe
 }
 

@@ -3,12 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
 import 'package:java_go/config/common/button.dart';
+import 'package:java_go/config/common/extensions.dart';
+import 'package:java_go/config/widgets/common_message_popup.dart';
+import 'package:java_go/home/cafeinfotabscreen.dart';
 
 import 'package:java_go/home/completed.dart';
 import 'package:java_go/home/inprogress.dart';
 import 'package:java_go/home/model/get_orders.dart';
+import 'package:java_go/home/notifier/order_notifier/order_notifier.dart';
 import 'package:java_go/home/notifiers/accept_orders.dart';
 import 'package:java_go/home/notifiers/view_order_provider.dart';
+import 'package:java_go/home/state/order_state/order_state.dart';
+
+import 'bottombar.dart';
 
 final unavailableItemsProvider = StateProvider<List<String>>((ref) => []);
 
@@ -18,50 +25,85 @@ class ItemAvailabilityScreen extends ConsumerStatefulWidget {
   const ItemAvailabilityScreen({super.key, this.tabController});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _ItemAvailabilityScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _ItemAvailabilityScreenState();
 }
 
-class _ItemAvailabilityScreenState extends ConsumerState<ItemAvailabilityScreen> {
+class _ItemAvailabilityScreenState
+    extends ConsumerState<ItemAvailabilityScreen> {
   @override
   void initState() {
     super.initState();
-    ref.listenManual(acceptOrdersProvider, (previous, next) {
-      if (next?.message != null && next!.message!.isNotEmpty) {
-        if (next.message == "Order marked processed successfully!" ||
-            next.message == "Order marked completed successfully!") {
-          context.pop();
-          ref.invalidate(todayOrdersProvider);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(next.message.toString()),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 2),
-            ),
-          );
-        } else if (next.message == "Refund processed and notifications sent.") {
-          context.pop();
-        } else if (next.message == "Menu item status updated successfully!") {
-          context.pop();
-        } else if (next.message == "Order cannot be processed as some items are not available!") {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return Dialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: OrderUnaviableDialog(
-                  unavailableItems: next.unavailableItems ?? [],
-                  orderId: next.orderId ?? "",
-                  isIndividualOrder: next.isIndividual ?? 1,
-                ),
-              );
-            },
-          );
-        } else if (next.message == "Refund processed and notifications sent.") {
-          context.pop();
-        }
+    ref.listenManual(orderNotifierProvider, (previous, next) {
+      switch (next) {
+        case AsyncData<OrderState?> data when data.value != null:
+          if (data.value != null) {
+            if (data.value?.orderEvent == OrderEvent.orderRefundOrComplete) {
+              ref.invalidate(todayOrdersProvider);
+              context.pop();
+              context.pop();
+              context.showSnackBar(data.value?.response ?? "");
+              CommonPopUp.showMessageDialog(context,
+                  message: "Please update your item availability",
+                  onPressed: () {
+                context.pop();
+                ref.read(bottomBarTabProvider.notifier).update((_) => 0);
+                ref.read(cafeInfoTabIndexProvider.notifier).update((_) => 1);
+              });
+              return;
+            }
+            if (data.value?.orderEvent == OrderEvent.orderComplete) {
+              ref.invalidate(todayOrdersProvider);
+              context.pop();
+              context.showSnackBar(data.value?.response ?? "");
+            }
+          }
+
+        case AsyncError error:
+          context.showSnackBar(error.error.toString());
       }
+
+      // if (next?.message != null && next!.message!.isNotEmpty) {
+      //   if (next.message == "Order marked processed successfully!" ||
+      //       next.message == "Order marked completed successfully!") {
+      //     context.pop();
+      //     ref.invalidate(todayOrdersProvider);
+      //     ScaffoldMessenger.of(context).showSnackBar(
+      //       SnackBar(
+      //         content: Text(next.message.toString()),
+      //         backgroundColor: Colors.green,
+      //         duration: Duration(seconds: 2),
+      //       ),
+      //     );
+      //   } else if (next.message == "Refund processed and notifications sent.") {
+      //   } else if (next.message == "Menu item status updated successfully!") {
+      //     context.pop();
+      //   } else if (next.message ==
+      //       "Order cannot be processed as some items are not available!") {
+      //     showDialog(
+      //       context: context,
+      //       builder: (BuildContext context) {
+      //         return Dialog(
+      //           shape: RoundedRectangleBorder(
+      //             borderRadius: BorderRadius.circular(20),
+      //           ),
+      //           child: OrderUnaviableDialog(
+      //             unavailableItems: next.unavailableItems ?? [],
+      //             orderId: next.orderId ?? "",
+      //             isIndividualOrder: next.isIndividual ?? 1,
+      //           ),
+      //         );
+      //       },
+      //     );
+      //   } else if (next.message == "Refund processed and notifications sent.") {
+      //     context.pop();
+      //     CommonPopUp.showMessageDialog(context,
+      //         message: "Please update your item availability", onPressed: () {
+      //       ref.read(bottomBarTabProvider.notifier).update((_) => 0);
+      //       ref.read(cafeInfoTabIndexProvider.notifier).update((_) => 1);
+      //     });
+      //   }
+      // }
 
       // if (next?.error != null && next!.error!.isNotEmpty) {
 
@@ -87,7 +129,6 @@ class _ItemAvailabilityScreenState extends ConsumerState<ItemAvailabilityScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-
       backgroundColor: const Color(0xFFF5F3F0),
       body: Column(
         children: [
@@ -101,7 +142,8 @@ class _ItemAvailabilityScreenState extends ConsumerState<ItemAvailabilityScreen>
             indicatorColor: Colors.transparent,
             dividerColor: Colors.transparent,
             labelStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-            unselectedLabelStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+            unselectedLabelStyle:
+                TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
             tabs: const [
               Tab(child: Text('In progress')),
               Tab(child: Text('Completed')),
@@ -117,7 +159,7 @@ class _ItemAvailabilityScreenState extends ConsumerState<ItemAvailabilityScreen>
           Expanded(
             child: TabBarView(
               controller: widget.tabController,
-              children: const [ InProgressScreen(), CompletedScreen()],
+              children: const [InProgressScreen(), CompletedScreen()],
             ),
           ),
         ],
@@ -126,144 +168,148 @@ class _ItemAvailabilityScreenState extends ConsumerState<ItemAvailabilityScreen>
   }
 }
 
-class OrderUnaviableDialog extends ConsumerStatefulWidget {
-  const OrderUnaviableDialog({
-    super.key,
-    required this.unavailableItems,
-    required this.orderId,
-    required this.isIndividualOrder,
-  });
-  final List<UnaviableItems> unavailableItems;
-  final String orderId;
-  final int isIndividualOrder;
-  @override
-  ConsumerState<OrderUnaviableDialog> createState() => _OrderUnaviableDialogState();
-}
-
-class _OrderUnaviableDialogState extends ConsumerState<OrderUnaviableDialog> {
-  @override
-  Widget build(BuildContext context) {
-    final orderRefund = ref.watch(acceptOrdersProvider);
-    final makeAvailable = ref.watch(acceptOrdersProvider);
-
-    final screenSize = MediaQuery.of(context).size;
-
-    return Container(
-      width: screenSize.width * 0.4,
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Items Unavailable",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              20.verticalSpace,
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Some items in your order are unavailable",
-                  style: TextStyle(fontSize: 15),
-                ),
-              ),
-              20.verticalSpace,
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Items:",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-              ),
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.only(top: 0),
-                shrinkWrap: true,
-                itemCount: widget.unavailableItems.length,
-                itemBuilder: (context, index) {
-                  final item = widget.unavailableItems[index];
-                  final itemName = item.itemName ?? "";
-
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(child: Text(itemName)),
-                      Checkbox(
-                        value: item.isSelected,
-                        activeColor: Colors.brown,
-                        checkColor: Colors.white,
-                        side: const BorderSide(
-                          color: Colors.brown,
-                          width: 2,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        onChanged: (_) {
-                          // final current = ref.read(unavailableItemsProvider.notifier).state;
-                          // if (isSelected) {
-                          //   ref.read(unavailableItemsProvider.notifier).state =
-                          //       current.where((name) => name != itemName).toList();
-                          // } else {
-                          //   ref.read(unavailableItemsProvider.notifier).state = [
-                          //     ...current,
-                          //     itemName,
-                          //   ];
-                          // }
-                          setState(() {
-                            item.toggleSelection();
-                          });
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
-              30.verticalSpace,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    width: 200.w,
-                    height: 50.h,
-                    child: PrimaryButton(
-                      isLoading: makeAvailable!.isMakingAvailable,
-                      onClick: () {
-                        final selectedItems =
-                            widget.unavailableItems.where((e) => e.isSelected == true).map((e) {
-                          e.status = 1;
-                          return e;
-                        }).toList();
-
-                        ref.read(acceptOrdersProvider.notifier).makeAvailable(selectedItems);
-                        // ref.read(acceptOrdersProvider.notifier).makeAvailable(
-                        //       widget.unavailableItems.where((e) => e.isSelected == true).toList(),
-                        //     );
-                      },
-                      title: "Make Available",
-                    ),
-                  ),
-                  SizedBox(
-                    width: 200.w,
-                    height: 50.h,
-                    child: PrimaryButton(
-                      isLoading:
-                          orderRefund!.isRefunding && orderRefund.unavailableItems!.isNotEmpty,
-                      onClick: () {
-                        // ref
-                        //     .read(acceptOrdersProvider.notifier)
-                        //     .refundOrder(widget.orderId, widget.isIndividualOrder);
-                      },
-                      title: "Refund",
-                    ),
-                  )
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+// class OrderUnaviableDialog extends ConsumerStatefulWidget {
+//   const OrderUnaviableDialog({
+//     super.key,
+//     required this.unavailableItems,
+//     required this.orderId,
+//     required this.isIndividualOrder,
+//   });
+//   final List<UnaviableItems> unavailableItems;
+//   final String orderId;
+//   final int isIndividualOrder;
+//   @override
+//   ConsumerState<OrderUnaviableDialog> createState() =>
+//       _OrderUnaviableDialogState();
+// }
+//
+// class _OrderUnaviableDialogState extends ConsumerState<OrderUnaviableDialog> {
+//   @override
+//   Widget build(BuildContext context) {
+//     final orderRefund = ref.watch(acceptOrdersProvider);
+//     final makeAvailable = ref.watch(acceptOrdersProvider);
+//
+//     final screenSize = MediaQuery.of(context).size;
+//
+//     return Container(
+//       width: screenSize.width * 0.4,
+//       child: SingleChildScrollView(
+//         child: Padding(
+//           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+//           child: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             children: [
+//               Text(
+//                 "Items Unavailable",
+//                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+//               ),
+//               20.verticalSpace,
+//               Align(
+//                 alignment: Alignment.centerLeft,
+//                 child: Text(
+//                   "Some items in your order are unavailable",
+//                   style: TextStyle(fontSize: 15),
+//                 ),
+//               ),
+//               20.verticalSpace,
+//               Align(
+//                 alignment: Alignment.centerLeft,
+//                 child: Text(
+//                   "Items:",
+//                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+//                 ),
+//               ),
+//               ListView.builder(
+//                 physics: const NeverScrollableScrollPhysics(),
+//                 padding: EdgeInsets.only(top: 0),
+//                 shrinkWrap: true,
+//                 itemCount: widget.unavailableItems.length,
+//                 itemBuilder: (context, index) {
+//                   final item = widget.unavailableItems[index];
+//                   final itemName = item.itemName ?? "";
+//
+//                   return Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     children: [
+//                       Expanded(child: Text(itemName)),
+//                       Checkbox(
+//                         value: item.isSelected,
+//                         activeColor: Colors.brown,
+//                         checkColor: Colors.white,
+//                         side: const BorderSide(
+//                           color: Colors.brown,
+//                           width: 2,
+//                         ),
+//                         shape: RoundedRectangleBorder(
+//                           borderRadius: BorderRadius.circular(4),
+//                         ),
+//                         onChanged: (_) {
+//                           // final current = ref.read(unavailableItemsProvider.notifier).state;
+//                           // if (isSelected) {
+//                           //   ref.read(unavailableItemsProvider.notifier).state =
+//                           //       current.where((name) => name != itemName).toList();
+//                           // } else {
+//                           //   ref.read(unavailableItemsProvider.notifier).state = [
+//                           //     ...current,
+//                           //     itemName,
+//                           //   ];
+//                           // }
+//                           setState(() {
+//                             item.toggleSelection();
+//                           });
+//                         },
+//                       ),
+//                     ],
+//                   );
+//                 },
+//               ),
+//               30.verticalSpace,
+//               Row(
+//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                 children: [
+//                   SizedBox(
+//                     width: 200.w,
+//                     height: 50.h,
+//                     child: PrimaryButton(
+//                       isLoading: makeAvailable!.isMakingAvailable,
+//                       onClick: () {
+//                         final selectedItems = widget.unavailableItems
+//                             .where((e) => e.isSelected == true)
+//                             .map((e) {
+//                           e.status = 1;
+//                           return e;
+//                         }).toList();
+//
+//                         ref
+//                             .read(acceptOrdersProvider.notifier)
+//                             .makeAvailable(selectedItems);
+//                         // ref.read(acceptOrdersProvider.notifier).makeAvailable(
+//                         //       widget.unavailableItems.where((e) => e.isSelected == true).toList(),
+//                         //     );
+//                       },
+//                       title: "Make Available",
+//                     ),
+//                   ),
+//                   SizedBox(
+//                     width: 200.w,
+//                     height: 50.h,
+//                     child: PrimaryButton(
+//                       isLoading: orderRefund!.isRefunding &&
+//                           orderRefund.unavailableItems!.isNotEmpty,
+//                       onClick: () {
+//                         // ref
+//                         //     .read(acceptOrdersProvider.notifier)
+//                         //     .refundOrder(widget.orderId, widget.isIndividualOrder);
+//                       },
+//                       title: "Refund",
+//                     ),
+//                   )
+//                 ],
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

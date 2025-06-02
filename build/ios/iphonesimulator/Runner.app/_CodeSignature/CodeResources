@@ -46,7 +46,7 @@
 		</data>
 		<key>Frameworks/App.framework/App</key>
 		<data>
-		ERRDam1Ol56eO3ceDKLZ4GhXh9o=
+		7npq/xRZWx0IYTA3IMD+dSl1mxI=
 		</data>
 		<key>Frameworks/App.framework/Info.plist</key>
 		<data>
@@ -54,7 +54,7 @@
 		</data>
 		<key>Frameworks/App.framework/_CodeSignature/CodeResources</key>
 		<data>
-		Qx5Aiy7Ce0T6dipBltW+e9hoRTs=
+		kzZVAdRmKJUPVjwKT0EpcXcRqig=
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/AssetManifest.bin</key>
 		<data>
@@ -70,7 +70,7 @@
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/NOTICES.Z</key>
 		<data>
-		hG1Rzj9J1+V9onZZ+2Pnq3APohI=
+		TFP/TlpgK+zNY6fkcjGYy1YZzJo=
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/assets/fonts/Poppins-Black.ttf</key>
 		<data>
@@ -326,7 +326,7 @@
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/kernel_blob.bin</key>
 		<data>
-		Qo4eJxGwbLqLT78eLgUuW0MaaHE=
+		f76qWnalvybpUKuPEz57WyLjpdE=
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>
 		<data>
@@ -520,9 +520,29 @@
 		<data>
 		YIiJ5tHvqBeSpBm2mcfVZdaGz3E=
 		</data>
+		<key>Frameworks/webview_flutter_wkwebview.framework/Info.plist</key>
+		<data>
+		NhkpDaHrYj+Xv5ayeKRkw3wnFfU=
+		</data>
+		<key>Frameworks/webview_flutter_wkwebview.framework/_CodeSignature/CodeResources</key>
+		<data>
+		rxirOMAbwC3dj+6CRD280lhdLFM=
+		</data>
+		<key>Frameworks/webview_flutter_wkwebview.framework/webview_flutter_wkwebview</key>
+		<data>
+		1jziyMSPZBcym81Z1TPCf/s79GQ=
+		</data>
+		<key>Frameworks/webview_flutter_wkwebview.framework/webview_flutter_wkwebview_privacy.bundle/Info.plist</key>
+		<data>
+		uH/0PL0sLtwCYWTnemYeXBLVmhE=
+		</data>
+		<key>Frameworks/webview_flutter_wkwebview.framework/webview_flutter_wkwebview_privacy.bundle/PrivacyInfo.xcprivacy</key>
+		<data>
+		/LX0ZlwxwIAIhjZaDB8EiH5KpXA=
+		</data>
 		<key>Info.plist</key>
 		<data>
-		8dqASR00K0qXOPRT1G1YjokcSRo=
+		+oVh1goDoC1b6Tc1TZZJZGDo1xM=
 		</data>
 		<key>PkgInfo</key>
 		<data>
@@ -530,7 +550,7 @@
 		</data>
 		<key>Runner.debug.dylib</key>
 		<data>
-		6TrzJfN6ny29pBar8oNphZma3J4=
+		w+W4OBeHYqmIeaiAz3sxYo9Wibw=
 		</data>
 		<key>__preview.dylib</key>
 		<data>
@@ -613,7 +633,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			kfLS/enycdAWNLGlPNRuMqf8L0HWMRtjT0Zy8vGOAc8=
+			B9yIELGcssfkjxbjo59phvxH4U62CSwwP55xJ5evF5I=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/Info.plist</key>
@@ -627,7 +647,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			W+zVhJYpHWtt7jFUShznPomgo7KQS+xGBOWPI0Lii20=
+			F2FZUs3MAnTLBXP3RozpYj9IQYC84m7tls3MZM8G5gY=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/flutter_assets/AssetManifest.bin</key>
@@ -655,7 +675,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Dh4clT3Jt2CYGw5kq/XA8W+Tw+q7l1Xsik4JHTNHRT8=
+			PuUHZtQT7Bsb20dQJ5OtotZOFtThABdAh3zLqckDQHU=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/flutter_assets/assets/fonts/Poppins-Black.ttf</key>
@@ -1103,7 +1123,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			nuruHZ/kRV23ww4HF0cRD5jC2vkGj3Jze96gOYABGTE=
+			ycmx7uIfrp7D42+AmhSxoJvGtuTFQ/m26av8NBdCAWw=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>
@@ -1442,11 +1462,46 @@
 			RyJqKWCN8gatChEOav61p3/1dawd+cdr/bLW37P6/tE=
 			</data>
 		</dict>
+		<key>Frameworks/webview_flutter_wkwebview.framework/Info.plist</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			rEiaWeeurdeDr6azF25NsCpFuVZVMXw2zgC1mtfhaRA=
+			</data>
+		</dict>
+		<key>Frameworks/webview_flutter_wkwebview.framework/_CodeSignature/CodeResources</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			htxrHpr+GQ1hxaxu3+N/3zQ1f5fz9q1xhba7Urh7QFM=
+			</data>
+		</dict>
+		<key>Frameworks/webview_flutter_wkwebview.framework/webview_flutter_wkwebview</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			5YF0tB99icFNoyCCxRb4vEqCy37hztDr4snyX+uXW8s=
+			</data>
+		</dict>
+		<key>Frameworks/webview_flutter_wkwebview.framework/webview_flutter_wkwebview_privacy.bundle/Info.plist</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			dU/f0ih/M7/vxOFl69YyDqXWoHZpGwLTRlaRaOMACrk=
+			</data>
+		</dict>
+		<key>Frameworks/webview_flutter_wkwebview.framework/webview_flutter_wkwebview_privacy.bundle/PrivacyInfo.xcprivacy</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			bS2g2NkwIn1CjB2TY7CtbjoS4sm2jFzilxWKdBL8jDE=
+			</data>
+		</dict>
 		<key>Runner.debug.dylib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			qeH/7YG77pBjq7Cb3QXKCg2YsC6ROV7zmIdH/T+4sos=
+			m1HN+CJUBO3Ybhgpyel4vpgsJv8/fx6jD8qK9j2H/FI=
 			</data>
 		</dict>
 		<key>__preview.dylib</key>

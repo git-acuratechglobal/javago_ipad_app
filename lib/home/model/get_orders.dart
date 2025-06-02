@@ -41,6 +41,7 @@ List<GetOrder> get getCombinedUniqueOrders {
   final Map<String, GetOrder> uniqueOrdersMap = {};
 
   // Merge group coffee run orders using requestUniqueId
+if(groupCoffeeRunOrders!=null&&groupCoffeeRunOrders!.isNotEmpty){
   groupCoffeeRunOrders?.forEach((_, orderList) {
     for (final order in orderList) {
       final key = order.requestUniqueId ?? '';
@@ -49,6 +50,7 @@ List<GetOrder> get getCombinedUniqueOrders {
       }
     }
   });
+}
 
   // Merge individual orders using a prefixed id to avoid collision
   for (final order in individualOrders ?? []) {

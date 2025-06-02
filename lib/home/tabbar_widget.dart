@@ -175,12 +175,13 @@ class _CustomTabBarState extends ConsumerState<CustomTabBar> {
 class CustomTabBarCafeInfo extends ConsumerStatefulWidget {
   final String title;
   final bool? onBackPress;
-
+final TabController tabController;
   const CustomTabBarCafeInfo({
     super.key,
     required this.title,
     required this.onTap,
     this.onBackPress,
+    required this.tabController
   });
   final void Function(int val) onTap;
   @override
@@ -228,9 +229,7 @@ class _CustomTabBarCafeInfoState extends ConsumerState<CustomTabBarCafeInfo> {
             padding: EdgeInsets.only(right: 57),
             child: InkWell(
               onTap: () {
-                {
-                  context.navigateTo(CustomBottomNavBar(homescreen: true,));
-                }
+                ref.read(bottomBarTabProvider.notifier).update((_)=>1);
               },
               child: Container(
                 width: 158.w,
@@ -263,6 +262,7 @@ class _CustomTabBarCafeInfoState extends ConsumerState<CustomTabBarCafeInfo> {
           )
         ],
         bottom: TabBar(
+          controller: widget.tabController,
           onTap: (val) => widget.onTap(val),
           tabAlignment: TabAlignment.fill,
           indicatorSize: TabBarIndicatorSize.tab,

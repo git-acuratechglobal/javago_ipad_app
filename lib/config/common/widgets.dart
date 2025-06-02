@@ -16,6 +16,8 @@ import 'package:java_go/home/notifiers/menu_item_showing.dart';
 import '../../auth/model/cafe_model.dart';
 import '../../auth/model/cafetime_model.dart';
 import '../../auth/pages/sign_up/menu.dart';
+import '../../home/model/menu_items_data.dart';
+import '../../home/notifier/update_menu_item_status/update_menu_item_status_notifier.dart';
 
 final selectedItemIdProvider = StateProvider<int?>((ref) => null);
 final selectedIdsProvider = StateProvider<List<String>>((ref) => []);
@@ -638,18 +640,34 @@ class _ReviewtimingState extends State<Reviewtiming> {
   }
 }
 
-class ReviewItems extends ConsumerWidget {
+// class ReviewItems extends ConsumerWidget {
+//   const ReviewItems({super.key, this.isFromSignUp = false});
+//   final bool isFromSignUp;
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//
+//   }
+// }
+
+class ReviewItems extends ConsumerStatefulWidget {
   const ReviewItems({super.key, this.isFromSignUp = false});
   final bool isFromSignUp;
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState createState() => _ReviewItemsState();
+}
+
+class _ReviewItemsState extends ConsumerState<ReviewItems> {
+  @override
+  Widget build(BuildContext context) {
     final menuItemAsync = ref.watch(showMenuItemssProvider);
-    final controller=ref.watch(cafePageControllerProvider);
+    final controller = ref.watch(cafePageControllerProvider);
     return AsyncWidget(
+      onRetry: () => ref.refresh(showMenuItemssProvider),
       value: menuItemAsync,
       data: (menuItem) {
         final data = menuItem.data;
-        final items = data?.data != null ? data?.data!.sortByLatest() : [];
+        final List<Datum>? items =
+            data?.data != null ? data?.data!.sortByLatest() : [];
         final lastPage = int.tryParse(data?.lastPage.toString() ?? '1') ?? 1;
 
         // final selectedIdsNotifier =    ref.read(selectedItemIdProvider.notifier);
@@ -660,261 +678,271 @@ class ReviewItems extends ConsumerWidget {
             ref.read(selectedIdsProvider.notifier).state = allIds;
           });
         }
-        return  Stack(
+        return Stack(
           children: [
             SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    // Header Row
-                    11.verticalSpace,
-                    if (isFromSignUp)
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Padding(
-                          padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                          child: InkWell(
-                            onTap: () {
-                              context.navigateTo(
-                                const MenuScreen(
-                                  isEditmode: true,
-                                  fromAdd: true,
-                                ),
-                              );
-                            },
-                            child: Container(
-                              width: 140,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Color(0xFF9B6842),
-                                border:
-                                Border.all(color: Color(0xFF9B6842), width: 1),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  // Header Row
+                  11.verticalSpace,
+                  if (widget.isFromSignUp)
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                        child: InkWell(
+                          onTap: () {
+                            context.navigateTo(
+                              const MenuScreen(
+                                isEditmode: true,
+                                fromAdd: true,
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 5),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(Icons.add, color: Colors.white),
-                                    8.horizontalSpace,
-                                    Text(
-                                      'Add Items',
-                                      style: TextStyle(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
+                            );
+                          },
+                          child: Container(
+                            width: 140,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Color(0xFF9B6842),
+                              border: Border.all(
+                                  color: Color(0xFF9B6842), width: 1),
+                            ),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 5),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.add, color: Colors.white),
+                                  8.horizontalSpace,
+                                  Text(
+                                    'Add Items',
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                         ),
                       ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 15),
-                      width: 1189.w,
-                      height: 59.h,
-                      decoration: const BoxDecoration(color: Color(0xFF9B6842)),
-                      child: Row(
-                        children: [
-                          SizedBox(
-                              width: 74.w,
-                              child: Text('Images',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 16.sp))),
-                          15.horizontalSpace,
-                          SizedBox(
-                              width: 121.w,
-                              child: Text('Item Name',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 16.sp))),
-                          15.horizontalSpace,
-                          SizedBox(
-                              width: 102.w,
-                              child: Text('Category',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 16.sp))),
-                          35.horizontalSpace,
-                          SizedBox(
-                              width: 110.w,
-                              child: Text('Price',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 16.sp))),
-                          15.horizontalSpace,
-                          SizedBox(
-                              width: 198.w,
-                              child: Text('Description',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 16.sp))),
-                          10.horizontalSpace,
-                          SizedBox(
-                              width: 100.w,
-                              child: Text('Type',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 16.sp))),
-                          15.horizontalSpace,
-                          SizedBox(
-                              width: 120.w,
-                              child: Text('Status',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 16.sp))),
-                          15.horizontalSpace,
-                          SizedBox(
-                              width: 120.w,
-                              child: Text('Availability',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 16.sp))),
-                        ],
-                      ),
                     ),
-
-                    // Items List
-                    if (items.isEmpty) ...[
-                      100.verticalSpace,
-                      Text("No items Added yet!")
-                    ] else
-                      ListView.separated(
-                        padding: EdgeInsets.zero,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: items.length,
-                        separatorBuilder: (_, __) => 10.verticalSpace,
-                        itemBuilder: (context, index) {
-                          final item = items[index];
-
-                          // final selectedIds = ref.watch(selectedIdsProvider);
-                          // final selectedIdsNotifier = ref.read(selectedIdsProvider.notifier);
-                          // final idsToPass = selectedIds.isEmpty ? items.map((e) => e.id).toList() : [item.id];
-                          return Container(
-                            margin: EdgeInsets.symmetric(horizontal: 10.w),
-                            padding: EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade300),
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.white,
-                            ),
-                            child: Row(
-                              spacing: 10,
-                              children: [
-                                SizedBox(
-                                  height: 40.h,
-                                  width: 40.w,
-                                  child: item.itemImage != null
-                                      ? Image.network(item.itemImage!,
-                                      fit: BoxFit.cover)
-                                      : const Icon(Icons.image_not_supported),
-                                ),
-                                25.horizontalSpace,
-                                SizedBox(
-                                    width: 100.w,
-                                    child: Text(item.itemName ?? "-",
-                                        overflow: TextOverflow.ellipsis)),
-                                25.horizontalSpace,
-                                SizedBox(
-                                    width: 90.w,
-                                    child: Text(item.itemCategory ?? "-",
-                                        overflow: TextOverflow.ellipsis)),
-                                15.horizontalSpace,
-                                SizedBox(
-                                    width: 90.w,
-                                    child: Text(item.itemPrice ?? "-",
-                                        overflow: TextOverflow.ellipsis)),
-                                15.horizontalSpace,
-                                SizedBox(
-                                    width: 160.w,
-                                    child: Text(item.itemDescription ?? "-",
-                                        overflow: TextOverflow.ellipsis)),
-                                35.horizontalSpace,
-                                SizedBox(
-                                  width: 50.w,
-                                  child: Text(
-                                        () {
-                                      switch (item.itemType) {
-                                        case 1:
-                                          return "Veg";
-                                        case 2:
-                                          return "Non-Veg";
-                                        case 3:
-                                          return "Vegan";
-                                        default:
-                                          return "Unknown";
-                                      }
-                                    }(),
-                                  ),
-                                ),
-                                15.horizontalSpace,
-                                StatusContainer(
-                                  status: item.status,
-                                  id: item.id,
-                                  editOption: isFromSignUp,
-                                )
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    // Spacer(),
-                    11.verticalSpace,
-                    CustomPaginationBar(
-                      currentPage: ref.watch(paginationProvider),
-                      totalItems: data!.total ?? 0,
-                      totalPages: (data.perPage == 0 || data.total == null)
-                          ? 1
-                          : ((data.total! / data.perPage).ceil()),
-                      itemsPerPage: data.perPage,
-                      onPageChanged: (page) {
-                        ref.read(paginationProvider.notifier).state = page;
-                      },
-                      onItemsPerPageChanged: (value) {
-                        data.perPage = value;
-                        ref.read(paginationProvider.notifier).state =
-                        1; // Reset to page 1
-                      },
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    width: 1189.w,
+                    height: 59.h,
+                    decoration: const BoxDecoration(color: Color(0xFF9B6842)),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                            width: 74.w,
+                            child: Text('Images',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16.sp))),
+                        15.horizontalSpace,
+                        SizedBox(
+                            width: 121.w,
+                            child: Text('Item Name',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16.sp))),
+                        15.horizontalSpace,
+                        SizedBox(
+                            width: 102.w,
+                            child: Text('Category',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16.sp))),
+                        35.horizontalSpace,
+                        SizedBox(
+                            width: 110.w,
+                            child: Text('Price',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16.sp))),
+                        15.horizontalSpace,
+                        SizedBox(
+                            width: 198.w,
+                            child: Text('Description',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16.sp))),
+                        10.horizontalSpace,
+                        SizedBox(
+                            width: 100.w,
+                            child: Text('Type',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16.sp))),
+                        15.horizontalSpace,
+                        SizedBox(
+                            width: 120.w,
+                            child: Text('Status',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16.sp))),
+                        15.horizontalSpace,
+                        SizedBox(
+                            width: 120.w,
+                            child: Text('Availability',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16.sp))),
+                      ],
                     ),
+                  ),
 
-                    164.verticalSpace
-                  ],
-                ),
-              ),
-
-            if(isFromSignUp)
-            Positioned(
-              right: 50,
-              bottom: 10,
-              child: SizedBox(
-                width: 55,
-                height: 53,
-                child: PrimaryButton(
-                  backgroundColor: const Color(0xFFC0987C),
-                  onClick: () {
-                    if(items.isNotEmpty){
-                      if (controller.hasClients) {
-                        controller.nextPage(
-                          duration: Duration(milliseconds: 250),
-                          curve: Curves.bounceIn,
+                  // Items List
+                  if (items.isEmpty) ...[
+                    100.verticalSpace,
+                    Text("No items Added yet!")
+                  ] else
+                    ListView.separated(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: items.length,
+                      separatorBuilder: (_, __) => 10.verticalSpace,
+                      itemBuilder: (context, index) {
+                        final item = items[index];
+                        return Container(
+                          margin: EdgeInsets.symmetric(horizontal: 10.w),
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.white,
+                          ),
+                          child: Row(
+                            spacing: 10,
+                            children: [
+                              SizedBox(
+                                height: 40.h,
+                                width: 40.w,
+                                child: item.itemImage != null
+                                    ? Image.network(item.itemImage!,
+                                        fit: BoxFit.cover)
+                                    : const Icon(Icons.image_not_supported),
+                              ),
+                              25.horizontalSpace,
+                              SizedBox(
+                                  width: 100.w,
+                                  child: Text(item.itemName ?? "-",
+                                      overflow: TextOverflow.ellipsis)),
+                              25.horizontalSpace,
+                              SizedBox(
+                                  width: 90.w,
+                                  child: Text(item.itemCategory ?? "-",
+                                      overflow: TextOverflow.ellipsis)),
+                              15.horizontalSpace,
+                              SizedBox(
+                                  width: 90.w,
+                                  child: Text(item.itemPrice ?? "-",
+                                      overflow: TextOverflow.ellipsis)),
+                              15.horizontalSpace,
+                              SizedBox(
+                                  width: 160.w,
+                                  child: Text(item.itemDescription ?? "-",
+                                      overflow: TextOverflow.ellipsis)),
+                              35.horizontalSpace,
+                              SizedBox(
+                                width: 50.w,
+                                child: Text(
+                                  () {
+                                    switch (item.itemType) {
+                                      case 1:
+                                        return "Veg";
+                                      case 2:
+                                        return "Non-Veg";
+                                      case 3:
+                                        return "Vegan";
+                                      default:
+                                        return "Unknown";
+                                    }
+                                  }(),
+                                ),
+                              ),
+                              15.horizontalSpace,
+                              StatusContainer(
+                                status: item.status,
+                                id: item.id,
+                                editOption: !widget.isFromSignUp,
+                                onChanged: (bool value) {
+                                  if (!widget.isFromSignUp) {
+                                    ref
+                                        .read(
+                                            updateMenuItemStatusNotifierProvider
+                                                .notifier)
+                                        .updateMenuItemStatus(
+                                            itemId: item.id,
+                                            status: value ? 1 : 0);
+                                    setState(() {
+                                      items[index] = items[index]
+                                          .copyWith(status: value ? 1 : 0);
+                                    });
+                                  }
+                                },
+                              )
+                            ],
+                          ),
                         );
-                        return;
-                      }
-                    }
-                    context.showSnackBar("Please add 1 or more cafe menu item");
-                  },
-                  isIconButton: true,
-                ),
+                      },
+                    ),
+                  // Spacer(),
+                  11.verticalSpace,
+                  CustomPaginationBar(
+                    currentPage: ref.watch(paginationProvider),
+                    totalItems: data!.total ?? 0,
+                    totalPages: (data.perPage == 0 || data.total == null)
+                        ? 1
+                        : ((data.total! / data.perPage).ceil()),
+                    itemsPerPage: data.perPage,
+                    onPageChanged: (page) {
+                      ref.read(paginationProvider.notifier).state = page;
+                    },
+                    onItemsPerPageChanged: (value) {
+                      data.perPage = value;
+                      ref.read(paginationProvider.notifier).state =
+                          1; // Reset to page 1
+                    },
+                  ),
+
+                  164.verticalSpace
+                ],
               ),
-            )
+            ),
+            if (widget.isFromSignUp)
+              Positioned(
+                right: 50,
+                bottom: 10,
+                child: SizedBox(
+                  width: 55,
+                  height: 53,
+                  child: PrimaryButton(
+                    backgroundColor: const Color(0xFFC0987C),
+                    onClick: () {
+                      if (items.isNotEmpty) {
+                        if (controller.hasClients) {
+                          controller.nextPage(
+                            duration: Duration(milliseconds: 250),
+                            curve: Curves.bounceIn,
+                          );
+                          return;
+                        }
+                      }
+                      context
+                          .showSnackBar("Please add 1 or more cafe menu item");
+                    },
+                    isIconButton: true,
+                  ),
+                ),
+              )
           ],
         );
-
-
-
       },
     );
   }
 }
+
 // Page Index
 // PageIndex(currentPage: currentPage, totalPages: lastPage),
 // const SizedBox(height: 8),
@@ -1139,11 +1167,13 @@ class StatusContainer extends ConsumerStatefulWidget {
   final int status;
   final int id;
   final bool? editOption;
+  final void Function(bool) onChanged;
   StatusContainer(
       {super.key,
       required this.id,
       required this.status,
-      this.editOption = true});
+      this.editOption = true,
+      required this.onChanged});
 
   @override
   ConsumerState<StatusContainer> createState() => _StatusContainerState();
@@ -1156,6 +1186,14 @@ class _StatusContainerState extends ConsumerState<StatusContainer> {
   void initState() {
     super.initState();
     _isSwitched = widget.status == 1;
+  }
+
+  void _handleSwitch(bool value) {
+    setState(() {
+      _isSwitched = value; // local update for UI responsiveness
+    });
+
+    widget.onChanged(value); // parent handles backend update
   }
 
   @override
@@ -1197,18 +1235,10 @@ class _StatusContainerState extends ConsumerState<StatusContainer> {
               )),
           10.horizontalSpace,
           CupertinoSwitch(
-            activeColor: const Color(0xFFC0987C),
-            trackColor: const Color(0xFF757575),
-            value: _isSwitched,
-            onChanged: (bool value) {
-              if (widget.editOption ?? false) {
-                // ref.read(updateAddonItemStatusProvider(widget.id,widget.status).notifier).updateAddonItemStatus(widget.id);
-              }
-              setState(() {
-                _isSwitched = value;
-              });
-            },
-          ),
+              activeColor: const Color(0xFFC0987C),
+              trackColor: const Color(0xFF757575),
+              value: _isSwitched,
+              onChanged: _handleSwitch),
           (widget.editOption ?? false) ? 3.horizontalSpace : 2.horizontalSpace,
           (widget.editOption ?? true)
               ? Row(

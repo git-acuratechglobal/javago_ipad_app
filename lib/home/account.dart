@@ -21,7 +21,7 @@ class _AccountState extends ConsumerState<Account> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: false,
         backgroundColor: Color(0xFFF5F3F0),
         appBar: PreferredSize(
             preferredSize: Size.fromHeight(50),
@@ -40,8 +40,9 @@ class _AccountState extends ConsumerState<Account> {
                       fromSettings: true,
                     ));
                   },
-                  child:
-                      AccountWidget(imagePath: 'assets/images/ic_user.png', title: 'My Profile')),
+                  child: AccountWidget(
+                      imagePath: 'assets/images/ic_user.png',
+                      title: 'My Profile')),
               24.verticalSpace,
               Divider(
                 thickness: 1,
@@ -52,8 +53,9 @@ class _AccountState extends ConsumerState<Account> {
                 onTap: () {
                   context.navigateTo(ChangePassword());
                 },
-                child:
-                    AccountWidget(imagePath: 'assets/images/ic_lock.png', title: 'Change password'),
+                child: AccountWidget(
+                    imagePath: 'assets/images/ic_lock.png',
+                    title: 'Change password'),
               ),
               24.verticalSpace,
               Divider(
@@ -62,21 +64,25 @@ class _AccountState extends ConsumerState<Account> {
               ),
               24.verticalSpace,
               AccountWidget(
-                  imagePath: 'assets/images/ic_account_frame.png', title: 'Terms and Conditions'),
+                  imagePath: 'assets/images/ic_account_frame.png',
+                  title: 'Terms and Conditions'),
               24.verticalSpace,
               Divider(
                 thickness: 1,
                 color: Color(0x33461C10),
               ),
               24.verticalSpace,
-              AccountWidget(imagePath: 'assets/images/ic_shield.png', title: 'Privacy Policy'),
+              AccountWidget(
+                  imagePath: 'assets/images/ic_shield.png',
+                  title: 'Privacy Policy'),
               24.verticalSpace,
               Divider(
                 thickness: 1,
                 color: Color(0x33461C10),
               ),
               24.verticalSpace,
-              AccountWidget(imagePath: 'assets/images/ic_help-circle.png', title: 'FAQs'),
+              AccountWidget(
+                  imagePath: 'assets/images/ic_help-circle.png', title: 'FAQs'),
               24.verticalSpace,
               Divider(
                 thickness: 1,
@@ -84,11 +90,13 @@ class _AccountState extends ConsumerState<Account> {
               ),
               24.verticalSpace,
               InkWell(
-                  onTap: (){
+                  onTap: () {
                     ref.read(localStorageServiceProvider).clearSession();
                     context.navigateAndRemoveUntil(LoginScreen());
                   },
-                  child: AccountWidget(imagePath: 'assets/images/logoutcurve.png', title: 'Logout')),
+                  child: AccountWidget(
+                      imagePath: 'assets/images/logoutcurve.png',
+                      title: 'Logout')),
               24.verticalSpace,
               24.verticalSpace,
             ],
@@ -100,7 +108,8 @@ class _AccountState extends ConsumerState<Account> {
 class AccountWidget extends StatefulWidget {
   final String imagePath;
   final String title;
-  const AccountWidget({super.key, required this.imagePath, required this.title});
+  const AccountWidget(
+      {super.key, required this.imagePath, required this.title});
 
   @override
   State<AccountWidget> createState() => _AccountWidgetState();
@@ -151,7 +160,8 @@ class _AppBarWidgetState extends ConsumerState<AppBarWidget> {
   Widget build(BuildContext context) {
     final orders = ref.watch(todayOrdersProvider);
     final items = orders.value?.getCombinedUniqueOrders;
-    final inProgressOrders = items?.where((order) => order.orderCompleted != 1).toList().length;
+    final inProgressOrders =
+        items?.where((order) => order.orderCompleted != 1).toList().length;
     return AppBar(
         backgroundColor: Color(0xFFF5F3F0),
         automaticallyImplyLeading: false,
@@ -182,9 +192,7 @@ class _AppBarWidgetState extends ConsumerState<AppBarWidget> {
             child: widget.myOrders
                 ? InkWell(
                     onTap: () {
-                      context.navigateTo(CustomBottomNavBar(
-                        homescreen: true,
-                      ));
+                      ref.read(bottomBarTabProvider.notifier).update((_) => 1);
                     },
                     child: Container(
                         width: 158.w,

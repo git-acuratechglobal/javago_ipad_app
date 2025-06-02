@@ -8,6 +8,7 @@ import 'package:java_go/auth/params/cafe_info_params.dart';
 import 'package:java_go/config/common/widgets.dart';
 import 'package:java_go/config/validator.dart';
 import 'package:java_go/config/widgets/app_text_field.dart';
+import 'package:java_go/home/notifier/cafe_info_notifier/cafe_info_notifier.dart';
 import '../../../config/async_widget.dart';
 import '../../../config/common/button.dart';
 import '../../../config/common/custom_dropdown.dart';
@@ -18,10 +19,10 @@ import '../../model/cafetime_model.dart';
 import '../../notifier/auth_notifier.dart';
 
 class CafeInfoScreen extends ConsumerStatefulWidget {
-  final bool isEditmode;
+  final bool isFromSignUp;
   const CafeInfoScreen({
     super.key,
-    required this.isEditmode,
+    required this.isFromSignUp,
   });
 
   @override
@@ -44,7 +45,7 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
       backgroundColor: const Color(0xFFF5F3F0),
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        leading: widget.isEditmode
+        leading: !widget.isFromSignUp
             ? InkWell(
                 onTap: () {
                   context.pop();
@@ -58,7 +59,7 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
             : null,
         backgroundColor: Color(0xFFF5F3F0),
         title: Text(
-          'Sign up',
+          widget.isFromSignUp ? 'Sign up' : 'Edit Profile',
           style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                 color: Color(0xFF461C10),
               ),
@@ -91,7 +92,7 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                           },
                         ),
                         Spacer(),
-                        if (widget.isEditmode)
+                        if (!widget.isFromSignUp)
                           InkWell(
                             onTap: () {},
                             child: Text(
@@ -103,7 +104,7 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                             ),
                           ),
                         23.horizontalSpace,
-                        if (widget.isEditmode)
+                        if (!widget.isFromSignUp)
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 42),
                             child: InkWell(
@@ -192,7 +193,7 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                         fontWeight: FontWeight.w600),
                               ),
                               SizedBox(
-                                height: 150,
+                                height: 200,
                                 width: 300,
                                 child: AsyncWidget(
                                     onRetry: () => ref.refresh(
@@ -276,7 +277,7 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                               data.cafeTimings,
                                           onTimeChanged:
                                               (List<CafeDayTime> cafeTime) {
-                                            if(cafeTime.isNotEmpty){
+                                            if (cafeTime.isNotEmpty) {
                                               cafeInfoNotifier
                                                   .updateCafeHours(cafeTime);
                                             }
@@ -380,15 +381,14 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                     hint: "Select speciality",
                                     validator: (value) => validator
                                         .validateSpecialityCoffee(value),
-                                    initialValue: cafeData?.cafeManagement
-                                                 !=
-                                            null
-                                        ? (cafeData?.cafeManagement!
-                                                    .speciallityCoffee ==
-                                                1
-                                            ? "Yes"
-                                            : "No")
-                                        : null,
+                                    initialValue:
+                                        cafeData?.cafeManagement != null
+                                            ? (cafeData?.cafeManagement!
+                                                        .speciallityCoffee ==
+                                                    1
+                                                ? "Yes"
+                                                : "No")
+                                            : null,
                                     items: items.toSet().toList(),
                                     onChanged: (val) {
                                       if (val == "Yes") {
@@ -411,24 +411,28 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
               ),
             );
           }),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(top: 70, right: 40),
-        child: SizedBox(
-          width: 55,
-          height: 53,
-          child: PrimaryButton(
-            isLoading: ref.watch(authNotifierProvider).isLoading,
-            backgroundColor: const Color(0xFFC0987C),
-            onClick: () {
-              if (_fkey.currentState!.validate()) {
-                _fkey.currentState!.save();
-                ref.read(authNotifierProvider.notifier).addCafeInformation();
-              }
-            },
-            isIconButton: true,
-          ),
-        ),
-      ),
+      floatingActionButton: widget.isFromSignUp
+          ? Padding(
+              padding: const EdgeInsets.only(top: 70, right: 40),
+              child: SizedBox(
+                width: 55,
+                height: 53,
+                child: PrimaryButton(
+                  isLoading: ref.watch(cafeInfoNotifierProvider).isLoading,
+                  backgroundColor: const Color(0xFFC0987C),
+                  onClick: () {
+                    if (_fkey.currentState!.validate()) {
+                      _fkey.currentState!.save();
+                      ref
+                          .read(cafeInfoNotifierProvider.notifier)
+                          .addCafeInformation();
+                    }
+                  },
+                  isIconButton: true,
+                ),
+              ),
+            )
+          : null,
     );
   }
 
@@ -583,19 +587,28 @@ class CustomContainer extends StatelessWidget {
       decoration: ShapeDecoration(
         color: Colors.white,
         shape: RoundedRectangleBorder(
-          side: BorderSide(width: 1, color: borderColor),
+          borderRadius: BorderRadius.circular(10),
+          side: BorderSide(color: const Color(0xFF4C2F27)),
         ),
       ),
-      child: Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8),
-          child: Text(
-            label,
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(fontWeight: FontWeight.w600),
-          ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.copyWith(fontWeight: FontWeight.w600),
+            ),
+            Icon(
+              Icons.keyboard_arrow_down_outlined,
+              color: const Color(0xFF4C2F27),
+              size: 40,
+            )
+          ],
         ),
       ),
     );

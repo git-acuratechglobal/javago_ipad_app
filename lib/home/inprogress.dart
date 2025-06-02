@@ -210,7 +210,7 @@ class _OrderWidgetState extends ConsumerState<OrderWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${widget.peopleCount} people',
+                  '${widget.peopleCount} person',
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w400,
@@ -240,9 +240,9 @@ class _OrderWidgetState extends ConsumerState<OrderWidget> {
                       orderId: widget.orderId.toString(),
                     ));
                   } else {
-                    ref
-                        .read(acceptOrdersProvider.notifier)
-                        .makeOrderComplete(widget.orderId.toString(), widget.isIndividualOrder, 1);
+                    // ref
+                    //     .read(acceptOrdersProvider.notifier)
+                    //     .makeOrderComplete(widget.orderId.toString(), widget.isIndividualOrder, 1);
                   }
                 },
                 title: widget.status == 1 ? 'View Order' : 'Complete Order',

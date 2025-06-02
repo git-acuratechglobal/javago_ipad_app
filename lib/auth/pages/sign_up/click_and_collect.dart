@@ -8,6 +8,7 @@ import 'package:java_go/config/common/extensions.dart';
 
 import 'package:java_go/config/common/widgets.dart';
 
+import '../../../home/notifier/cafe_info_notifier/cafe_info_notifier.dart';
 import '../../model/cafe_model.dart';
 import '../../model/cafe_time_and_category.dart';
 import '../../model/cafetime_model.dart';
@@ -75,11 +76,11 @@ class _ClickAndCollectState extends ConsumerState<ClickAndCollect> {
                 width: 55,
                 height: 53,
                 child: PrimaryButton(
-                  isLoading: ref.watch(authNotifierProvider).isLoading,
+                  isLoading: ref.watch(cafeInfoNotifierProvider).isLoading,
                   backgroundColor: const Color(0xFFC0987C),
                   onClick: () {
                     ref
-                        .read(authNotifierProvider.notifier)
+                        .read(cafeInfoNotifierProvider.notifier)
                         .updateClickAndCollect();
                   },
                   isIconButton: true,
@@ -293,7 +294,7 @@ class _ClickandCollectWidgetState extends ConsumerState<ClickandCollectWidget> {
                       clickAndCollect = 0;
                     }
                   });
-                  ref.read(authNotifierProvider.notifier).updateForm(
+                  ref.read(cafeInfoNotifierProvider.notifier).updateForm(
                       key: 'clickAndCollect', value: clickAndCollect);
                 },
               ),
@@ -339,7 +340,7 @@ class _ClickandCollectWidgetState extends ConsumerState<ClickandCollectWidget> {
                               setState(() {
                                 selectedCapacity = value!;
                                 ref
-                                    .read(authNotifierProvider
+                                    .read(cafeInfoNotifierProvider
                                         .notifier)
                                     .updateForm(
                                         key: 'maxOrders',
@@ -386,7 +387,7 @@ class _ClickandCollectWidgetState extends ConsumerState<ClickandCollectWidget> {
                                       .toList(),
                           onTimeChanged: (List<CafeDayTime> cafeTime) {
                             ref
-                                .read(authNotifierProvider.notifier)
+                                .read(cafeInfoNotifierProvider.notifier)
                                 .updateForm(key: 'cafeTimes', value: cafeTime);
                           },
                         ),

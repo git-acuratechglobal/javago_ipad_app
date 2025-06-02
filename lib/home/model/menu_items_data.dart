@@ -130,6 +130,47 @@ class Datum {
     factory Datum.fromJson(Map<String, dynamic> json) => _$DatumFromJson(json);
 
     Map<String, dynamic> toJson() => _$DatumToJson(this);
+
+    Datum copyWith({
+        dynamic id,
+        String? itemName,
+        dynamic cafeId,
+        dynamic cafeMenuId,
+        dynamic itemImageId,
+        int? itemType,
+        String? itemPrice,
+        String? itemDescription,
+        dynamic status,
+        dynamic itemDeletedAt,
+        dynamic createdAt,
+        dynamic updatedAt,
+        String? itemImage,
+        String? itemCategory,
+        String? itemSizes,
+        dynamic addonOptions,
+        String? suggestedItems,
+    }) {
+        return Datum(
+            id: id ?? this.id,
+            itemName: itemName ?? this.itemName,
+            cafeId: cafeId ?? this.cafeId,
+            cafeMenuId: cafeMenuId ?? this.cafeMenuId,
+            itemImageId: itemImageId ?? this.itemImageId,
+            itemType: itemType ?? this.itemType,
+            itemPrice: itemPrice ?? this.itemPrice,
+            itemDescription: itemDescription ?? this.itemDescription,
+            status: status ?? this.status,
+            itemDeletedAt: itemDeletedAt ?? this.itemDeletedAt,
+            createdAt: createdAt ?? this.createdAt,
+            updatedAt: updatedAt ?? this.updatedAt,
+            itemImage: itemImage ?? this.itemImage,
+            itemCategory: itemCategory ?? this.itemCategory,
+            itemSizes: itemSizes ?? this.itemSizes,
+            addonOptions: addonOptions ?? this.addonOptions,
+            suggestedItems: suggestedItems ?? this.suggestedItems,
+        );
+    }
+
 }
 
 @JsonSerializable()

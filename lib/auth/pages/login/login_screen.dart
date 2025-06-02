@@ -6,7 +6,6 @@ import 'package:java_go/config/common/button.dart';
 import 'package:java_go/config/validator.dart';
 import 'package:java_go/home/bottombar.dart';
 import 'package:java_go/service/local_storage_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../notifier/auth_notifier.dart';
 import '../../state/auth_state/auth_state.dart';
 import '../steps/stepper_widget.dart';
@@ -36,42 +35,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             final controller = ref.read(cafePageControllerProvider);
             final saveUserLogin = ref.read(localStorageServiceProvider);
             final shouldReturnToReview = ref.read(returnToReviewProvider);
+
             if (authState?.authEvent == AuthEvent.login) {
               final profile = authState?.cafeModel;
               final controller = ref.read(cafePageControllerProvider);
-              if (profile?.signupCompleted == 0) {
-                context.navigateTo(CafeSteps());
-                Future.delayed(Duration(milliseconds: 300), () {
+
+              final steps = [
+                MapEntry(0, profile?.signupCompleted),
+                MapEntry(1, profile?.profileCompleted),
+                MapEntry(3, profile?.menuCompleted),
+                MapEntry(4, profile?.loyaltyCompleted),
+                MapEntry(6, profile?.stripeOnboardingCompleted),
+                MapEntry(6, profile?.isPublished == 0 ? 0 : 1),
+              ];
+
+              final nextStepPage = steps
+                  .firstWhere(
+                    (entry) => entry.value == 0,
+                    orElse: () => const MapEntry(-1, 1),
+                  )
+                  .key;
+
+              if (nextStepPage >= 0) {
+                context.navigateAndRemoveUntil(const CafeSteps());
+                Future.delayed(const Duration(milliseconds: 300), () {
                   if (controller.hasClients) {
-                    controller.jumpToPage(0);
-                  }
-                });
-              } else if (profile?.profileCompleted == 0) {
-                context.navigateTo(CafeSteps());
-                Future.delayed(Duration(milliseconds: 300), () {
-                  if (controller.hasClients) {
-                    controller.jumpToPage(1);
-                  }
-                });
-              } else if (profile?.menuCompleted == 0) {
-                context.navigateTo(CafeSteps());
-                Future.delayed(Duration(milliseconds: 300), () {
-                  if (controller.hasClients) {
-                    controller.jumpToPage(3);
-                  }
-                });
-              } else if (profile?.loyaltyCompleted == 0) {
-                context.navigateTo(CafeSteps());
-                Future.delayed(Duration(milliseconds: 300), () {
-                  if (controller.hasClients) {
-                    controller.jumpToPage(4);
-                  }
-                });
-              } else if (profile?.isPublished == 0) {
-                context.navigateTo(CafeSteps());
-                Future.delayed(Duration(milliseconds: 300), () {
-                  if (controller.hasClients) {
-                    controller.jumpToPage(6);
+                    controller.jumpToPage(nextStepPage);
                   }
                 });
               } else {
@@ -91,39 +80,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 );
               }
               return;
-            }
-            if (authState?.authEvent == AuthEvent.addCafeInfo) {
-              // if (shouldReturnToReview) {
-              //   ref.read(returnToReviewProvider.notifier).state = false;
-              //   controller.animateToPage(
-              //     5,
-              //     duration: const Duration(milliseconds: 300),
-              //     curve: Curves.easeInOut,
-              //   );
-              // } else {
-                if (controller.hasClients) {
-                  controller.nextPage(
-                    duration: Duration(milliseconds: 250),
-                    curve: Curves.bounceIn,
-                  );
-                }
-
-                return;
-              // }
-            }
-            if (authState?.authEvent == AuthEvent.updateClickAndCollect) {
-              if (controller.hasClients) {
-                controller.nextPage(
-                  duration: Duration(milliseconds: 250),
-                  curve: Curves.bounceIn,
-                );
-              }
-
-              return;
-            }
-            if (authState?.authEvent == AuthEvent.publishCafe) {
-              saveUserLogin.setUserLoginSaved(true);
-              context.navigateAndRemoveUntil(CustomBottomNavBar());
             }
 
           case AsyncError error:
@@ -149,8 +105,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
       return;
     }
-
-    // Note: Loading handled by listener
   }
 
   @override
@@ -274,7 +228,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               _isPasswordVisible = !_isPasswordVisible;
                             });
                           },
-                          child: _isPasswordVisible
+                          child: !_isPasswordVisible
                               ? Image.asset(
                                   'assets/images/ic_hide_password.png')
                               : Image.asset(

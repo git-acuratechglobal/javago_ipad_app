@@ -248,9 +248,9 @@ class _OrderWidgetState extends ConsumerState<OrderWidget> {
                       widget.orderId.toString() == orderState.orderId &&
                       orderState.unavailableItems == null,
                   onClick: () async {
-                    ref
-                        .read(acceptOrdersProvider.notifier)
-                        .acceptOrder(widget.orderId.toString(), widget.isIndividualOrder);
+                    // ref
+                    //     .read(acceptOrdersProvider.notifier)
+                    //     .acceptOrder(widget.orderId.toString(), widget.isIndividualOrder);
                   },
                   title: 'Accept',
                 ),
