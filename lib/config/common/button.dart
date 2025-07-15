@@ -10,6 +10,7 @@ class PrimaryButton extends StatelessWidget {
   final bool isIconButton;
   final Color? backgroundColor;
   final Color? textColor;
+  final double borderRadius;
   const PrimaryButton({
     super.key,
     this.title,
@@ -20,6 +21,7 @@ class PrimaryButton extends StatelessWidget {
     this.isIconButton = false,
     this.backgroundColor,
     this.textColor,
+    this.borderRadius=8
   });
 
   @override
@@ -28,7 +30,7 @@ class PrimaryButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         fixedSize: fixedSize ?? (isIconButton ? const Size(48, 48) : null),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(isIconButton ? 12 : 8),
+          borderRadius: BorderRadius.circular(isIconButton ? 12 : borderRadius),
         ),
         backgroundColor: backgroundColor ?? const Color(0xFFC0987C),
         disabledBackgroundColor: const Color(0xFFC0987C),
@@ -41,8 +43,8 @@ class PrimaryButton extends StatelessWidget {
         child: isLoading
             ? LoadingAnimationWidget.twistingDots(
                 size: 24,
-                rightDotColor: const Color(0xFF005FF2),
-                leftDotColor: const Color(0xFFD7ED5D),
+                rightDotColor: Colors.white,
+                leftDotColor: Colors.white,
               )
             : isIconButton
                 ? const Icon(Icons.arrow_forward, color: Colors.white, size: 20)

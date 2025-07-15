@@ -376,10 +376,10 @@ class _SimpleCustomDropdownState extends State<SimpleCustomDropdown> {
                 },
                 buttonStyleData: ButtonStyleData(
                   height: widget.height,
-                   width:widget.width,
+                  width: widget.width,
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(widget.borderRadius),
                     color: widget.backgroundColor,
                     border: Border.all(
                       color: Color(0xFF4C2F27),
@@ -387,7 +387,10 @@ class _SimpleCustomDropdownState extends State<SimpleCustomDropdown> {
                   ),
                 ),
                 iconStyleData: IconStyleData(
-                  icon: SvgPicture.asset("assets/images/drop_down.svg",height: 30,),
+                  icon: SvgPicture.asset(
+                    "assets/images/drop_down.svg",
+                    height: 30,
+                  ),
                 ),
                 dropdownStyleData: DropdownStyleData(
                   maxHeight: widget.dropdownHeight ?? 200,
@@ -435,7 +438,6 @@ class _SimpleCustomDropdownState extends State<SimpleCustomDropdown> {
   }
 }
 
-
 class DropdownItem {
   final String id;
   final String name;
@@ -444,10 +446,10 @@ class DropdownItem {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is DropdownItem &&
-              runtimeType == other.runtimeType &&
-              id == other.id &&
-              name == other.name;
+      other is DropdownItem &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          name == other.name;
 
   @override
   int get hashCode => id.hashCode ^ name.hashCode;
@@ -555,7 +557,8 @@ class MultiSelectCustomDropdown extends StatefulWidget {
   final Color checkboxCheckColor;
 
   @override
-  State<MultiSelectCustomDropdown> createState() => _MultiSelectCustomDropdownState();
+  State<MultiSelectCustomDropdown> createState() =>
+      _MultiSelectCustomDropdownState();
 }
 
 class _MultiSelectCustomDropdownState extends State<MultiSelectCustomDropdown> {
@@ -602,10 +605,29 @@ class _MultiSelectCustomDropdownState extends State<MultiSelectCustomDropdown> {
 
   void _toggleSelection(String id) {
     setState(() {
-      if (selectedIds.contains(id)) {
-        selectedIds.remove(id);
+      if (id == "all") {
+        // If "All" is selected
+        if (selectedIds.contains("all")) {
+          // If "All" is already selected, deselect it
+          selectedIds.remove("all");
+        } else {
+          // If "All" is not selected, select it and clear all other selections
+          selectedIds.clear();
+          selectedIds.add("all");
+        }
       } else {
-        selectedIds.add(id);
+        // If any other item is selected
+        // First, remove "all" if it exists
+        if (selectedIds.contains("all")) {
+          selectedIds.remove("all");
+        }
+
+        // Then toggle the current item
+        if (selectedIds.contains(id)) {
+          selectedIds.remove(id);
+        } else {
+          selectedIds.add(id);
+        }
       }
     });
     widget.onChanged(selectedIds);
@@ -633,21 +655,22 @@ class _MultiSelectCustomDropdownState extends State<MultiSelectCustomDropdown> {
                     _getDisplayText(),
                     style: selectedIds.isEmpty
                         ? (widget.hintStyle ??
-                        TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ))
+                            TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ))
                         : (widget.textStyle ??
-                        const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black87,
-                        )),
+                            const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black87,
+                            )),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 items: uniqueItems.map((DropdownItem item) {
                   final isSelected = selectedIds.contains(item.id);
                   return DropdownMenuItem<String>(
+                    key: UniqueKey(),
                     value: item.id,
                     enabled: false, // Disable default selection behavior
                     child: StatefulBuilder(
@@ -655,8 +678,10 @@ class _MultiSelectCustomDropdownState extends State<MultiSelectCustomDropdown> {
                         return InkWell(
                           onTap: () {
                             _toggleSelection(item.id);
-                            menuSetState(() {}); // Update checkbox state in dropdown
-                            field.didChange(selectedIds); // Update FormField state
+                            menuSetState(
+                                () {}); // Update checkbox state in dropdown
+                            field.didChange(
+                                selectedIds); // Update FormField state
                           },
                           child: Container(
                             height: double.infinity,
@@ -667,12 +692,15 @@ class _MultiSelectCustomDropdownState extends State<MultiSelectCustomDropdown> {
                                   value: selectedIds.contains(item.id),
                                   onChanged: (bool? value) {
                                     _toggleSelection(item.id);
-                                    menuSetState(() {}); // Update checkbox state
-                                    field.didChange(selectedIds); // Update FormField state
+                                    menuSetState(
+                                        () {}); // Update checkbox state
+                                    field.didChange(
+                                        selectedIds); // Update FormField state
                                   },
                                   activeColor: widget.checkboxActiveColor,
                                   checkColor: widget.checkboxCheckColor,
-                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
@@ -728,11 +756,11 @@ class _MultiSelectCustomDropdownState extends State<MultiSelectCustomDropdown> {
                     radius: widget.scrollbarRadius ?? const Radius.circular(40),
                     thickness: widget.scrollbarThickness != null
                         ? WidgetStateProperty.all<double>(
-                        widget.scrollbarThickness!)
+                            widget.scrollbarThickness!)
                         : null,
                     thumbVisibility: widget.scrollbarAlwaysShow != null
                         ? WidgetStateProperty.all<bool>(
-                        widget.scrollbarAlwaysShow!)
+                            widget.scrollbarAlwaysShow!)
                         : null,
                   ),
                 ),
@@ -763,46 +791,44 @@ class _MultiSelectCustomDropdownState extends State<MultiSelectCustomDropdown> {
   }
 }
 
-
-
-
-class CustomDropdownWithImage<T> extends StatelessWidget {
-  const CustomDropdownWithImage({
-    super.key,
-    required this.hint,
-    required this.value,
-    required this.dropdownItems,
-    required this.onChanged,
-    required this.getLabel,
-    required this.getImageUrl,
-    this.selectedItemBuilder,
-    this.hintAlignment,
-    this.valueAlignment,
-    this.buttonHeight,
-    this.buttonWidth,
-    this.buttonPadding,
-    this.buttonDecoration,
-    this.buttonElevation,
-    this.icon,
-    this.customBtn,
-    this.iconSize,
-    this.iconEnabledColor,
-    this.iconDisabledColor,
-    this.itemHeight,
-    this.itemPadding,
-    this.dropdownHeight,
-    this.dropdownWidth,
-    this.dropdownPadding,
-    this.dropdownDecoration,
-    this.dropdownElevation,
-    this.scrollbarRadius,
-    this.scrollbarThickness,
-    this.scrollbarAlwaysShow,
-    this.offset = Offset.zero,
-  });
+class CustomDropdownWithImage<T> extends StatefulWidget {
+  CustomDropdownWithImage(
+      {super.key,
+      required this.hint,
+      required this.value,
+      required this.dropdownItems,
+      required this.onChanged,
+      required this.getLabel,
+      required this.getImageUrl,
+      this.selectedItemBuilder,
+      this.hintAlignment,
+      this.valueAlignment,
+      this.buttonHeight,
+      this.buttonWidth,
+      this.buttonPadding,
+      this.buttonDecoration,
+      this.buttonElevation,
+      this.icon,
+      this.customBtn,
+      this.iconSize,
+      this.iconEnabledColor,
+      this.iconDisabledColor,
+      this.itemHeight,
+      this.itemPadding,
+      this.dropdownHeight,
+      this.dropdownWidth,
+      this.dropdownPadding,
+      this.dropdownDecoration,
+      this.dropdownElevation,
+      this.scrollbarRadius,
+      this.scrollbarThickness,
+      this.scrollbarAlwaysShow,
+      this.offset = Offset.zero,
+      this.initialValue});
 
   final String hint;
-  final T? value;
+  T? value;
+  final T? initialValue;
   final List<T> dropdownItems;
   final ValueChanged<T?>? onChanged;
 
@@ -833,20 +859,35 @@ class CustomDropdownWithImage<T> extends StatelessWidget {
   final Offset offset;
 
   @override
+  State<CustomDropdownWithImage<T>> createState() =>
+      _CustomDropdownWithImageState<T>();
+}
+
+class _CustomDropdownWithImageState<T>
+    extends State<CustomDropdownWithImage<T>> {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialValue != null) {
+      widget.value = widget.initialValue;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return DropdownButtonHideUnderline(
       child: DropdownButton2<T>(
         isExpanded: true,
-        customButton: customBtn,
+        customButton: widget.customBtn,
         hint: Align(
-          alignment: hintAlignment ?? Alignment.centerLeft,
+          alignment: widget.hintAlignment ?? Alignment.centerLeft,
           child: Text(
-            hint,
+            widget.hint,
             style: TextStyle(fontSize: 14.sp),
           ),
         ),
-        value: value,
-        items: dropdownItems.map((item) {
+        value: widget.value,
+        items: widget.dropdownItems.map((item) {
           return DropdownMenuItem<T>(
             value: item,
             child: Row(
@@ -856,7 +897,7 @@ class CustomDropdownWithImage<T> extends StatelessWidget {
                     width: 30.w,
                     height: 30.h,
                     child: NetworkImageWidget(
-                      imageUrl: getImageUrl(item),
+                      imageUrl: widget.getImageUrl(item),
                       loadingWidgetSize: 15,
                     ),
                   ),
@@ -864,7 +905,7 @@ class CustomDropdownWithImage<T> extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    getLabel(item),
+                    widget.getLabel(item),
                     style: TextStyle(fontSize: 14.sp, color: Colors.black),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -873,49 +914,51 @@ class CustomDropdownWithImage<T> extends StatelessWidget {
             ),
           );
         }).toList(),
-        onChanged: onChanged,
-        selectedItemBuilder: selectedItemBuilder,
+        onChanged: widget.onChanged,
+        selectedItemBuilder: widget.selectedItemBuilder,
         buttonStyleData: ButtonStyleData(
-          height: buttonHeight ?? 60,
-          width: buttonWidth ?? 240.w,
-          padding: buttonPadding ?? const EdgeInsets.symmetric(horizontal: 14),
-          decoration: buttonDecoration ??
+          height: widget.buttonHeight ?? 60,
+          width: widget.buttonWidth ?? 240.w,
+          padding: widget.buttonPadding ??
+              const EdgeInsets.symmetric(horizontal: 14),
+          decoration: widget.buttonDecoration ??
               BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.black45),
               ),
-          elevation: buttonElevation,
+          elevation: widget.buttonElevation,
         ),
         iconStyleData: IconStyleData(
-          icon: icon ?? const Icon(Icons.arrow_forward_ios_outlined),
-          iconSize: iconSize ?? 12,
-          iconEnabledColor: iconEnabledColor,
-          iconDisabledColor: iconDisabledColor,
+          icon: widget.icon ?? const Icon(Icons.arrow_forward_ios_outlined),
+          iconSize: widget.iconSize ?? 12,
+          iconEnabledColor: widget.iconEnabledColor,
+          iconDisabledColor: widget.iconDisabledColor,
         ),
         dropdownStyleData: DropdownStyleData(
-          maxHeight: dropdownHeight ?? 200,
-          width: dropdownWidth ?? 240.w,
-          padding: dropdownPadding,
-          decoration: dropdownDecoration ??
+          maxHeight: widget.dropdownHeight ?? 200,
+          width: widget.dropdownWidth ?? 240.w,
+          padding: widget.dropdownPadding,
+          decoration: widget.dropdownDecoration ??
               BoxDecoration(
                 color: const Color(0xFF4C2F27),
                 borderRadius: BorderRadius.circular(1),
               ),
-          elevation: dropdownElevation ?? 8,
-          offset: offset,
+          elevation: widget.dropdownElevation ?? 8,
+          offset: widget.offset,
           scrollbarTheme: ScrollbarThemeData(
-            radius: scrollbarRadius ?? const Radius.circular(40),
-            thickness: scrollbarThickness != null
-                ? WidgetStateProperty.all(scrollbarThickness!)
+            radius: widget.scrollbarRadius ?? const Radius.circular(40),
+            thickness: widget.scrollbarThickness != null
+                ? WidgetStateProperty.all(widget.scrollbarThickness!)
                 : null,
-            thumbVisibility: scrollbarAlwaysShow != null
-                ? WidgetStateProperty.all(scrollbarAlwaysShow!)
+            thumbVisibility: widget.scrollbarAlwaysShow != null
+                ? WidgetStateProperty.all(widget.scrollbarAlwaysShow!)
                 : null,
           ),
         ),
         menuItemStyleData: MenuItemStyleData(
-          height: itemHeight ?? 40,
-          padding: itemPadding ?? const EdgeInsets.symmetric(horizontal: 14),
+          height: widget.itemHeight ?? 40,
+          padding:
+              widget.itemPadding ?? const EdgeInsets.symmetric(horizontal: 14),
         ),
       ),
     );

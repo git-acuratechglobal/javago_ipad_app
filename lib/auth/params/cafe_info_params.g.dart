@@ -6,11 +6,12 @@ part of 'cafe_info_params.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_CafeInfoParams _$CafeInfoParamsFromJson(Map<String, dynamic> json) =>
-    _CafeInfoParams(
+_$CafeInfoParamsImpl _$$CafeInfoParamsImplFromJson(Map<String, dynamic> json) =>
+    _$CafeInfoParamsImpl(
       name: json['name'] as String,
       phone: json['phone'] as String,
       address: json['address'] as String,
+      city: json['city'] as String,
       postcode: json['postcode'] as String,
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
@@ -26,11 +27,13 @@ _CafeInfoParams _$CafeInfoParamsFromJson(Map<String, dynamic> json) =>
           .toList(),
     );
 
-Map<String, dynamic> _$CafeInfoParamsToJson(_CafeInfoParams instance) =>
+Map<String, dynamic> _$$CafeInfoParamsImplToJson(
+        _$CafeInfoParamsImpl instance) =>
     <String, dynamic>{
       'name': instance.name,
       'phone': instance.phone,
       'address': instance.address,
+      'city': instance.city,
       'postcode': instance.postcode,
       'latitude': instance.latitude,
       'longitude': instance.longitude,
@@ -49,7 +52,7 @@ Map<String, dynamic> _$CafeInfoParamsToJson(_CafeInfoParams instance) =>
 // **************************************************************************
 
 String _$cafeInfoParamsNotifierHash() =>
-    r'84330c4a08fa76ea3d21f241addc17c24b1b53a3';
+    r'3ca5ae975e741422334b84cf2cfdc5a44d0ad8e5';
 
 /// See also [CafeInfoParamsNotifier].
 @ProviderFor(CafeInfoParamsNotifier)

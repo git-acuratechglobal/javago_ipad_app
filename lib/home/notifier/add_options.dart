@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../param/item_param/item_param.dart';
+
 class OptionFieldData {
   final int key;
   final int? addonSizeId;
@@ -34,6 +36,16 @@ class OptionFieldNotifier extends StateNotifier<List<OptionFieldData>> {
 
   void addField() {
     state = [...state, OptionFieldData(key: _counter++)];
+  }
+  void setFieldsFromSelectedOptions(List<SelectedOption> selectedOptions) {
+    _counter = 1; // Reset the key counter
+    state = selectedOptions.map((selected) {
+      return OptionFieldData(
+        key: _counter++,
+        addonSizeId: int.tryParse(selected.optionId),
+        price: selected.price,
+      );
+    }).toList();
   }
 
   void removeField(int key) {
@@ -74,7 +86,7 @@ class OptionFieldNotifier extends StateNotifier<List<OptionFieldData>> {
 }
 
 final optionFieldProvider =
-    StateNotifierProvider<OptionFieldNotifier, List<OptionFieldData>>(
+    StateNotifierProvider.autoDispose<OptionFieldNotifier, List<OptionFieldData>>(
         (ref) => OptionFieldNotifier());
 
 //

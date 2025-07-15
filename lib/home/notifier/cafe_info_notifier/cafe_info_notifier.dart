@@ -1,23 +1,25 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:java_go/auth/params/click_and_collect_params.dart';
 import 'package:java_go/home/state/cafe_info_state/cafe_info_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../../../auth/model/cafe_model.dart';
-import '../../../auth/model/cafe_time_and_category.dart';
-import '../../../auth/model/cafetime_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../auth/notifier/cafe_data_notifier/cafe_data_notifier.dart';
 import '../../../auth/params/cafe_info_params.dart';
 import '../../../service/auth_service.dart';
+import '../../../service/strip_service.dart';
+import '../../notifiers/menu_item_showing.dart';
 part 'cafe_info_notifier.g.dart';
 
 @riverpod
 class CafeInfoNotifier extends _$CafeInfoNotifier {
-  Map<String, dynamic> _clickAndCollectForm = {};
-
+  Map<String, dynamic>? _paymentIntent;
   @override
- FutureOr<CafeInfoState?>  build() {
+  FutureOr<CafeInfoState?> build() {
     return null;
   }
-
 
   Future<void> addCafeInformation() async {
     state = AsyncLoading();
@@ -36,7 +38,7 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
           .addCafeInfo(cafeInfoParams: cafeInfoParams);
       if (cafeInfoParams.cafeTimes != null &&
           cafeInfoParams.cafeTimes!.isNotEmpty)
-      await ref
+        await ref
             .watch(authServiceProvider)
             .updateCafeHours(cafeTimes: cafeInfoParams.cafeTimes!);
       ref.invalidate(getCafeInfoProvider);
@@ -47,39 +49,27 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
     });
   }
 
-
   Future<void> updateClickAndCollect() async {
     state = AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final clickAndCollect = _clickAndCollectForm['clickAndCollect'];
+      final clickAnCollectParams = ref.watch(clickAndCollectParamProvider);
 
-      final message =
-      await ref.watch(authServiceProvider).updateClickAndCollect(
-        clickAndCollect: clickAndCollect,
-        maxOrders: clickAndCollect == 1
-            ? _clickAndCollectForm['maxOrders']
-            : null,
-      );
-      if (clickAndCollect == 1) {
-        final data = (await ref.watch(getCafeInfoProvider.future));
-        final rawCafeTimes = _clickAndCollectForm['cafeTimes'];
-        final List<CafeDayTime> cafeTimes = rawCafeTimes != null
-            ? List<CafeDayTime>.from(rawCafeTimes)
-            : (data?.cafeClickCollectTiming?.isNotEmpty ?? false)
-            ? convertCafeTimingToCafeDayTime(data!.cafeClickCollectTiming!)
-            : (data?.timing != null)
-            ? convertCafeTimingToCafeDayTime(data!.timing!)
-            : [];
-        await ref
-            .watch(authServiceProvider)
-            .updateCollectionTime(cafeTimes: cafeTimes);
+      final message = await ref
+          .watch(authServiceProvider)
+          .updateClickAndCollect(param: clickAnCollectParams);
+      if (clickAnCollectParams.click_and_collect == 1) {
+        await ref.watch(authServiceProvider).updateCollectionTime(
+            cafeTimes: clickAnCollectParams.clickAndCollectTime);
         ref.invalidate(getCafeInfoProvider);
         return CafeInfoState(
           cafeEvent: CafeEvent.updateClickAndCollect,
           response: message,
         );
       }
-      return null;
+      return CafeInfoState(
+        cafeEvent: CafeEvent.updateClickAndCollect,
+        response: message,
+      );
     });
   }
 
@@ -89,9 +79,40 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
       final cafeInfoParams = ref.watch(cafeInfoParamsNotifierProvider);
       final data = await ref
           .watch(authServiceProvider)
-          .updateCafeInfo(cafeInfoParams: cafeInfoParams);
+          .addCafeInfo(cafeInfoParams: cafeInfoParams);
+      if (cafeInfoParams.cafeTimes != null &&
+          cafeInfoParams.cafeTimes!.isNotEmpty)
+        await ref
+            .watch(authServiceProvider)
+            .updateCafeHours(cafeTimes: cafeInfoParams.cafeTimes!);
+      ref.invalidate(getCafeInfoProvider);
       return CafeInfoState(
-        cafeEvent: CafeEvent.addCafeInfo,
+        cafeEvent: CafeEvent.updateCafeInfo,
+        response: data,
+      );
+    });
+  }
+
+  Future<void> downloadFile() async {
+    state = AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final data = await ref.watch(authServiceProvider).getSampleFileLink();
+      return CafeInfoState(
+        cafeEvent: CafeEvent.downloadSampleFile,
+        response: data,
+      );
+    });
+  }
+
+  Future<void> uploadPickedFile() async {
+    state = AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final path = await _pickFile();
+      final data = await ref.watch(authServiceProvider).uploadFile(path);
+        ref.watch(authServiceProvider).syncMenuToSquare().ignore();
+      ref.invalidate(showMenuItemssProvider);
+      return CafeInfoState(
+        cafeEvent: CafeEvent.fileUploaded,
         response: data,
       );
     });
@@ -108,6 +129,27 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
     });
   }
 
+  Future<void> createSquareAccount() async {
+    state = AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final data = await ref.watch(authServiceProvider).createSquareAccount();
+      return CafeInfoState(
+        cafeEvent: CafeEvent.createSquareAccount,
+        response: data,
+      );
+    });
+  }
+
+  Future<void> squareAccountCreated() async {
+    state = AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      return CafeInfoState(
+        cafeEvent: CafeEvent.squareAccountCreated,
+        response: "Your Square Account Connected",
+      );
+    });
+  }
+
   Future<void> stripAccountStatus() async {
     state = AsyncLoading();
     state = await AsyncValue.guard(() async {
@@ -117,6 +159,27 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
         cafeEvent: CafeEvent.stripAccountStatus,
         response: data.toString(),
       );
+    });
+  }
+
+  Future<void> purchaseSubscription({required double amount}) async {
+    state = AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final stripeService = ref.read(stripeServiceProvider);
+      _paymentIntent ??= await stripeService.createPaymentIntent(amount);
+      await _attemptPayment(_paymentIntent!['client_secret']);
+      return CafeInfoState(
+        cafeEvent: CafeEvent.subscriptionPurchase,
+      );
+    });
+  }
+
+  Future<void> syncMenuToSquare() async {
+    state = AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final data = await ref.watch(authServiceProvider).syncMenuToSquare();
+      return CafeInfoState(
+          cafeEvent: CafeEvent.syncMenuToSquare, response: data);
     });
   }
 
@@ -133,38 +196,50 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
 
 
 
-  void updateForm({required String key, required dynamic value}) {
-    _clickAndCollectForm[key] = value;
+
+  Future<void> launch(String url) async {
+    final uri = Uri.parse(url);
+    await _launchUrl(uri);
   }
 
-  List<CafeDayTime> convertCafeTimingToCafeDayTime(List<dynamic> list) {
-    return list.map((item) {
-      if (item is CafeClickCollectTiming) {
-        return CafeDayTime(
-          day: item.day ?? '',
-          openingTime:
-          const TimeOfDayConverter().fromJson(item.startTime ?? '00:00'),
-          closingTime:
-          const TimeOfDayConverter().fromJson(item.endTime ?? '00:00'),
-          isActive: item.isActive ?? 1,
-        );
-      } else if (item is CafeTiming) {
-        return CafeDayTime(
-          day: item.day?.toString() ?? '',
-          openingTime:
-          const TimeOfDayConverter().fromJson(item.openTime ?? '00:00'),
-          closingTime:
-          const TimeOfDayConverter().fromJson(item.closeTime ?? '00:00'),
-          isActive: item.isActive ?? 1,
-        );
+  Future<void> _launchUrl(Uri url) async {
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
+  Future<String> _pickFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      );
+      if (result != null && result.files.single.path != null) {
+        File file = File(result.files.single.path!);
+
+        String fileName = file.path;
+        return fileName;
       } else {
-        throw Exception("Unsupported timing type");
+        throw Exception("No file selected");
       }
-    }).toList();
+    } catch (e) {
+      rethrow;
+    }
   }
 
+  Future<void> _attemptPayment(String clientSecret) async {
+    try {
+      await Stripe.instance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          merchantDisplayName: 'JavaGo',
+          paymentIntentClientSecret: clientSecret,
+        ),
+      );
+      await Stripe.instance.presentPaymentSheet();
+    } on StripeException catch (e) {
+      final errorMessage = e.error.message ?? e.error.toString();
 
-
-
-
+      throw "Failed to attempt payment: $errorMessage";
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

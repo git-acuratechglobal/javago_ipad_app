@@ -1,24 +1,24 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:java_go/auth/model/cafe_time_and_category.dart';
 import 'package:java_go/auth/model/stamp_suggestion.dart';
 import 'package:java_go/auth/params/add_stamp_params.dart';
+import 'package:java_go/auth/params/click_and_collect_params.dart';
 import 'package:java_go/home/model/cafe_stats_model.dart';
 import 'package:java_go/home/model/get_menu_items.dart';
 import 'package:java_go/home/model/get_orders.dart';
+import 'package:java_go/home/model/menu_item_details.dart';
 import 'package:java_go/home/model/menu_items_data.dart';
 import 'package:java_go/home/model/optional_data.dart';
 import 'package:java_go/home/model/order_detail.dart';
 import 'package:java_go/home/model/order_details.dart';
-import 'package:java_go/home/notifiers/accept_orders.dart';
 import 'package:java_go/service/dio.dart';
 import 'package:java_go/service/local_storage_service.dart';
-
 import '../auth/model/cafe_model.dart';
 import '../auth/model/cafetime_model.dart';
 import '../auth/model/getStamp.dart';
 import '../auth/params/cafe_info_params.dart';
+import '../home/model/menu_category_order.dart';
 
 final authServiceProvider = Provider<AuthService>((ref) {
   return AuthService(
@@ -32,6 +32,7 @@ class AuthService {
   final Dio _dio;
   final LocalStorageService _localStorageService;
   final String _token;
+
   AuthService(this._dio, this._localStorageService, this._token);
 
   Future<String> login(String email, String password) async {
@@ -65,6 +66,34 @@ class AuthService {
       await saveTokens(response.data['token']);
       print(response.data['token']);
       return response.data['message'] ?? "Register successful.";
+    });
+  }
+
+  Future<String> updatePassword(
+      String? currentPassword, String? newPassword) async {
+    return await asyncGuard(() async {
+      final token = await getTokens();
+      if (currentPassword == null ||
+          currentPassword.isEmpty ||
+          newPassword == null ||
+          newPassword.isEmpty) {
+        throw Exception('All field is required');
+      }
+      final response = await _dio.post(
+        '/update-account-password',
+        data: FormData.fromMap({
+          'current_password': currentPassword,
+          'new_password': newPassword,
+        }),
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      return response.data['message'];
     });
   }
 
@@ -360,8 +389,7 @@ class AuthService {
     });
   }
 
-  Future<RefundResponse> orderAccept(
-      String orderId, int isIndividualOrder) async {
+  Future<String> orderAccept(String orderId, int isIndividualOrder) async {
     final token = await getTokens();
     if (token == null || token.isEmpty) {
       throw Exception("Authorization failed: Token is missing.");
@@ -389,16 +417,8 @@ class AuthService {
       final data = response.data;
 
       final message = data['message'];
-      final unavailableItems = data['unavailable_items'] != null
-          ? (data['unavailable_items'] as List)
-              .map((item) => UnaviableItems.fromJson(item))
-              .toList()
-          : null;
 
-      return RefundResponse(
-        message: message,
-        unavailableItems: unavailableItems,
-      );
+      return message;
     });
   }
 
@@ -541,6 +561,46 @@ class AuthService {
     });
   }
 
+  Future<String> updateMenuItems(
+      {required Map<String, dynamic> itemsParams, required itemId}) async {
+    return asyncGuard(() async {
+      final token = await getTokens();
+      if (token == null || token.isEmpty) {
+        throw Exception("Authorization failed: Token is missing.");
+      }
+      print('Token used for Authorization: $token');
+      final response = await _dio.post("/update-menu-item/$itemId",
+          options: Options(
+            headers: {
+              'x-access-token': '$token',
+              'Accept': 'application/json',
+            },
+          ),
+          data: FormData.fromMap(itemsParams));
+      return response.data['message'];
+    });
+  }
+
+  Future<String> deleteMenuItem({required int id}) async {
+    return asyncGuard(() async {
+      final token = await getTokens();
+      if (token == null || token.isEmpty) {
+        throw Exception("Authorization failed: Token is missing.");
+      }
+      print('Token used for Authorization: $token');
+      final response = await _dio.delete(
+        "/delete-menu-item/$id",
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+      return response.data['message'];
+    });
+  }
+
   Future<CafeModel?> getCafeData() async {
     return asyncGuard(() async {
       final token = await getTokens();
@@ -584,11 +644,8 @@ class AuthService {
   }
 
   Future<String> updateClickAndCollect(
-      {int? clickAndCollect, int? maxOrders}) async {
+      {required ClickAndCollectParams param}) async {
     return asyncGuard(() async {
-      if (clickAndCollect != null && maxOrders == null) {
-        throw Exception("Please choose max Order");
-      }
       final token = await getTokens();
       if (token == null || token.isEmpty) {
         throw Exception("Authorization failed: Token is missing.");
@@ -596,8 +653,8 @@ class AuthService {
       final response = await _dio.post(
         "/update-click-collect",
         data: FormData.fromMap({
-          "click_and_collect": clickAndCollect ?? 0,
-          "max_orders_click_collect": maxOrders
+          "click_and_collect": param.click_and_collect,
+          "max_orders_click_collect": param.max_orders_click_collect
         }),
         options: Options(
           headers: {
@@ -732,7 +789,27 @@ class AuthService {
     return await asyncGuard(() async {
       final response = await _dio.post(
         '/add-loyalty-stamp',
-        data: FormData.fromMap(addStampParams.toJson()),
+        data: FormData.fromMap(addStampParams.toQueryParameters()),
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      print(response.data['token']);
+      return response.data['message'] ?? "Register successful.";
+    });
+  }
+
+  Future<String> updateStamp(
+      {required AddStampParams addStampParams, required int id}) async {
+    final token = await getTokens();
+    return await asyncGuard(() async {
+      final response = await _dio.post(
+        '/update-loyalty-stamp/$id',
+        data: FormData.fromMap(addStampParams.toQueryParameters()),
         options: Options(
           headers: {
             'x-access-token': '$token',
@@ -806,10 +883,111 @@ class AuthService {
         );
         return response1.data['url'];
       }
-
       return "";
     });
   }
+
+  Future<String> createSquareAccount() async {
+    final token = await getTokens();
+    return await asyncGuard(() async {
+      final response = await _dio.get(
+        '/square/connect',
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      return response.data['url'];
+    });
+  }
+
+  Future<String> syncMenuToSquare() async {
+    final token = await getTokens();
+    return await asyncGuard(() async {
+      final response = await _dio.post(
+        '/sync-menu-to-square',
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+      final result = response.data['message'];
+      return result;
+    });
+  }
+
+  Future<String> deleteSquareItem(int id) async {
+    final token = await getTokens();
+    return await asyncGuard(() async {
+      final response = await _dio.delete(
+        '/delete-square-item/$id',
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+      final result = response.data['message'];
+      return result;
+    });
+  }
+
+  Future<String> syncMenuCategory() async {
+    final token = await getTokens();
+    return await asyncGuard(() async {
+      final response = await _dio.post(
+        '/sync-menu-categories',
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+      final result = response.data['message'];
+      return result;
+    });
+  }
+
+  // Future<String> syncMenu() async {
+  //   final token = await getTokens();
+  //   return await asyncGuard(() async {
+  //     final response = await _dio.post(
+  //       '/sync-menu-to-square-new',
+  //       options: Options(
+  //         headers: {
+  //           'x-access-token': '$token',
+  //           'Accept': 'application/json',
+  //         },
+  //       ),
+  //     );
+  //     final result=  response.data['message'];
+  //     return result;
+  //   });
+  // }
+
+  // Future<String> syncAddon() async {
+  //   final token = await getTokens();
+  //   return await asyncGuard(() async {
+  //     final response = await _dio.post(
+  //       '/sync-addon-sizes-to-square',
+  //       options: Options(
+  //         headers: {
+  //           'x-access-token': '$token',
+  //           'Accept': 'application/json',
+  //         },
+  //       ),
+  //     );
+  //     final result=  response.data['message'];
+  //     return result;
+  //   });
+  // }
 
   Future<bool> stripAccountStatus() async {
     final token = await getTokens();
@@ -827,6 +1005,118 @@ class AuthService {
       );
 
       return response.data['success'];
+    });
+  }
+
+  Future<String> updateMenuCategory(Map<String, dynamic> request) async {
+    final token = await getTokens();
+
+    return await asyncGuard(() async {
+      final response = await _dio.post('/update-menu-order',
+          options: Options(
+            headers: {
+              'x-access-token': '$token',
+              'Accept': 'application/json',
+            },
+          ),
+          data: FormData.fromMap(request));
+      return response.data['message'];
+    });
+  }
+
+  Future<List<MenuCategoryOrder>> getMenuCategory() async {
+    final token = await getTokens();
+
+    return await asyncGuard(() async {
+      final response = await _dio.get(
+        '/get-menu-order',
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      final List<dynamic> list = response.data['menuOrders'] ?? [];
+      final menuCategoryList =
+          list.map((e) => MenuCategoryOrder.fromJson(e)).toList();
+      return menuCategoryList.where((e) => e.itemCount != 0).toList();
+    });
+  }
+
+  Future<MenuItemDetails> getMenuItemDetails(int itemId) async {
+    final token = await getTokens();
+    return asyncGuard(() async {
+      final response = await _dio.get(
+        '/get-item-detail/$itemId',
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+      final itemJson = response.data['data'];
+      return MenuItemDetails.fromJson(itemJson);
+    });
+  }
+
+  Future<String> updateFcmToken(String fcmToken) async {
+    final token = await getTokens();
+    return asyncGuard(() async {
+      final response = await _dio.post('/update-fcm-token',
+          options: Options(
+            headers: {
+              'x-access-token': '$token',
+              'Accept': 'application/json',
+            },
+          ),
+          queryParameters: {'fcm_token': fcmToken});
+      final itemJson = response.data['message'];
+      return itemJson;
+    });
+  }
+
+  Future<String> getSampleFileLink() async {
+    final token = await getTokens();
+    return asyncGuard(() async {
+      final response = await _dio.get(
+        '/download-sample-file',
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+      final url = response.data['file_url'];
+      return url;
+    });
+  }
+
+  Future<String> uploadFile(String filePath) async {
+    final token = await getTokens();
+    return asyncGuard(() async {
+
+      FormData formData = FormData.fromMap({
+        "file": await MultipartFile.fromFile(
+          filePath,
+           filename: filePath.split('/').last,
+        ),
+      });
+      final response = await _dio.post(
+        '/upload-file',
+        data: formData,
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+      final msg = response.data['message'];
+      return msg;
     });
   }
 

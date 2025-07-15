@@ -17,12 +17,14 @@ class AppTextField extends StatelessWidget {
       this.initialValue,
       this.maxLines = 1,
       this.width = 310,
+        this.height,
       this.readOnly = false,
-        this.onChanged,
-      this.inputType}) {
+      this.onChanged,
+      this.inputType,
+      this.fillColor=Colors.white
+      }) {
     if (initialValue != null) {
       controller?.text = initialValue ?? "";
-
     }
   }
   final String? label;
@@ -32,15 +34,17 @@ class AppTextField extends StatelessWidget {
   final bool? obscureText;
   final VoidCallback? toggle;
   final String? iconPath;
- final  void Function(String?)? onSaved;
-  final  void Function(String?)? onChanged;
+  final void Function(String?)? onSaved;
+  final void Function(String?)? onChanged;
   final void Function(PointerDownEvent)? onTapOutside;
   final String? Function(String?)? validator;
   final String? initialValue;
   final int? maxLines;
   final double? width;
+  final double? height;
   final bool? readOnly;
   final TextInputType? inputType;
+  final Color fillColor;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -55,6 +59,7 @@ class AppTextField extends StatelessWidget {
           8.verticalSpace,
         ],
         SizedBox(
+          height: height,
           width: width,
           child: TextFormField(
             keyboardType: inputType,
@@ -67,14 +72,17 @@ class AppTextField extends StatelessWidget {
             controller: controller,
             obscureText: obscureText!,
             decoration: InputDecoration(
+              filled: true,
+              fillColor: fillColor,
+              errorMaxLines: 2,
               contentPadding:
                   const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFFC0987C)),
+                borderSide: BorderSide(color: Color(0xFF4C2F27)),
                 borderRadius: BorderRadius.all(Radius.circular(8)),
               ),
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFFC0987C)),
+                borderSide: BorderSide(color: Color(0xFF4C2F27)),
                 borderRadius: BorderRadius.all(Radius.circular(8)),
               ),
               prefixIcon: iconPath != null

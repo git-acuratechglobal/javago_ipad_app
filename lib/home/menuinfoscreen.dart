@@ -9,9 +9,13 @@ import 'package:java_go/config/common/widgets.dart';
 import 'package:java_go/config/widgets/page_loading_widget.dart';
 import 'package:java_go/home/cafeinfotabscreen.dart';
 import 'package:java_go/home/menucategoryitemscreen.dart';
+import 'package:java_go/home/notifier/cafe_info_notifier/cafe_info_notifier.dart';
 import 'package:java_go/home/notifier/update_menu_item_status/update_menu_item_status_notifier.dart';
 import 'package:java_go/home/notifiers/add_option_items.dart';
 import 'package:java_go/home/menu_info_state.dart';
+
+import '../auth/pages/sign_up/menu.dart';
+import 'notifiers/add_menu_items_notifier.dart';
 
 final consolidatedOptionsProvider =
     Provider.family<AsyncValue<List<dynamic>>, List<int>>((ref, ids) {
@@ -130,16 +134,12 @@ class _MenuInfoScreenState extends ConsumerState<MenuInfoScreen>
       }
     });
 
-    ref.listenManual(updateMenuItemStatusNotifierProvider, (_,next){
-      switch(next){
-
+    ref.listenManual(updateMenuItemStatusNotifierProvider, (_, next) {
+      switch (next) {
         case AsyncError error:
           context.showSnackBar(error.error.toString());
-
       }
     });
-
-
   }
 
   @override
@@ -160,165 +160,168 @@ class _MenuInfoScreenState extends ConsumerState<MenuInfoScreen>
             : infotabdata.id) ??
         0;
     final isLoading =
-        ref.watch(updateMenuItemStatusNotifierProvider).isLoading;
+        ref.watch(updateMenuItemStatusNotifierProvider).isLoading ||
+            ref.watch(addMenuItemsNotifierProvider).isLoading ||
+            ref.watch(cafeInfoNotifierProvider).isLoading;
     return Stack(
       children: [
         DefaultTabController(
           initialIndex: infotabdata.tabIndex,
           length: 2,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                62.verticalSpace,
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 57),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 370,
-                        height: 50,
-                        padding: EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFD9D9D9),
-                          borderRadius: BorderRadius.circular(11),
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: TabBar(
-                            controller: _tabController,
-                            indicatorColor: Colors.transparent,
-                            dividerColor: Colors.transparent,
-                            overlayColor:
-                                MaterialStateProperty.all(Colors.transparent),
-                            indicator: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            labelColor: Colors.black,
-                            unselectedLabelColor: Colors.black,
-                            labelStyle: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15.sp,
-                            ),
-                            indicatorSize: TabBarIndicatorSize.tab,
-                            tabs: const [
-                              Tab(text: 'Menu Items'),
-                              Tab(text: 'Additional Options'),
-                            ],
-                            onTap: (value) {
-                              ref
-                                  .read(menuInfoTabStateProvider.notifier)
-                                  .updateMenuTab(value);
-                              ref.read(selectedItemIdProvider.notifier).state =
-                                  null;
-                            },
-                          ),
-                        ),
+          child: Column(
+            children: [
+              62.verticalSpace,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 57),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 370,
+                      height: 50,
+                      padding: EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD9D9D9),
+                        borderRadius: BorderRadius.circular(11),
                       ),
-                      const Spacer(),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 45, right: 11),
-                        child: InkWell(
-                          onTap: () {
-                            context.navigateTo(const CafeInfoAddTabScreen());
+                      child: Material(
+                        color: Colors.transparent,
+                        child: TabBar(
+                          controller: _tabController,
+                          indicatorColor: Colors.transparent,
+                          dividerColor: Colors.transparent,
+                          overlayColor:
+                              MaterialStateProperty.all(Colors.transparent),
+                          indicator: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          labelColor: Colors.black,
+                          unselectedLabelColor: Colors.black,
+                          labelStyle: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15.sp,
+                          ),
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          tabs: const [
+                            Tab(text: 'Menu Items'),
+                            Tab(text: 'Additional Options'),
+                          ],
+                          onTap: (value) {
+                            ref
+                                .read(menuInfoTabStateProvider.notifier)
+                                .updateMenuTab(value);
+                            ref.read(selectedItemIdProvider.notifier).state =
+                                null;
                           },
-                          child: Container(
-                            width: 100,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.transparent,
-                              border: Border.all(color: Colors.black, width: 1),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.add, color: Colors.black),
-                                8.horizontalSpace,
-                                Text(
-                                  'Add',
-                                  style: TextStyle(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
                         ),
                       ),
-                      InkWell(
+                    ),
+                    const Spacer(),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 45, right: 11),
+                      child: InkWell(
                         onTap: () {
-                          _showDialog(context);
+                          //    TODO ("ADD ITEM");
+                          showDialogMenu();
                         },
                         child: Container(
-                          width: 193.w,
-                          height: 41.h,
-                          decoration: ShapeDecoration(
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              side: const BorderSide(width: 1),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                          width: 100,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.transparent,
+                            border: Border.all(color: Colors.black, width: 1),
                           ),
-                          child: Center(
-                            child: Text(
-                              'Menu Category Order',
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.add, color: Colors.black),
+                              8.horizontalSpace,
+                              Text(
+                                'Add',
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              )
+                            ],
                           ),
                         ),
                       ),
-                      8.horizontalSpace,
-                      SizedBox(
-                        width: 212.26.w,
-                        height: 42.48.h,
-                        child: TextFormField(
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.all(5),
-                            suffixIcon: const Icon(Icons.search,
-                                color: Color(0xFF4C2F27)),
-                            hintText: "Search",
-                            hintStyle: TextStyle(
-                              color: const Color(0xFF7B7B7B),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        _showDialog(context);
+                      },
+                      child: Container(
+                        width: 193.w,
+                        height: 41.h,
+                        decoration: ShapeDecoration(
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            side: const BorderSide(width: 1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Menu Category Order',
+                            style: TextStyle(
                               fontSize: 16.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            fillColor: const Color(0xFFF5F3F0),
-                            filled: true,
-                            focusedBorder: OutlineInputBorder(
-                              borderSide:
-                                  const BorderSide(color: Color(0xFF4C2F27)),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.black),
-                              borderRadius: BorderRadius.circular(10),
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    8.horizontalSpace,
+                    SizedBox(
+                      width: 212.26.w,
+                      height: 42.48.h,
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.all(5),
+                          suffixIcon: const Icon(Icons.search,
+                              color: Color(0xFF4C2F27)),
+                          hintText: "Search",
+                          hintStyle: TextStyle(
+                            color: const Color(0xFF7B7B7B),
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          fillColor: const Color(0xFFF5F3F0),
+                          filled: true,
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFF4C2F27)),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(color: Colors.black),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onTapOutside: (val) {
+                          FocusScope.of(context).unfocus();
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                5.verticalSpace,
-                SizedBox(
-                  height: 600.h,
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      const ReviewItems(),
-                      _buildAdditionalOptionsTab(),
-                    ],
-                  ),
+              ),
+              5.verticalSpace,
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    const ReviewItems(),
+                    _buildAdditionalOptionsTab(),
+                  ],
                 ),
-                100.verticalSpace,
-              ],
-            ),
+              ),
+              100.verticalSpace,
+            ],
           ),
         ),
         if (isLoading) PageLoadingWidget()
@@ -356,6 +359,7 @@ class _MenuInfoScreenState extends ConsumerState<MenuInfoScreen>
 
     return Scaffold(
       body: RefreshIndicator(
+        color: Color(0xFFC0987C),
         onRefresh: _onRefresh,
         child: AsyncWidget(
           onRetry: () {
@@ -475,16 +479,19 @@ class _MenuInfoScreenState extends ConsumerState<MenuInfoScreen>
                             15.horizontalSpace,
                             StatusContainer(
                               editOption: false,
+                              isFromAddition: true,
                               status: item.status ?? 1,
                               id: item.addonSizeId ?? 0,
                               onChanged: (bool val) {
                                 ref
-                                    .read(
-                                        updateMenuItemStatusNotifierProvider.notifier)
+                                    .read(updateMenuItemStatusNotifierProvider
+                                        .notifier)
                                     .updateAddonItemStatus(
                                         id: item.addonSizeId,
                                         status: val ? 1 : 0);
                               },
+                              onDelete: () {},
+                              onEdit: () {},
                             )
                           ],
                         ),
@@ -492,11 +499,113 @@ class _MenuInfoScreenState extends ConsumerState<MenuInfoScreen>
                     },
                   ),
                 ),
-                211.verticalSpace
+                // 211.verticalSpace
               ],
             );
           },
         ),
+      ),
+    );
+  }
+
+  void showDialogMenu() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: SizedBox(height: 300, width: 500, child: _MenuUploadWidget()),
+        );
+      },
+    );
+  }
+}
+
+class _MenuUploadWidget extends ConsumerStatefulWidget {
+  const _MenuUploadWidget({super.key});
+
+  @override
+  ConsumerState<_MenuUploadWidget> createState() => _MenuUploadWidgetState();
+}
+
+class _MenuUploadWidgetState extends ConsumerState<_MenuUploadWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            height: 60,
+            width: 300,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                context.navigateTo(const MenuScreen2(
+                  isEditmode: false,
+                ));
+              },
+              child: const Text("Add Manually"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFC0987C),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                textStyle: TextStyle(
+                  fontSize: 30.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            height: 60,
+            width: 300,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                ref.read(cafeInfoNotifierProvider.notifier).uploadPickedFile();
+              },
+              child: const Text("Upload Sheet"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFC0987C),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                textStyle: TextStyle(
+                  fontSize: 30.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            height: 60,
+            width: 300,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                ref.read(cafeInfoNotifierProvider.notifier).downloadFile();
+              },
+              child: const Text("Download Sheet"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFC0987C),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                textStyle: TextStyle(
+                  fontSize: 30.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

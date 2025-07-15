@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
 import 'package:java_go/auth/notifier/cafe_data_notifier/cafe_data_notifier.dart';
-import 'package:java_go/auth/pages/sign_up/reviewscreen.dart';
 import 'package:java_go/auth/params/cafe_info_params.dart';
 import 'package:java_go/config/common/widgets.dart';
 import 'package:java_go/config/validator.dart';
@@ -16,7 +15,6 @@ import '../../../config/common/image_form_widget.dart';
 import '../../../config/widgets/country_dropdown.dart';
 import '../../model/cafe_time_and_category.dart';
 import '../../model/cafetime_model.dart';
-import '../../notifier/auth_notifier.dart';
 
 class CafeInfoScreen extends ConsumerStatefulWidget {
   final bool isFromSignUp;
@@ -92,24 +90,25 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                           },
                         ),
                         Spacer(),
-                        if (!widget.isFromSignUp)
-                          InkWell(
-                            onTap: () {},
-                            child: Text(
-                              'Undo',
-                              style: TextStyle(
-                                fontSize: 20.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
                         23.horizontalSpace,
                         if (!widget.isFromSignUp)
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 42),
-                            child: InkWell(
-                                onTap: () {},
-                                child: EditContainer(title: 'Save Changes')),
+                          SizedBox(
+                            height: 50,
+                            width: 200,
+                            child: PrimaryButton(
+                              title: "Save Changes",
+                              isLoading:
+                                  ref.watch(cafeInfoNotifierProvider).isLoading,
+                              backgroundColor: const Color(0xFFC0987C),
+                              onClick: () {
+                                if (_fkey.currentState!.validate()) {
+                                  _fkey.currentState!.save();
+                                  ref
+                                      .read(cafeInfoNotifierProvider.notifier)
+                                      .updateCafeInformation();
+                                }
+                              },
+                            ),
                           )
                       ],
                     ),
@@ -140,9 +139,10 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   AppTextField(
+                                    inputType: TextInputType.phone,
                                     validator: (val) =>
                                         validator.validatePhone(val!),
-                                    width: 200,
+                                    width: 160,
                                     initialValue: cafeData?.phone,
                                     label: 'Phone Number',
                                     hint: "Enter cafe number",
@@ -155,11 +155,11 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                   AppTextField(
                                     validator: (val) =>
                                         validator.validateAddress(val!),
-                                    width: 270,
+                                    width: 240,
                                     initialValue: cafeData?.address,
                                     maxLines: 1,
-                                    label: 'Address',
-                                    hint: "Enter your address",
+                                    label: 'Address Line 1',
+                                    hint: "Enter your address line1",
                                     onSaved: (val) {
                                       if (val != null) {
                                         cafeInfoNotifier.updateAddress(val);
@@ -168,12 +168,26 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                   ),
                                   AppTextField(
                                     validator: (val) =>
+                                        validator.validateAddress(val!),
+                                    width: 100,
+                                    initialValue: cafeData?.city,
+                                    maxLines: 1,
+                                    label: 'City',
+                                    hint: "Enter your city",
+                                    onSaved: (val) {
+                                      if (val != null) {
+                                        cafeInfoNotifier.updateCity(val);
+                                      }
+                                    },
+                                  ),
+                                  AppTextField(
+                                    validator: (val) =>
                                         validator.validateZipCode(val!),
-                                    inputType: TextInputType.number,
+                                    inputType: TextInputType.phone,
                                     width: 150,
                                     initialValue: cafeData?.postcode,
-                                    label: 'ZipCode',
-                                    hint: "Enter your zipcode",
+                                    label: 'Postcode',
+                                    hint: "Enter your postcode",
                                     onSaved: (val) {
                                       if (val != null) {
                                         cafeInfoNotifier.updatePostcode(val);
@@ -218,7 +232,13 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                         CheckboxFormField(
                                           validator: (value) =>
                                               validator.validateCheckBox(value),
-                                          items: data.cafeFilters ?? [],
+                                          items: data.cafeFilters
+                                                  ?.where((e) =>
+                                                      e.name != "All" &&
+                                                      e.name != "Favorites" &&
+                                                      e.name != "Vegetarian ")
+                                                  .toList() ??
+                                              [],
                                           onSelectionChanged: (val) {
                                             cafeInfoNotifier
                                                 .updateCategories(val);
@@ -264,25 +284,22 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
-                                flex: 2,
                                 child: AsyncWidget(
                                     onRetry: () => ref.refresh(
                                         getCafeTimeAndCategoryProvider),
                                     value: filters,
                                     data: (data) {
-                                      return SizedBox(
-                                        height: 380.h,
-                                        child: CafeHoursScreen(
-                                          initialCafeTime: cafeData?.timing ??
-                                              data.cafeTimings,
-                                          onTimeChanged:
-                                              (List<CafeDayTime> cafeTime) {
-                                            if (cafeTime.isNotEmpty) {
-                                              cafeInfoNotifier
-                                                  .updateCafeHours(cafeTime);
-                                            }
-                                          },
-                                        ),
+                                      return CafeHoursScreen(
+                                        initialCafeTime: cafeData?.timing ??
+                                            data.cafeTimings,
+                                        onTimeChanged:
+                                            (List<CafeDayTime> cafeTime) {
+                                          print(cafeTime);
+                                          if (cafeTime.isNotEmpty) {
+                                            cafeInfoNotifier
+                                                .updateCafeHours(cafeTime);
+                                          }
+                                        },
                                       );
                                     })),
                             Column(
@@ -299,6 +316,8 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                 ),
                                 9.verticalSpace,
                                 SimpleCustomDropdown(
+                                    height: 55,
+                                    borderRadius: 8,
                                     hint: "Coffee Origin",
                                     validator: (val) =>
                                         validator.validateCoffeeOrigin(val),
@@ -321,29 +340,24 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                 9.verticalSpace,
                                 SizedBox(
                                     width: 252,
-                                    child: AsyncWidget(
-                                        value: ref.watch(countriesListProvider),
-                                        data: (data) {
-                                          return CountrySearchDropdown(
-                                            validator: (value) => validator
-                                                .validateCountryOrigin(value!),
-                                            initialSelectedCountry: cafeData
-                                                ?.cafeManagement
-                                                ?.coffeeOriginCountry,
-                                            countries: data,
-                                            onCountrySelected:
-                                                (String selectedCountry) {
-                                              cafeInfoNotifier
-                                                  .updateCoffeeOriginCountry(
-                                                      selectedCountry);
-                                            },
-                                          );
-                                        })),
+                                    child: CountrySearchDropdown(
+                                      validator: (value) => validator
+                                          .validateCountryOrigin(value!),
+                                      initialSelectedCountry: cafeData
+                                          ?.cafeManagement?.coffeeOriginCountry,
+                                      countries: originCountries,
+                                      onCountrySelected:
+                                          (String selectedCountry) {
+                                        cafeInfoNotifier
+                                            .updateCoffeeOriginCountry(
+                                                selectedCountry);
+                                      },
+                                    )),
                               ],
                             ),
                             80.horizontalSpace,
                             Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   'Coffee Roast',
@@ -355,16 +369,20 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                           fontWeight: FontWeight.w600),
                                 ),
                                 9.verticalSpace,
-                                SimpleCustomDropdown(
-                                  validator: (value) =>
-                                      validator.validateCoffeeRoast(value),
-                                  hint: "Coffee Roast",
-                                  initialValue:
-                                      cafeData?.cafeManagement?.coffeeRoast,
-                                  items: coffeeRoastTypes.toSet().toList(),
-                                  onChanged: (String? value) {
-                                    cafeInfoNotifier.updateCoffeeRoast(value!);
-                                  },
+                                SizedBox(
+                                  width: 252,
+                                  child: CountrySearchDropdown(
+                                    hintText: "Coffee Roast",
+                                    validator: (value) =>
+                                        validator.validateCoffeeRoast(value),
+                                    onCountrySelected: (String value) {
+                                      cafeInfoNotifier.updateCoffeeRoast(value);
+                                    },
+                                    initialSelectedCountry:
+                                        cafeData?.cafeManagement?.coffeeRoast,
+                                    countries:
+                                        coffeeRoastTypes.toSet().toList(),
+                                  ),
                                 ),
                                 66.verticalSpace,
                                 Text(
@@ -378,6 +396,7 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                 ),
                                 9.verticalSpace,
                                 SimpleCustomDropdown(
+                                    height: 55,
                                     hint: "Select speciality",
                                     validator: (value) => validator
                                         .validateSpecialityCoffee(value),
@@ -401,7 +420,7 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                     }),
                               ],
                             ),
-                            150.horizontalSpace,
+                            // 150.horizontalSpace,
                           ],
                         ),
                       ],
@@ -436,26 +455,48 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
     );
   }
 
-  List<String> items = ['Yes', 'No'];
+  List<String> items = ['Yes', 'No', 'N/A'];
   List<String> coffeeOriginTypes = [
-    'Single Origin',
-    'Blend',
-    'Microlot',
-    'Estate',
-    'Regional',
-    'Cooperative',
-    'Varietal Specific',
-    'Experimental Lot',
+    'Single',
+    'Blended',
+    'We offer both',
+    'N/A',
   ];
   List<String> coffeeRoastTypes = [
-    'Light Roast',
-    'City Roast',
-    'Medium Roast',
-    'Full City Roast',
-    'Medium-Dark Roast',
-    'Dark Roast',
-    'French Roast',
-    'Italian Roast',
+    'Light',
+    'Medium',
+    'Dark',
+    'N/A',
+  ];
+
+  List<String> originCountries = [
+    'Ethiopia',
+    'Kenya',
+    'Tanzania',
+    'Rwanda',
+    'Burundi',
+    'Colombia',
+    'Brazil',
+    'Costa Rica',
+    'Guatemala',
+    'Panama',
+    'Honduras',
+    'El Salvador',
+    'Indonesia',
+    'Vietnam',
+    'India',
+    'Papua New Guinea',
+    'Yemen',
+    'Peru',
+    'Mexico',
+    'Bolivia',
+    'Ecuador',
+    'Dominican Republic',
+    'Cuba',
+    'Thailand',
+    'Philippines',
+    'Other',
+    'N/A',
   ];
 }
 
@@ -505,8 +546,6 @@ class CheckboxFormField extends FormField<List<CafeFilter>> {
                             final allExceptAll = items
                                 .where((e) => e.name?.toLowerCase() != 'all')
                                 .toList();
-                            final allItem = items.firstWhere(
-                                (e) => e.name?.toLowerCase() == 'all');
 
                             if (isAll) {
                               if (value == true) {
@@ -527,9 +566,7 @@ class CheckboxFormField extends FormField<List<CafeFilter>> {
                                         (e) => e.name?.toLowerCase() != 'all')
                                     .toList();
                                 if (selectedExceptAll.length ==
-                                    allExceptAll.length) {
-                                  selected.add(allItem);
-                                }
+                                    allExceptAll.length) {}
                               } else {
                                 selected.remove(category);
                                 selected.removeWhere(

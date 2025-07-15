@@ -1,4 +1,3 @@
-// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -10,52 +9,39 @@ part of 'home_state.dart';
 // FreezedGenerator
 // **************************************************************************
 
-// dart format off
 T _$identity<T>(T value) => value;
+
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$HomeState {
-  GetOrdersResponse? get ordersResponse;
+  GetOrdersResponse? get ordersResponse => throw _privateConstructorUsedError;
 
   /// Create a copy of HomeState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
   $HomeStateCopyWith<HomeState> get copyWith =>
-      _$HomeStateCopyWithImpl<HomeState>(this as HomeState, _$identity);
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is HomeState &&
-            (identical(other.ordersResponse, ordersResponse) ||
-                other.ordersResponse == ordersResponse));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, ordersResponse);
-
-  @override
-  String toString() {
-    return 'HomeState(ordersResponse: $ordersResponse)';
-  }
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract mixin class $HomeStateCopyWith<$Res> {
-  factory $HomeStateCopyWith(HomeState value, $Res Function(HomeState) _then) =
-      _$HomeStateCopyWithImpl;
+abstract class $HomeStateCopyWith<$Res> {
+  factory $HomeStateCopyWith(HomeState value, $Res Function(HomeState) then) =
+      _$HomeStateCopyWithImpl<$Res, HomeState>;
   @useResult
   $Res call({GetOrdersResponse? ordersResponse});
 }
 
 /// @nodoc
-class _$HomeStateCopyWithImpl<$Res> implements $HomeStateCopyWith<$Res> {
-  _$HomeStateCopyWithImpl(this._self, this._then);
+class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
+    implements $HomeStateCopyWith<$Res> {
+  _$HomeStateCopyWithImpl(this._value, this._then);
 
-  final HomeState _self;
-  final $Res Function(HomeState) _then;
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
   /// Create a copy of HomeState
   /// with the given fields replaced by the non-null parameter values.
@@ -64,9 +50,44 @@ class _$HomeStateCopyWithImpl<$Res> implements $HomeStateCopyWith<$Res> {
   $Res call({
     Object? ordersResponse = freezed,
   }) {
-    return _then(_self.copyWith(
+    return _then(_value.copyWith(
       ordersResponse: freezed == ordersResponse
-          ? _self.ordersResponse
+          ? _value.ordersResponse
+          : ordersResponse // ignore: cast_nullable_to_non_nullable
+              as GetOrdersResponse?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$HomeStateImplCopyWith<$Res>
+    implements $HomeStateCopyWith<$Res> {
+  factory _$$HomeStateImplCopyWith(
+          _$HomeStateImpl value, $Res Function(_$HomeStateImpl) then) =
+      __$$HomeStateImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({GetOrdersResponse? ordersResponse});
+}
+
+/// @nodoc
+class __$$HomeStateImplCopyWithImpl<$Res>
+    extends _$HomeStateCopyWithImpl<$Res, _$HomeStateImpl>
+    implements _$$HomeStateImplCopyWith<$Res> {
+  __$$HomeStateImplCopyWithImpl(
+      _$HomeStateImpl _value, $Res Function(_$HomeStateImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of HomeState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? ordersResponse = freezed,
+  }) {
+    return _then(_$HomeStateImpl(
+      ordersResponse: freezed == ordersResponse
+          ? _value.ordersResponse
           : ordersResponse // ignore: cast_nullable_to_non_nullable
               as GetOrdersResponse?,
     ));
@@ -75,25 +96,22 @@ class _$HomeStateCopyWithImpl<$Res> implements $HomeStateCopyWith<$Res> {
 
 /// @nodoc
 
-class _HomeState implements HomeState {
-  const _HomeState({this.ordersResponse});
+class _$HomeStateImpl implements _HomeState {
+  const _$HomeStateImpl({this.ordersResponse});
 
   @override
   final GetOrdersResponse? ordersResponse;
 
-  /// Create a copy of HomeState
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$HomeStateCopyWith<_HomeState> get copyWith =>
-      __$HomeStateCopyWithImpl<_HomeState>(this, _$identity);
+  String toString() {
+    return 'HomeState(ordersResponse: $ordersResponse)';
+  }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _HomeState &&
+            other is _$HomeStateImpl &&
             (identical(other.ordersResponse, ordersResponse) ||
                 other.ordersResponse == ordersResponse));
   }
@@ -101,44 +119,26 @@ class _HomeState implements HomeState {
   @override
   int get hashCode => Object.hash(runtimeType, ordersResponse);
 
+  /// Create a copy of HomeState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  String toString() {
-    return 'HomeState(ordersResponse: $ordersResponse)';
-  }
+  @pragma('vm:prefer-inline')
+  _$$HomeStateImplCopyWith<_$HomeStateImpl> get copyWith =>
+      __$$HomeStateImplCopyWithImpl<_$HomeStateImpl>(this, _$identity);
 }
 
-/// @nodoc
-abstract mixin class _$HomeStateCopyWith<$Res>
-    implements $HomeStateCopyWith<$Res> {
-  factory _$HomeStateCopyWith(
-          _HomeState value, $Res Function(_HomeState) _then) =
-      __$HomeStateCopyWithImpl;
+abstract class _HomeState implements HomeState {
+  const factory _HomeState({final GetOrdersResponse? ordersResponse}) =
+      _$HomeStateImpl;
+
   @override
-  @useResult
-  $Res call({GetOrdersResponse? ordersResponse});
-}
-
-/// @nodoc
-class __$HomeStateCopyWithImpl<$Res> implements _$HomeStateCopyWith<$Res> {
-  __$HomeStateCopyWithImpl(this._self, this._then);
-
-  final _HomeState _self;
-  final $Res Function(_HomeState) _then;
+  GetOrdersResponse? get ordersResponse;
 
   /// Create a copy of HomeState
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? ordersResponse = freezed,
-  }) {
-    return _then(_HomeState(
-      ordersResponse: freezed == ordersResponse
-          ? _self.ordersResponse
-          : ordersResponse // ignore: cast_nullable_to_non_nullable
-              as GetOrdersResponse?,
-    ));
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$HomeStateImplCopyWith<_$HomeStateImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
-
-// dart format on

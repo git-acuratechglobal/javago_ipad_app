@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,886 +7,790 @@ import 'package:java_go/config/common/button.dart';
 import 'package:java_go/config/common/cache_network_image.dart';
 import 'package:java_go/config/common/custom_dropdown.dart';
 import 'package:java_go/config/common/custom_text_feild.dart';
-import 'package:java_go/config/common/extensions.dart';
+import 'package:java_go/config/widgets/page_loading_widget.dart';
 import 'package:java_go/home/model/get_menu_items.dart';
+import 'package:java_go/home/notifier/get_menu_item_details/get_menu_item_details_notifier.dart';
 import 'package:java_go/home/notifier/menu_notifier.dart';
 import 'package:java_go/home/notifiers/menu_items.dart';
 import 'package:java_go/home/param/item_param/item_param.dart';
-import 'package:rename_app/utils.dart';
-
 import '../../../config/async_widget.dart';
+import '../../../config/common/widgets.dart';
+import '../../../config/widgets/app_text_field.dart';
+import '../../../home/model/menu_items_data.dart';
 import '../../../home/notifier/add_options.dart';
+import '../../../home/notifier/cafe_info_notifier/cafe_info_notifier.dart';
 import '../../../home/notifiers/add_menu_items_notifier.dart';
-import '../../../home/notifiers/menu_item_showing.dart';
+import '../../../home/state/cafe_info_state/cafe_info_state.dart';
 
-class MenuScreen extends ConsumerStatefulWidget {
-  const MenuScreen({super.key, required this.isEditmode, this.fromAdd = false});
+class MenuScreen2 extends ConsumerStatefulWidget {
+  const MenuScreen2(
+      {super.key,
+      required this.isEditmode,
+      this.fromAdd = false,
+      this.itemId,
+      this.menuItem});
+  final int? itemId;
   final bool isEditmode;
   final bool? fromAdd;
-
+  final Datum? menuItem;
   @override
-  ConsumerState<MenuScreen> createState() => _MenuScreenState();
+  ConsumerState<MenuScreen2> createState() => _MenuScreen2State();
 }
 
-class _MenuScreenState extends ConsumerState<MenuScreen> {
+class _MenuScreen2State extends ConsumerState<MenuScreen2> {
   final List<String> itemSizes = ['Small', 'Medium', 'Large'];
 
-  // void _showDialog(BuildContext context) {
-  //   showGeneralDialog(
-  //     context: context,
-  //     barrierDismissible: true,
-  //     barrierLabel: "Dismiss",
-  //     transitionDuration: const Duration(milliseconds: 300),
-  //     pageBuilder: (context, animation, secondaryAnimation) {
-  //       return BackdropFilter(
-  //         filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-  //         child: Padding(
-  //           padding: const EdgeInsets.symmetric(horizontal: 24),
-  //           child: Align(
-  //             alignment: Alignment.center,
-  //             child: Material(
-  //               color: Colors.transparent,
-  //               child: Container(
-  //                 decoration: BoxDecoration(
-  //                   color: Colors.white,
-  //                   borderRadius: BorderRadius.circular(4),
-  //                 ),
-  //                 child: Addoptions(),
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
   PreDefinedItem? selectedItem;
-  Set<String> selectedAddonItemsSet = {};
-  final TextEditingController itemCategoryController = TextEditingController();
-  final TextEditingController itemSizeController = TextEditingController();
-  final TextEditingController addonsItemNameController =
-      TextEditingController();
-  final TextEditingController itemTypeController = TextEditingController();
-  final TextEditingController itemDescriptionController =
-      TextEditingController();
-  String? selectedSize;
-  String? selectedPrice;
-  String? selectedAddonItem;
-  String? selectedAddonItems;
-  String? selectedAddonItemss;
+
   List<AddonItemModel?> selectedItems = [];
 
   @override
   void initState() {
     super.initState();
-    ref.listenManual(addMenuItemsNotifierProvider, (_, next) {
-      switch (next) {
-        case AsyncValue<String?> data when data.value != null:
-          if (data.value != null) {
-            context.showSnackBar(data.value!);
-            context.pop();
-            ref.invalidate(optionFieldProvider);
-            ref.invalidate(showMenuItemssProvider);
-          }
-        case AsyncError error:
-          context.showSnackBar(error.error.toString());
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.listenManual(getMenuItemsDetailsProvider(itemId: widget.itemId),
+          (_, next) {
+        next.whenData((data) {
+          ref.read(itemParamNotifierProvider.notifier).updateItemData(data);
+        });
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final menuItemState = ref.watch(menuItemsProvider);
-
-    final items = menuItemState.value?.data;
     final menuItemParam = ref.read(itemParamNotifierProvider.notifier);
-    final groupedOptions = menuItemState.value?.data?.groupedOptions ?? {};
-    final totalSelectableCount = groupedOptions.values.expand((e) => e).length;
+    final itemsData = ref.watch(itemParamNotifierProvider);
     final fields = ref.watch(optionFieldProvider);
     final notifier = ref.read(optionFieldProvider.notifier);
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F3F0),
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFFF5F3F0),
-        leading: widget.isEditmode
-            ? InkWell(
-                onTap: () => context.pop(),
-                child: Image.asset(
-                  'assets/images/ic_left_arrow.png',
-                  color: const Color(0xFF461C10),
-                  height: 55.h,
-                  width: 55.w,
-                ),
-              )
-            : null,
-        title: widget.isEditmode
-            ? Text(
-                widget.fromAdd! ? "Add Item" : 'Menu',
-                style: const TextStyle(
-                  color: Color(0xFF461C10),
-                  fontSize: 32,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                ),
-              )
-            : null,
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            40.verticalSpace,
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CustomDropdownWithImage<PreDefinedItem>(
-                      value: selectedItem,
-                      hint: "Select Name",
-                      dropdownItems: items?.preDefinedItem ?? [],
-                      onChanged: (value) {
-                        if (value != null) {
-                          menuItemParam.updateImageId(value.id);
-                          setState(() {
-                            selectedItem = value;
-                          });
-                        }
-                      },
-                      getLabel: (item) => item.itemName ?? "",
-                      getImageUrl: (item) => item.itemImage ?? "",
-                      customBtn: Column(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: const Color(0xFFF5F3F0),
+          leading: widget.isEditmode
+              ? InkWell(
+                  onTap: () => context.pop(),
+                  child: Image.asset(
+                    'assets/images/ic_left_arrow.png',
+                    color: const Color(0xFF461C10),
+                    height: 55.h,
+                    width: 55.w,
+                  ),
+                )
+              : null,
+          title: widget.isEditmode
+              ? Text(
+                  widget.fromAdd! ? "Add Item" : 'Menu',
+                  style: const TextStyle(
+                    color: Color(0xFF461C10),
+                    fontSize: 32,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w600,
+                  ),
+                )
+              : null,
+          centerTitle: true,
+        ),
+        body: AsyncWidget(
+            value:
+                ref.watch(getMenuItemsDetailsProvider(itemId: widget.itemId)),
+            data: (itemDetails) {
+              return AsyncWidget(
+                  value: ref.watch(menuItemsProvider),
+                  data: (data) {
+                    final items = data.data;
+                    final groupedOptions = items?.groupedOptions ?? {};
+                    return SingleChildScrollView(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Select Item Icon*',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                            ),
-                          ),
-                          3.verticalSpace,
-                          Container(
-                            width: 240.w,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 12.w, vertical: 10.h),
-                            decoration: BoxDecoration(
-                              border:
-                                  Border.all(color: const Color(0xFF4C2F27)),
-                              borderRadius: BorderRadius.circular(6.r),
-                            ),
+                          40.verticalSpace,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 45),
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (selectedItem?.itemImage?.isNotEmpty ??
-                                    false)
-                                  SizedBox(
-                                    width: 28,
-                                    height: 28,
-                                    child: NetworkImageWidget(
-                                      imageUrl: selectedItem!.itemImage!,
-                                      fit: BoxFit.cover,
-                                      loadingWidgetSize: 15,
-                                    ),
-                                  ),
-                                if (selectedItem?.itemImage?.isNotEmpty ??
-                                    false)
-                                  15.horizontalSpace,
-                                Expanded(
-                                  child: Text(
-                                    selectedItem?.itemName ?? "Select Icon",
-                                    style: TextStyle(
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: const Color(0xFF4C2F27),
-                                    ),
+                                CustomDropdownWithImage<PreDefinedItem>(
+                                  value: itemsData.itemImageId == 0
+                                      ? selectedItem
+                                      : items?.preDefinedItem?.firstWhere(
+                                          (e) =>
+                                              e.id == itemsData.itemImageId &&
+                                              e.id != 0,
+                                        ),
+                                  hint: "Select Name",
+                                  dropdownItems: items?.preDefinedItem ?? [],
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      menuItemParam.updateImageId(value.id);
+                                      setState(() {
+                                        selectedItem = value;
+                                      });
+                                    }
+                                  },
+                                  getLabel: (item) => item.itemName ?? "",
+                                  getImageUrl: (item) => item.itemImage ?? "",
+                                  customBtn: CustomButtonForIcon(
+                                    selectedItem: itemsData.itemImageId == 0
+                                        ? selectedItem
+                                        : items?.preDefinedItem?.firstWhere(
+                                            (e) =>
+                                                e.id == itemsData.itemImageId &&
+                                                e.id != 0,
+                                          ),
                                   ),
                                 ),
-                                const Icon(
-                                  Icons.arrow_drop_down,
-                                  color: Color(0xFF4C2F27),
+                                70.horizontalSpace,
+                                AppTextField(
+                                  height: 45,
+                                  width: 250,
+                                  fillColor: Colors.transparent,
+                                  initialValue: itemsData.itemName,
+                                  label: 'Item Name',
+                                  hint: "Enter item name",
+                                  onChanged: (val) {
+                                    menuItemParam.updateName(val!);
+                                  },
+                                ),
+                                70.horizontalSpace,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Select Category*',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    6.verticalSpace,
+                                    SimpleCustomDropdown(
+                                      initialValue: items?.itemCategory?[
+                                          itemsData.itemCategoryId.toString()],
+                                      height: 45,
+                                      items: items?.itemCategory?.values
+                                              .toList() ??
+                                          [],
+                                      onChanged: (String? value) {
+                                        if (value != null) {
+                                          final categoryMap =
+                                              items?.itemCategory ?? {};
+                                          final categoryId = categoryMap.entries
+                                              .firstWhere(
+                                                  (entry) =>
+                                                      entry.value == value,
+                                                  orElse: () =>
+                                                      const MapEntry('0', ''))
+                                              .key;
+                                          menuItemParam.updateCategoryId(
+                                              int.parse(categoryId));
+                                        }
+                                      },
+                                      hint: 'Select Category',
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    36.verticalSpace,
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 45),
-                      child: CustomTextField(
-                        labelText: 'Item Description*',
-                        maxLines: 7,
-                        controller: itemDescriptionController,
-                        border: InputBorder.none,
-                        hintText: 'Enter item description',
-                        onChanged: (val) {
-                          menuItemParam.updateDescription(val);
-                        },
-                      ),
-                    ),
-                    11.verticalSpace,
-                    CustomDropdownButton(
-                        customBtn: IgnorePointer(
-                          child: CustomTextField(
-                            labelText: 'Select Type*',
-                            controller: itemTypeController,
-                            readOnly: true,
-                            hintText: "Select Type",
-                            suffixIcon: const Icon(Icons.arrow_drop_down),
-                          ),
-                        ),
-                        hint: "",
-                        value: itemTypeController.text.isEmpty
-                            ? null
-                            : itemTypeController.text,
-                        dropdownItems: items?.itemType?.values.toList() ?? [],
-                        onChanged: (value) {
-                          if (value != null) {
-                            itemTypeController.text = value;
-                            String? selectedKey;
-                            items?.itemType?.forEach((key, val) {
-                              if (val == value) {
-                                selectedKey = key;
-                              }
-                            });
-                            if (selectedKey != null) {
-                              menuItemParam
-                                  .updateTypeId(int.parse(selectedKey!));
-                            }
-                          }
-                        }),
-                    24.verticalSpace,
-                    Padding(
-                      padding: const EdgeInsets.only(left: 0, right: 40),
-                      child: InkWell(
-                        onTap: (){
-                          notifier.addField();
-                        },
-                        child: Container(
-                          width: 200,
-                          height: 50,
-                          clipBehavior: Clip.antiAlias,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            color: const Color(0xFF2C851F),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          41.verticalSpace,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(Icons.add, color: Colors.white),
-                              Text(
-                                'Add Options',
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-
-                  ],
-                ),
-                40.horizontalSpace,
-                // Middle Column (Name, Size+Price)
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            10.horizontalSpace,
-                            CustomTextField(
-                              labelText: 'Item Name *',
-                              hintText: "Enter item name",
-                              onChanged: (val) {
-                                menuItemParam.updateName(val);
-                              },
-                            ),
-                            140.horizontalSpace,
-                            CustomDropdownButton(
-                                customBtn: IgnorePointer(
-                                  child: CustomTextField(
-                                    labelText: 'Select Category*',
-                                    controller: itemCategoryController,
-                                    readOnly: true,
-                                    hintText: "Select Category",
-                                    suffixIcon:
-                                        const Icon(Icons.arrow_drop_down),
-                                  ),
-                                ),
-                                hint: "Select Category",
-                                value: itemCategoryController.text.isEmpty
-                                    ? null
-                                    : itemCategoryController.text,
-                                dropdownItems:
-                                    items?.itemCategory?.values.toList() ?? [],
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    itemCategoryController.text = value;
-                                    final categoryMap =
-                                        items?.itemCategory ?? {};
-                                    final categoryId = categoryMap.entries
-                                        .firstWhere(
-                                            (entry) => entry.value == value,
-                                            orElse: () =>
-                                                const MapEntry('0', ''))
-                                        .key;
-                                    menuItemParam.updateCategoryId(
-                                        int.parse(categoryId));
-                                  }
-                                }),
-                          ],
-                        ),
-                        40.verticalSpace,
-                        Consumer(
-                          builder: (context, ref, _) {
-                            final list = ref.watch(sizePriceProvider);
-                            final notifier =
-                                ref.read(sizePriceProvider.notifier);
-                            final itemSizeMap = items?.itemSize ?? {};
-                            final sizeToIdMap = itemSizeMap.map((key, value) =>
-                                MapEntry(value, int.parse(key)));
-                            final validList = list
-                                .where((e) =>
-                                    e.size.isNotEmpty &&
-                                    e.price != null &&
-                                    e.price != 0.0)
-                                .map((e) => ItemSize(
-                                      itemSizeId: sizeToIdMap[e.size]!,
-                                      itemPrice: e.price!,
-                                    ))
-                                .toList();
-
-                            print(validList);
-
-                            return Column(
-                              children: [
-                                ...List.generate(list.length, (index) {
-                                  final item = list[index];
-                                  final selectedSizes = list
-                                      .asMap()
-                                      .entries
-                                      .where((entry) => entry.key != index)
-                                      .map((entry) => entry.value.size)
-                                      .where((size) => size.isNotEmpty)
-                                      .toSet();
-                                  final allSizes =
-                                      items?.itemSize?.values.toList() ?? [];
-                                  final availableSizes = allSizes.where((size) {
-                                    return !selectedSizes.contains(size) ||
-                                        size == item.size;
-                                  }).toList();
-                                  print(item.price);
-                                  return Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 10,
-                                        top: 10,
-                                        bottom: 10,
-                                        right: 10),
-                                    child: Row(
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 45, right: 70),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    AppTextField(
+                                      initialValue:
+                                          itemDetails?.itemDescription,
+                                      fillColor: Colors.transparent,
+                                      width: 240.w,
+                                      maxLines: 7,
+                                      onChanged: (val) {
+                                        menuItemParam.updateDescription(val!);
+                                      },
+                                      hint: 'Enter item description',
+                                      label: 'Item Description',
+                                    ),
+                                    26.verticalSpace,
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Flexible(
-                                          child: CustomDropdownButton(
-                                            customBtn: IgnorePointer(
-                                              child: CustomTextField(
-                                                labelText: 'Size *',
-                                                controller:
-                                                    TextEditingController(
-                                                        text: item.size),
-                                                readOnly: true,
-                                                hintText: "Select Size",
-                                                suffixIcon: const Icon(
-                                                    Icons.arrow_drop_down),
-                                              ),
-                                            ),
-                                            hint: "Select size",
-                                            value: item.size.isEmpty
-                                                ? null
-                                                : item.size,
-                                            dropdownItems: availableSizes,
-                                            onChanged: (value) {
-                                              if (value != null) {
-                                                notifier.updateSize(
-                                                    index, value);
+                                        Text(
+                                          'Select Type*',
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        6.verticalSpace,
+                                        SimpleCustomDropdown(
+                                          initialValue: items?.itemType?[
+                                              itemDetails?.itemType.toString()],
+                                          height: 45,
+                                          hint: 'Select Type',
+                                          items: items?.itemType?.values
+                                                  .toList() ??
+                                              [],
+                                          onChanged: (String? value) {
+                                            String? selectedKey;
+                                            items?.itemType
+                                                ?.forEach((key, val) {
+                                              if (val == value) {
+                                                selectedKey = key;
                                               }
-                                            },
-                                          ),
+                                            });
+                                            if (selectedKey != null) {
+                                              menuItemParam.updateTypeId(
+                                                  int.parse(selectedKey!));
+                                            }
+                                          },
                                         ),
-                                        140.horizontalSpace,
-                                        Flexible(
-                                          child: PriceTextField(
-                                            readOnly: item.size.isNotEmpty,
-                                            labelText: 'Price',
-                                            hintText: 'Enter price',
-                                            initialValue: item.price,
-                                            onPriceChanged: (price) {
-                                              notifier.updatePrice(
-                                                  index, price);
-                                              setState(() {
-                                                menuItemParam
-                                                    .addItemSize(validList);
-                                              });
-                                            },
-                                          ),
-                                        ),
-                                        50.horizontalSpace,
-                                        if (list.length > 1 && index != 0)
-                                          GestureDetector(
-                                            onTap: () {
-                                              notifier.remove(index);
-                                            },
-                                            child: Column(
-                                              children: [
-                                                28.verticalSpace,
-                                                Image.asset(
-                                                    "assets/images/view.png",
-                                                    height: 33.h,
-                                                    width: 33.w),
-                                              ],
-                                            ),
-                                          ),
                                       ],
                                     ),
-                                  );
-                                }),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 44.0, left: 0, right: 755),
-                                  child: Consumer(
-                                    builder: (context, ref, _) {
-                                      final list = ref.watch(sizePriceProvider);
-                                      final notifier =
-                                          ref.read(sizePriceProvider.notifier);
-
-                                      if (list.length >= 3)
-                                        return const SizedBox.shrink();
-
-                                      return GestureDetector(
-                                        onTap: () => notifier.add(),
-                                        child: Image.asset(
-                                          "assets/images/view2.png",
-                                          height: 44.h,
-                                          width: 44.w,
-                                        ),
-                                      );
-                                    },
-                                  ),
+                                  ],
                                 ),
-                              ],
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                40.horizontalSpace,
-                // Right Column
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 90),
-                  child: Column(
-                    children: [
-                      40.verticalSpace,
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: AsyncWidget(
-                  value: menuItemState,
-                  data: (data) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Column(
-                          // crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Align(
-                            //   alignment: Alignment.topRight,
-                            //   child: IconButton(
-                            //     onPressed: () {
-                            //       context.pop();
-                            //     },
-                            //     icon: const Icon(Icons.cancel_outlined),
-                            //     color: const Color(0xFF6A442E),
-                            //   ),
-                            // ),
-                            // Center(
-                            //   child: Text(
-                            //     'Add Options',
-                            //     style: Theme.of(context)
-                            //         .textTheme
-                            //         .headlineLarge
-                            //         ?.copyWith(
-                            //       fontWeight: FontWeight.bold,
-                            //       color: const Color(0xFF461C10),
-                            //     ),
-                            //   ),
-                            // ),
-                            43.verticalSpace,
-                            ...fields.map((field) {
-                              final selectedIds = fields
-                                  .where((f) => f.key != field.key)
-                                  .map((f) => f.addonSizeId)
-                                  .whereType<int>()
-                                  .toSet();
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 16),
-                                child: Row(
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                              ),
+                              Expanded(
+                                child: Consumer(
+                                  builder: (context, ref, _) {
+                                    final list = ref.watch(sizePriceProvider);
+                                    final notifier =
+                                        ref.read(sizePriceProvider.notifier);
+                                    final itemSizeMap = items?.itemSize ?? {};
+
+                                    final sizeToIdMap = itemSizeMap.map(
+                                        (key, value) =>
+                                            MapEntry(value, int.parse(key)));
+
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Row(
+                                        ListView.separated(
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
+                                            final item = list[index];
+                                            final selectedSizes = list
+                                                .asMap()
+                                                .entries
+                                                .where((entry) =>
+                                                    entry.key != index)
+                                                .map(
+                                                    (entry) => entry.value.size)
+                                                .where(
+                                                    (size) => size.isNotEmpty)
+                                                .toSet();
+                                            final allSizes = items
+                                                    ?.itemSize?.values
+                                                    .toList() ??
+                                                [];
+                                            final availableSizes =
+                                                allSizes.where((size) {
+                                              return !selectedSizes
+                                                      .contains(size) ||
+                                                  size == item.size;
+                                            }).toList();
+                                            return Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Flexible(
+                                                    child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Size*',
+                                                      style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                    6.verticalSpace,
+                                                    SimpleCustomDropdown(
+                                                      initialValue: item.size,
+                                                      items: availableSizes,
+                                                      onChanged:
+                                                          (String? value) {
+                                                        if (value != null) {
+                                                          notifier.updateSize(
+                                                              index, value);
+                                                        }
+                                                      },
+                                                      height: 45,
+                                                      hint: 'Select size',
+                                                    ),
+                                                  ],
+                                                )),
+                                                70.horizontalSpace,
+                                                Flexible(
+                                                  child: PriceTextField(
+                                                    readOnly:
+                                                        item.size.isNotEmpty,
+                                                    labelText: 'Price*',
+                                                    hintText: 'Enter price',
+                                                    initialValue: item.price,
+                                                    onPriceChanged: (price) {
+                                                      print(price);
+                                                      notifier.updatePrice(
+                                                          index, price);
+                                                      WidgetsBinding.instance
+                                                          .addPostFrameCallback(
+                                                              (_) {
+                                                        final updatedList =
+                                                            ref.read(
+                                                                sizePriceProvider);
+                                                        final validList =
+                                                            updatedList
+                                                                .where((e) =>
+                                                                    e.size
+                                                                        .isNotEmpty &&
+                                                                    e.price !=
+                                                                        null &&
+                                                                    e.price !=
+                                                                        0.0)
+                                                                .map((e) =>
+                                                                    ItemSize(
+                                                                      itemSizeId:
+                                                                          sizeToIdMap[
+                                                                              e.size]!,
+                                                                      itemPrice:
+                                                                          e.price!,
+                                                                    ))
+                                                                .toList();
+                                                        menuItemParam
+                                                            .addItemSize(
+                                                                validList);
+                                                      });
+                                                    },
+                                                  ),
+                                                ),
+                                                50.horizontalSpace,
+                                                if (list.length > 1 &&
+                                                    index != 0)
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      notifier.remove(index);
+                                                      WidgetsBinding.instance
+                                                          .addPostFrameCallback(
+                                                              (_) {
+                                                        final updatedList =
+                                                            ref.read(
+                                                                sizePriceProvider);
+                                                        final validList =
+                                                            updatedList
+                                                                .where((e) =>
+                                                                    e.size
+                                                                        .isNotEmpty &&
+                                                                    e.price !=
+                                                                        null &&
+                                                                    e.price !=
+                                                                        0.0)
+                                                                .map((e) =>
+                                                                    ItemSize(
+                                                                      itemSizeId:
+                                                                          sizeToIdMap[
+                                                                              e.size]!,
+                                                                      itemPrice:
+                                                                          e.price!,
+                                                                    ))
+                                                                .toList();
+                                                        menuItemParam
+                                                            .addItemSize(
+                                                                validList);
+                                                      });
+                                                    },
+                                                    child: Image.asset(
+                                                        "assets/images/view.png",
+                                                        height: 33.h,
+                                                        width: 33.w),
+                                                  ),
+                                              ],
+                                            );
+                                          },
+                                          separatorBuilder:
+                                              (BuildContext context,
+                                                  int index) {
+                                            return 50.verticalSpace;
+                                          },
+                                          itemCount: list.length,
+                                          shrinkWrap: true,
+                                          physics:
+                                              NeverScrollableScrollPhysics(),
+                                        ),
+                                        if (list.length >= 3)
+                                          SizedBox.shrink()
+                                        else
+                                          GestureDetector(
+                                            onTap: () => notifier.add(),
+                                            child: Image.asset(
+                                              "assets/images/view2.png",
+                                              height: 44.h,
+                                              width: 44.w,
+                                            ),
+                                          )
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          30.verticalSpace,
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 45,
+                            ),
+                            child: InkWell(
+                              onTap: () {
+                                notifier.addField();
+                              },
+                              child: Container(
+                                width: 200,
+                                height: 50,
+                                clipBehavior: Clip.antiAlias,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(4),
+                                  color: const Color(0xFF2C851F),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.add, color: Colors.white),
+                                    Text(
+                                      'Add Options',
+                                      style: TextStyle(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 45),
+                            child: Column(
+                              children: [
+                                43.verticalSpace,
+                                ...fields.map((field) {
+                                  final selectedIds = fields
+                                      .where((f) => f.key != field.key)
+                                      .map((f) => f.addonSizeId)
+                                      .whereType<int>()
+                                      .toSet();
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 16),
+                                    child: Row(
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            5.horizontalSpace,
                                             Text("Item Options",
                                                 style: TextStyle(
                                                   fontSize: 16.sp,
                                                   fontWeight: FontWeight.w500,
                                                   color: Colors.black,
                                                 )),
+                                            8.verticalSpace,
+                                            SizedBox(
+                                              width: 250.w,
+                                              child: GroupedDropdown(
+                                                groupedOptions: groupedOptions,
+                                                selectedValue: field.addonSizeId
+                                                    ?.toString(),
+                                                disabledAddonSizeIds:
+                                                    selectedIds,
+                                                onChanged: (selected) {
+                                                  notifier.updateField(
+                                                      field.key,
+                                                      addonSizeId: selected?.id,
+                                                      addonId:
+                                                          selected?.addonId);
+                                                },
+                                              ),
+                                            ),
                                           ],
                                         ),
-                                        5.verticalSpace,
-                                        SizedBox(
-                                          width: 250.w,
-                                          child: GroupedDropdown(
-                                            groupedOptions: groupedOptions,
-                                            selectedValue:
-                                            field.addonSizeId?.toString(),
-                                            disabledAddonSizeIds: selectedIds,
-                                            onChanged: (selected) {
-                                              notifier.updateField(field.key,
-                                                  addonSizeId: selected?.id,
-                                                  addonId: selected?.addonId);
-                                            },
-                                          ),
+                                        56.horizontalSpace,
+                                        PriceTextField(
+                                          readOnly: field.addonSizeId != null,
+                                          labelText: 'Price',
+                                          hintText: 'Enter price',
+                                          initialValue: field.price,
+                                          onPriceChanged: (price) {
+                                            notifier.updateField(
+                                              field.key,
+                                              price: price,
+                                            );
+                                          },
+                                        ),
+                                        55.horizontalSpace,
+                                        CustomTextField(
+                                            labelText: 'Additional note',
+                                            controller:
+                                                TextEditingController()),
+                                        36.horizontalSpace,
+                                        // Remove Button
+                                        Column(
+                                          children: [
+                                            28.verticalSpace,
+                                            IconButton(
+                                              icon: Image.asset(
+                                                'assets/images/view.png',
+                                                height: 38.h,
+                                                width: 38.w,
+                                              ),
+                                              onPressed: () => notifier
+                                                  .removeField(field.key),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
-                                    56.horizontalSpace,
-                                    PriceTextField(
-                                      readOnly: field.addonSizeId != null,
-                                      labelText: 'Price',
-                                      hintText: 'Enter price',
-                                      initialValue: field.price,
-                                      onPriceChanged: (price) {
-                                        notifier.updateField(
-                                          field.key,
-                                          price: price,
-                                        );
-                                      },
-                                    ),
-                                    55.horizontalSpace,
-                                    CustomTextField(
-                                        labelText: 'Additional note',
-                                        controller: TextEditingController()),
-                                    36.horizontalSpace,
-                                    // Remove Button
-                                      Column(
-                                        children: [
-                                          28.verticalSpace,
-                                          IconButton(
-                                            icon: Image.asset(
-                                              'assets/images/view.png',
-                                              height: 38.h,
-                                              width: 38.w,
-                                            ),
-                                            onPressed: () =>
-                                                notifier.removeField(field.key),
-                                          ),
-                                        ],
-                                      ),
-                                  ],
+                                  );
+                                }),
+                                30.verticalSpace,
+                              ],
+                            ),
+                          ),
+                          30.verticalSpace,
+                          if (items?.addons != null &&
+                              items!.addons!.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 45, vertical: 10),
+                              child: Text(
+                                'Addons Item Name*',
+                                style: TextStyle(
+                                  color: const Color(0xFF4C2F27),
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                              );
-                            }),
-                            30.verticalSpace,
-                            // Align(
-                            //   alignment: Alignment.centerLeft,
-                            //   child: Container(
-                            //     width: 200,
-                            //     height: 50,
-                            //     decoration: BoxDecoration(
-                            //       borderRadius: BorderRadius.circular(4),
-                            //       color: const Color(0xFF2C851F),
-                            //     ),
-                            //     child: InkWell(
-                            //       onTap: notifier.addField,
-                            //       child: Row(
-                            //         mainAxisAlignment: MainAxisAlignment.center,
-                            //         children: [
-                            //           const Icon(Icons.add, color: Colors.white),
-                            //           8.horizontalSpace,
-                            //           Text(
-                            //             'Add Another',
-                            //             style: TextStyle(
-                            //               fontSize: 16.sp,
-                            //               fontWeight: FontWeight.w500,
-                            //               color: Colors.white,
-                            //             ),
-                            //           ),
-                            //         ],
-                            //       ),
-                            //     ),
-                            //   ),
-                            // ),
-                          ],
-                        ),
-                        // 216.verticalSpace,
-                        // SizedBox(
-                        //   width: 167.29,
-                        //   height: 50,
-                        //   child: ElevatedButton(
-                        //     onPressed: () {
-                        //
-                        //       context.pop();
-                        //     },
-                        //     child: const Text('ADD'),
-                        //   ),
-                        // ),
-                      ],
+                              ),
+                            ),
+                          OptimizedDropdownWidget(
+                            items: items,
+                            menuItemParam: menuItemParam,
+                            addonItem: itemsData.addonItem,
+                          ),
+                          35.verticalSpace,
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 45),
+                                child: SizedBox(
+                                  width: 145.w,
+                                  child: ElevatedButton(
+                                      onPressed: () {
+                                        // ref.read(showMenuEditScreenProvider.notifier).state = false;
+                                      },
+                                      child: const Text('CANCEL')),
+                                ),
+                              ),
+                              18.horizontalSpace,
+                              SizedBox(
+                                height: 47,
+                                width: 145.w,
+                                child: PrimaryButton(
+                                  isLoading: ref
+                                      .watch(addMenuItemsNotifierProvider)
+                                      .isLoading,
+                                  title: 'NEXT',
+                                  textColor: const Color(0xFF461C10),
+                                  backgroundColor: Colors.white,
+                                  onClick: () {
+                                    final selectedOptions = fields
+                                        .where((f) =>
+                                            f.addonSizeId != null &&
+                                            f.price != null)
+                                        .map((f) => SelectedOption(
+                                              optionId:
+                                                  f.addonSizeId.toString(),
+                                              price: f.price!,
+                                            ))
+                                        .toList();
+                                    if (selectedOptions.isNotEmpty) {
+                                      menuItemParam
+                                          .addSelectedOption(selectedOptions);
+                                    }
+                                    if (widget.itemId != null) {
+                                      ref
+                                          .read(addMenuItemsNotifierProvider
+                                              .notifier)
+                                          .updateMenuItems(
+                                              itemId: widget.itemId!);
+                                    } else {
+                                      ref
+                                          .read(addMenuItemsNotifierProvider
+                                              .notifier)
+                                          .addMenuItems();
+                                    }
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
+                          133.verticalSpace,
+                        ],
+                      ),
                     );
-                  }),
-            ),
-            41.verticalSpace,
-            // Addons Title
-            if(items?.addons!=null&&items!.addons!.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 10),
-              child: Text(
-                'Addons Item Name*',
-                style: TextStyle(
-                  color: const Color(0xFF4C2F27),
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 45),
-              child: Column(
-                children: [
-                  Wrap(
-                    spacing: 20,
-                    children: List.generate(
-                        items?.items?.values.toList().length ?? 0, (index) {
-                      final dropdownValues = items!.items!.entries
-                          .map((entry) =>
-                              AddonItemModel(id: entry.key, name: entry.value))
-                          .toList();
-
-                      if (selectedItems.length != dropdownValues.length) {
-                        selectedItems =
-                            List.filled(dropdownValues.length, null);
-                      }
-                      final selectedValue = selectedItems[index];
-                      final isValidValue =
-                          dropdownValues.contains(selectedValue);
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 16.0),
-                        child: AddonDropdownField<AddonItemModel>(
-                          addonItems: items.addons ?? [],
-                          key: UniqueKey(),
-                          items: dropdownValues,
-                          selectedItem: isValidValue ? selectedValue : null,
-                          onChanged: (value) {
-                            setState(() {
-                              selectedItems[index] = value!;
-                            });
-                            final filteredItems = selectedItems
-                                .whereType<AddonItemModel>()
-                                .toList();
-                            final addonItems = filteredItems
-                                .map((model) =>
-                                    AddonItem(addonItemId: int.parse(model.id)))
-                                .toList();
-                            menuItemParam.addAddonItem(addonItems);
-                          },
-                          itemToString: (item) => item.name,
-                          getItemId: (item) => int.parse(item.id),
-                        ),
-                      );
-                    }),
-                  )
-                ],
-              ),
-            ),
-            35.verticalSpace,
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 45),
-                  child: SizedBox(
-                    width: 145.w,
-                    child: ElevatedButton(
-                        onPressed: () {
-                          // ref.read(showMenuEditScreenProvider.notifier).state = false;
-                        },
-                        child: const Text('CANCEL')),
-                  ),
-                ),
-                18.horizontalSpace,
-                // SizedBox(
-                //   width: 145.w,
-                //   child: ElevatedButton(
-                //     style: ElevatedButton.styleFrom(
-                //       backgroundColor: Colors.white,
-                //       foregroundColor: const Color(0xFF461C10),
-                //       padding: const EdgeInsets.symmetric(
-                //           horizontal: 20, vertical: 12),
-                //     ),
-                //     onPressed: () {
-                //       ref.read(addMenuItemsNotifierProvider.notifier).addMenuItems();
-                //
-                //     },
-                //     child: const Text('NEXT'),
-                //   ),
-                // ),
-                SizedBox(
-                  height: 47,
-                  width: 145.w,
-                  child: PrimaryButton(
-                    isLoading:
-                        ref.watch(addMenuItemsNotifierProvider).isLoading,
-                    title: 'NEXT',
-                    textColor: const Color(0xFF461C10),
-                    backgroundColor: Colors.white,
-                    onClick: () {
-                      final selectedOptions = fields
-                                .where(
-                                    (f) => f.addonSizeId != null && f.price != null)
-                                .map((f) => SelectedOption(
-                              optionId: f.addonSizeId.toString(),
-                              price: f.price!,
-                            ))
-                                .toList();
-                      if(selectedOptions.isNotEmpty){
-                        ref
-                            .read(itemParamNotifierProvider.notifier)
-                            .addSelectedOption(selectedOptions);
-                      }
-
-                      ref
-                          .read(addMenuItemsNotifierProvider.notifier)
-                          .addMenuItems();
-                    },
-                  ),
-                )
-              ],
-            ),
-            133.verticalSpace,
-          ],
-        ),
-      ),
-    );
+                  });
+            }));
   }
 }
 
-class SelectManually extends StatefulWidget {
+class SelectManually extends ConsumerStatefulWidget {
   const SelectManually({super.key});
 
   @override
-  State<SelectManually> createState() => _SelectManuallyState();
+  ConsumerState<SelectManually> createState() => _SelectManuallyState();
 }
 
-class _SelectManuallyState extends State<SelectManually> {
+class _SelectManuallyState extends ConsumerState<SelectManually> {
   bool _showMenuScreen = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F3F0),
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Color(0xFFF5F3F0),
-        title: Text(
-          'Menu',
-          style: TextStyle(
-            color: const Color(0xFF461C10),
-            fontSize: 32.sp,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-      body: _showMenuScreen
-          ? MenuScreen(isEditmode: false)
-          : Center(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 154, vertical: 50),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 800.sp,
-                        height: 200.sp,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _showMenuScreen = true;
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFFC0987C),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            textStyle: TextStyle(
-                              fontSize: 40.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          child: Text('Enter items manually'),
-                        ),
-                      ),
-                      54.verticalSpace,
-                      SizedBox(
-                        width: 800.sp,
-                        height: 200.sp,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _showMenuScreen = true;
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFFC0987C),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            textStyle: TextStyle(
-                              fontSize: 40.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          child: Text('Enter items as spreadsheet'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+    final cafeInfo = ref.watch(cafeInfoNotifierProvider);
+    final cafeEvent = cafeInfo.value?.cafeEvent;
+    return Stack(
+      children: [
+        Scaffold(
+          backgroundColor: const Color(0xFFF5F3F0),
+          appBar: AppBar(
+            toolbarHeight: 50,
+            leading: _showMenuScreen
+                ? IconButton(
+                    icon: Icon(Icons.arrow_back),
+                    color: const Color(0xFF461C10),
+                    onPressed: () {
+                      setState(() {
+                        _showMenuScreen = !_showMenuScreen;
+                      });
+                    },
+                  )
+                : null,
+            automaticallyImplyLeading: false,
+            backgroundColor: Color(0xFFF5F3F0),
+            title: Text(
+              'Menu',
+              style: TextStyle(
+                color: const Color(0xFF461C10),
+                fontSize: 32.sp,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
               ),
             ),
+          ),
+          body: cafeEvent == CafeEvent.fileUploaded || _showMenuScreen
+              ? ReviewItems(isFromSignUp: true)
+              : Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 154, vertical: 50),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 600.sp,
+                            height: 120.sp,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  _showMenuScreen = true;
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFFC0987C),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                textStyle: TextStyle(
+                                  fontSize: 30.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              child: Text('Enter items manually'),
+                            ),
+                          ),
+                          54.verticalSpace,
+                          SizedBox(
+                            width: 600.sp,
+                            height: 120.sp,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                ref
+                                    .read(cafeInfoNotifierProvider.notifier)
+                                    .downloadFile();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFFC0987C),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                textStyle: TextStyle(
+                                  fontSize: 30.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              child: Text('Download spreadsheet sample'),
+                            ),
+                          ),
+                          54.verticalSpace,
+                          SizedBox(
+                            width: 600.sp,
+                            height: 120.sp,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                ref
+                                    .read(cafeInfoNotifierProvider.notifier)
+                                    .uploadPickedFile()
+                                    .then((val) {
+                                  setState(() {
+                                    _showMenuScreen = true;
+                                  });
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFFC0987C),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                textStyle: TextStyle(
+                                  fontSize: 30.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              child: Text('Upload spreadsheet'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+        ),
+        if (cafeInfo is AsyncLoading) PageLoadingWidget()
+      ],
     );
   }
 }
@@ -976,6 +879,213 @@ class AddonDropdownField<T> extends StatelessWidget {
             ),
           )
       ],
+    );
+  }
+}
+
+class CustomButtonForIcon extends StatelessWidget {
+  const CustomButtonForIcon({super.key, this.selectedItem});
+  final PreDefinedItem? selectedItem;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Select Item Icon*',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w500,
+            fontSize: 16,
+          ),
+        ),
+        8.verticalSpace,
+        Container(
+          width: 240.w,
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+          decoration: BoxDecoration(
+            border: Border.all(color: const Color(0xFF4C2F27)),
+            borderRadius: BorderRadius.circular(6.r),
+          ),
+          child: Row(
+            children: [
+              if (selectedItem?.itemImage?.isNotEmpty ?? false)
+                SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: NetworkImageWidget(
+                    imageUrl: selectedItem!.itemImage!,
+                    fit: BoxFit.cover,
+                    loadingWidgetSize: 15,
+                  ),
+                ),
+              if (selectedItem?.itemImage?.isNotEmpty ?? false)
+                15.horizontalSpace,
+              Expanded(
+                child: Text(
+                  selectedItem?.itemName ?? "Select Icon",
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF4C2F27),
+                  ),
+                ),
+              ),
+              const Icon(
+                Icons.arrow_drop_down,
+                color: Color(0xFF4C2F27),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class OptimizedDropdownWidget extends StatefulWidget {
+  final MenuItemData? items;
+  final ItemParamNotifier menuItemParam;
+  final List<AddonItem> addonItem;
+  const OptimizedDropdownWidget(
+      {Key? key,
+      required this.items,
+      required this.menuItemParam,
+      required this.addonItem})
+      : super(key: key);
+
+  @override
+  State<OptimizedDropdownWidget> createState() =>
+      _OptimizedDropdownWidgetState();
+}
+
+class _OptimizedDropdownWidgetState extends State<OptimizedDropdownWidget> {
+  List<AddonItemModel?> selectedItems = [];
+  List<AddonItemModel> dropdownValues = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeDropdownValues();
+  }
+
+  @override
+  void didUpdateWidget(OptimizedDropdownWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.items != widget.items) {
+      _initializeDropdownValues();
+    }
+  }
+
+  void _initializeDropdownValues() {
+    if (widget.items?.items == null) {
+      dropdownValues = [];
+      selectedItems = [];
+      return;
+    }
+
+    dropdownValues = widget.items!.items!.entries
+        .map((entry) => AddonItemModel(id: entry.key, name: entry.value))
+        .toList();
+
+    // Only reinitialize if length changed
+
+    selectedItems = List.filled(dropdownValues.length, null);
+    // Set initial selections based on addonItem list
+    _setInitialSelections();
+  }
+
+  void _setInitialSelections() {
+    if (widget.addonItem.isEmpty) return;
+
+    // Create a set of addon item IDs for quick lookup
+    final addonItemIds =
+        widget.addonItem.map((item) => item.addonItemId.toString()).toSet();
+
+    // Create a list to track which addon items have been assigned
+    final assignedAddonIds = <String>{};
+
+    // Assign addon items to dropdown positions
+    for (int i = 0;
+        i < dropdownValues.length &&
+            assignedAddonIds.length < addonItemIds.length;
+        i++) {
+      final dropdownItem = dropdownValues[i];
+
+      // Check if this dropdown item matches any of the addon items
+      if (addonItemIds.contains(dropdownItem.id) &&
+          !assignedAddonIds.contains(dropdownItem.id)) {
+        selectedItems[i] = dropdownItem;
+        assignedAddonIds.add(dropdownItem.id);
+      }
+    }
+  }
+
+  Set<String> _getSelectedIdsExcluding(int excludeIndex) {
+    return selectedItems
+        .asMap()
+        .entries
+        .where((entry) => entry.key != excludeIndex && entry.value != null)
+        .map((entry) => entry.value!.id)
+        .toSet();
+  }
+
+  List<AddonItemModel> _getFilteredDropdownValues(int index) {
+    final selectedValue = selectedItems[index];
+    final excludedIds = _getSelectedIdsExcluding(index);
+
+    return dropdownValues
+        .where((item) =>
+            !excludedIds.contains(item.id) || item.id == selectedValue?.id)
+        .toList();
+  }
+
+  void _onDropdownChanged(int index, AddonItemModel? value) {
+    if (value == null) return;
+
+    setState(() {
+      selectedItems[index] = value;
+    });
+
+    _updateMenuItemParam();
+  }
+
+  void _updateMenuItemParam() {
+    final addonItems = selectedItems
+        .whereType<AddonItemModel>()
+        .map((model) => AddonItem(addonItemId: int.parse(model.id)))
+        .toList();
+
+    widget.menuItemParam.addAddonItem(addonItems);
+  }
+
+  Widget _buildDropdownItem(int index) {
+    return AddonDropdownField<AddonItemModel>(
+      addonItems: widget.items?.addons ?? [],
+      key: ValueKey('dropdown_$index'),
+      items: _getFilteredDropdownValues(index),
+      selectedItem: selectedItems[index],
+      onChanged: (value) => _onDropdownChanged(index, value),
+      itemToString: (item) => item.name,
+      getItemId: (item) => int.parse(item.id),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.items?.items == null || dropdownValues.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 45),
+      child: Wrap(
+        spacing: 20,
+        children: List.generate(
+          dropdownValues.length,
+          _buildDropdownItem,
+        ),
+      ),
     );
   }
 }

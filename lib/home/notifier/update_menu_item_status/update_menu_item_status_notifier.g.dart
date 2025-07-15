@@ -7,7 +7,7 @@ part of 'update_menu_item_status_notifier.dart';
 // **************************************************************************
 
 String _$updateMenuItemStatusNotifierHash() =>
-    r'ca594595dc1fdc27ef2610a31808a6e095ea43b4';
+    r'437b53b49294e8e709441703b1a5f42a5dc221e6';
 
 /// See also [UpdateMenuItemStatusNotifier].
 @ProviderFor(UpdateMenuItemStatusNotifier)

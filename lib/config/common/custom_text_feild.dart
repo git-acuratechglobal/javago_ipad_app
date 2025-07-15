@@ -47,7 +47,7 @@ final TextInputType? textInputType;
     this.minLines,
     this.radius,
     this.textInputType
-  }) : super(key: key);
+  }) : super(key: key,);
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +76,6 @@ final TextInputType? textInputType;
               ),
             ),
             child: TextFormField(
-              key: UniqueKey(),
               keyboardType: textInputType,
               minLines: minLines,
               controller: controller,

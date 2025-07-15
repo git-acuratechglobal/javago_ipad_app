@@ -1,4 +1,3 @@
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../model/cafe_model.dart';
@@ -12,13 +11,11 @@ abstract class AuthState with _$AuthState {
     String? response,
     CafeModel? cafeModel,
   }) = _AuthState;
-
 }
 
 enum AuthEvent {
   login,
   signUp,
   forgotPassword,
-  restPassword,
+  updatePassword,
 }
-

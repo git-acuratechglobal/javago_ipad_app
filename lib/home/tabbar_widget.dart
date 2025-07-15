@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
+import 'package:java_go/config/async_widget.dart';
 import 'package:java_go/home/bottombar.dart';
 import 'package:java_go/home/homescreen.dart';
 import 'package:java_go/home/notifiers/view_order_provider.dart';
@@ -94,7 +95,8 @@ class _CustomTabBarState extends ConsumerState<CustomTabBar> {
           indicatorColor: Colors.transparent,
           dividerColor: Colors.transparent,
           labelStyle: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
-          unselectedLabelStyle: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
+          unselectedLabelStyle:
+              TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
           tabs: [
             _buildTab(
               iconPath: 'assets/images/ic_bar_chart.png',
@@ -175,17 +177,17 @@ class _CustomTabBarState extends ConsumerState<CustomTabBar> {
 class CustomTabBarCafeInfo extends ConsumerStatefulWidget {
   final String title;
   final bool? onBackPress;
-final TabController tabController;
-  const CustomTabBarCafeInfo({
-    super.key,
-    required this.title,
-    required this.onTap,
-    this.onBackPress,
-    required this.tabController
-  });
+  final TabController tabController;
+  const CustomTabBarCafeInfo(
+      {super.key,
+      required this.title,
+      required this.onTap,
+      this.onBackPress,
+      required this.tabController});
   final void Function(int val) onTap;
   @override
-  ConsumerState<CustomTabBarCafeInfo> createState() => _CustomTabBarCafeInfoState();
+  ConsumerState<CustomTabBarCafeInfo> createState() =>
+      _CustomTabBarCafeInfoState();
 }
 
 class _CustomTabBarCafeInfoState extends ConsumerState<CustomTabBarCafeInfo> {
@@ -193,9 +195,6 @@ class _CustomTabBarCafeInfoState extends ConsumerState<CustomTabBarCafeInfo> {
 
   @override
   Widget build(BuildContext context) {
-       final orders = ref.watch(todayOrdersProvider);
-       final items = orders.value?.getCombinedUniqueOrders;
-       final inProgressOrders = items?.where((order) => order.orderCompleted != 1).toList().length;
     return AppBar(
         automaticallyImplyLeading: false,
         leading: widget.onBackPress != null && widget.onBackPress!
@@ -225,41 +224,50 @@ class _CustomTabBarCafeInfoState extends ConsumerState<CustomTabBarCafeInfo> {
           ),
         ),
         actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 57),
-            child: InkWell(
-              onTap: () {
-                ref.read(bottomBarTabProvider.notifier).update((_)=>1);
-              },
-              child: Container(
-                width: 158.w,
-                height: 48.h,
-                decoration: BoxDecoration(
-                  color: Color(0xFF5CF97F),
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color(0x3F000000),
-                      blurRadius: 2,
-                      offset: Offset(0, 2),
-                      spreadRadius: 0,
-                    )
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    'Orders: ${inProgressOrders}',
-                    style: TextStyle(
-                      color: const Color(0xFF414141),
-                      fontSize: 20,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w800,
+          AsyncWidget(
+            wantToShowLoading: false,
+              height: 48.h,
+              value: ref.watch(todayOrdersProvider),
+              data: (ordersData) {
+                final items = ordersData.getCombinedUniqueOrders;
+                final inProgressOrders =
+                    items.where((order) => order.orderCompleted != 1).toList().length;
+                return Padding(
+                  padding: EdgeInsets.only(right: 57),
+                  child: InkWell(
+                    onTap: () {
+                      ref.read(bottomBarTabProvider.notifier).update((_) => 1);
+                    },
+                    child: Container(
+                      width: 158.w,
+                      height: 48.h,
+                      decoration: BoxDecoration(
+                        color: Color(0xFF5CF97F),
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0x3F000000),
+                            blurRadius: 2,
+                            offset: Offset(0, 2),
+                            spreadRadius: 0,
+                          )
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Orders: ${inProgressOrders}',
+                          style: TextStyle(
+                            color: const Color(0xFF414141),
+                            fontSize: 20,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ),
-          )
+                );
+              })
         ],
         bottom: TabBar(
           controller: widget.tabController,
@@ -271,7 +279,8 @@ class _CustomTabBarCafeInfoState extends ConsumerState<CustomTabBarCafeInfo> {
           indicatorColor: Colors.transparent,
           dividerColor: Colors.transparent,
           labelStyle: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
-          unselectedLabelStyle: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
+          unselectedLabelStyle:
+              TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
           tabs: [
             _buildTab(
               label: 'Cafe information',

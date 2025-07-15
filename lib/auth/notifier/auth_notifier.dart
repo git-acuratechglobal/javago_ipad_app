@@ -11,7 +11,7 @@ part 'auth_notifier.g.dart';
 class AuthNotifier extends _$AuthNotifier {
   String? _email;
   String? _password;
-
+  String? _newPassword;
   @override
   FutureOr<AuthState?> build() {
     return null;
@@ -24,6 +24,10 @@ class AuthNotifier extends _$AuthNotifier {
       final loginResult =
           await ref.watch(authServiceProvider).login(email, password);
       ref.invalidate(localStorageServiceProvider);
+      final token = ref.read(localStorageServiceProvider).getFcmToken();
+      if (token != null) {
+        await ref.watch(authServiceProvider).updateFcmToken(token);
+      }
       final cafeModel = await ref.read(authServiceProvider).getCafeData();
       return AuthState(
           authEvent: AuthEvent.login,
@@ -34,11 +38,14 @@ class AuthNotifier extends _$AuthNotifier {
 
   Future<void> signUp() async {
     state = const AsyncLoading();
-
     state = await AsyncValue.guard(() async {
       final signUpResult =
           await ref.watch(authServiceProvider).signUp(_email, _password);
       ref.invalidate(localStorageServiceProvider);
+      final token = ref.read(localStorageServiceProvider).getFcmToken();
+      if (token != null) {
+        await ref.watch(authServiceProvider).updateFcmToken(token);
+      }
       return AuthState(
         authEvent: AuthEvent.signUp,
         response: signUpResult,
@@ -46,7 +53,19 @@ class AuthNotifier extends _$AuthNotifier {
     });
   }
 
+  Future<void> updateNewPassword() async {
+    state = const AsyncLoading();
 
+    state = await AsyncValue.guard(() async {
+      final signUpResult = await ref
+          .watch(authServiceProvider)
+          .updatePassword(_password, _newPassword);
+      return AuthState(
+        authEvent: AuthEvent.updatePassword,
+        response: signUpResult,
+      );
+    });
+  }
 
   void updateEmail({required email}) {
     _email = email;
@@ -56,7 +75,9 @@ class AuthNotifier extends _$AuthNotifier {
     _password = password;
   }
 
-
+  void newPassword({required password}) {
+    _newPassword = password;
+  }
 
   List<CafeDayTime> convertCafeTimingToCafeDayTime(List<dynamic> list) {
     return list.map((item) {

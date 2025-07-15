@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
 import 'package:java_go/config/async_widget.dart';
 import 'package:java_go/config/common/button.dart';
-import 'package:java_go/home/notifiers/accept_orders.dart';
 import 'package:java_go/home/notifiers/view_order_provider.dart';
 import 'package:java_go/home/orders.dart';
 
@@ -164,7 +163,6 @@ class _OrderWidgetState extends ConsumerState<OrderWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final orderState = ref.watch(acceptOrdersProvider);
     return Padding(
       padding: EdgeInsets.only(left: 30, top: 37),
       child: InkWell(
@@ -244,9 +242,6 @@ class _OrderWidgetState extends ConsumerState<OrderWidget> {
                 width: 198.w,
                 height: 34.h,
                 child: PrimaryButton(
-                  isLoading: orderState!.isLoading! &&
-                      widget.orderId.toString() == orderState.orderId &&
-                      orderState.unavailableItems == null,
                   onClick: () async {
                     // ref
                     //     .read(acceptOrdersProvider.notifier)

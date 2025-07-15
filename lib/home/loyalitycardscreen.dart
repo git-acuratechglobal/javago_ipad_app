@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
 import 'package:java_go/config/common/widgets.dart';
+import '../auth/model/getStamp.dart';
 import '../auth/notifier/stamp_notifier/get_stamp_notifier.dart';
 import '../auth/pages/sign_up/loyalitycard.dart';
 import '../auth/pages/sign_up/reviewscreen.dart';
@@ -17,90 +18,91 @@ class LoyalityCardScreen2 extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final getStamp = ref.watch(getStampProvider);
     return Scaffold(
         appBar: (isOpenFromSignup == true)
             ? AppBar(
-          automaticallyImplyLeading: false,
-          title: Text(
-            "Loyality stamp",
-            style: Theme.of(context)
-                .textTheme
-                .headlineLarge
-                ?.copyWith(color: Color(0xFF461C10), fontWeight: FontWeight.w600),
-          ),
-          centerTitle: true,
-        )
-            : null,
-        body: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 58, vertical: 36),
-          child: Column(
-            children: [
-              isOpenFromSignup ?? true
-                  ? Column(
-                children: [
-                  15.verticalSpace,
-                  Align(
-                      alignment: Alignment.topRight,
-                      child: InkWell(
-                        onTap: () {
-                          context.navigateTo(LoyalityCardScreen(
-                            isEditMode: true,
-                          ));
-                        },
-                        child: EditContainer(
-                          title: 'Add Stamp',
-                          icon: (Icons.add_circle_outline),
-                        ),
-                      )),
-                ],
+                automaticallyImplyLeading: false,
+                title: Text(
+                  "Loyality stamp",
+                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                      color: Color(0xFF461C10), fontWeight: FontWeight.w600),
+                ),
+                centerTitle: true,
               )
-                  : Align(
-                  alignment: Alignment.topRight,
-                  child: InkWell(
-                    onTap: () {
-                      context.navigateTo(LoyalityCardScreen(
-                        isEditMode: true,
-                      ));
-                    },
-                    child: EditContainer(
-                      title: 'Edit Stamp',
-                      icon: (Icons.add_circle_outline),
-                    ),
-                  )),
-              38.verticalSpace,
-              LoyalityCard(isOpenFromSignup: isOpenFromSignup),
-            ],
-          ),
-        ),
+            : null,
+        body: AsyncWidget(
+            value: getStamp,
+            data: (data) {
+              return SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 58, vertical: 36),
+                child: Column(
+                  children: [
+                    data.loyaltyStamp==null
+                        ? Column(
+                            children: [
+                              15.verticalSpace,
+                              Align(
+                                  alignment: Alignment.topRight,
+                                  child: InkWell(
+                                    onTap: () {
+                                      context.navigateTo(LoyalityCardScreen(
+                                      ));
+                                    },
+                                    child: EditContainer(
+                                      title: 'Add Stamp',
+                                      icon: (Icons.add_circle_outline),
+                                    ),
+                                  )),
+                            ],
+                          )
+                        : Align(
+                            alignment: Alignment.topRight,
+                            child: InkWell(
+                              onTap: () {
+                                context.navigateTo(LoyalityCardScreen(
+                                  loyaltyStamp: data.loyaltyStamp,
+                                ));
+                              },
+                              child: EditContainer(
+                                title: 'Edit Stamp',
+                                icon: (Icons.add_circle_outline),
+                              ),
+                            )),
+                    38.verticalSpace,
+                    LoyalityCard(),
+                  ],
+                ),
+              );
+            }),
         floatingActionButton: isOpenFromSignup == true
             ? Padding(
-          padding: const EdgeInsets.only(top: 70, right: 40),
-          child: SizedBox(
-            width: 55,
-            height: 53,
-            child: PrimaryButton(
-              backgroundColor: const Color(0xFFC0987C),
-              onClick: () {
-                final controller = ref.read(cafePageControllerProvider);
-                if (controller.hasClients) {
-                  controller.nextPage(
-                    duration: Duration(milliseconds: 250),
-                    curve: Curves.bounceIn,
-                  );
-                }
-              },
-              isIconButton: true,
-            ),
-          ),
-        )
+                padding: const EdgeInsets.only(top: 70, right: 40),
+                child: SizedBox(
+                  width: 55,
+                  height: 53,
+                  child: PrimaryButton(
+                    backgroundColor: const Color(0xFFC0987C),
+                    onClick: () {
+                      final controller = ref.read(cafePageControllerProvider);
+                      if (controller.hasClients) {
+                        controller.nextPage(
+                          duration: Duration(milliseconds: 250),
+                          curve: Curves.bounceIn,
+                        );
+                      }
+                    },
+                    isIconButton: true,
+                  ),
+                ),
+              )
             : null);
   }
 }
 
-
 class LoyalityCard extends ConsumerWidget {
-  final bool? isOpenFromSignup;
-  const LoyalityCard({super.key, this.isOpenFromSignup});
+
+  const LoyalityCard({super.key,});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -169,73 +171,89 @@ class LoyalityCard extends ConsumerWidget {
                     ),
                   ),
                 ),
-                (item == null && isOpenFromSignup == true)
+                (item == null)
                     ? Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 22),
-                  child: Text("No data available in table"),
-                )
-                    : Container(
-                  padding: EdgeInsets.symmetric(horizontal: 17),
-                  width: 1076.w,
-                  height: 159,
-                  child: Column(
-                    children: [
-                      19.horizontalSpace,
-                      19.verticalSpace,
-                      Row(
-                        children: [
-                          SizedBox(
-                              width: 300.w,
-                              height: 35,
-                              child: Align(
-                                alignment: Alignment.topLeft,
-                                child: item?.stampColor != null
-                                    ? Padding(
-                                  padding: const EdgeInsets.only(left: 28.0),
-                                  child: Container(
-                                    width: 44,
-                                    height: 44,
-                                    decoration: BoxDecoration(
-                                      color: HexColor.fromHex(item!.stampColor!),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                )
-                                    : Icon(Icons.broken_image, size: 33),
-                              )),
-                          SizedBox(
-                            width: 273.w,
-                            child: ReviewItembarname(
-                              label: "£ ${item?.discount?.toString() ?? ''}",
-                              color: Color(0xFF1B0701),
-                              fontSize: 16.sp,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 255.w,
-                            child: ReviewItembarname(
-                              label: item?.minOrderValue?.toString() ?? '',
-                              color: Color(0xFF1B0701),
-                              fontSize: 16.sp,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 199.w,
-                            child: ReviewItembarname(
-                              label: item?.stampNo?.toString() ?? '',
-                              color: Color(0xFF1B0701),
-                              fontSize: 16.sp,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Divider(
-                        thickness: 1,
-                        color: const Color(0xFFC0987C),
+                        padding: const EdgeInsets.symmetric(vertical: 22),
+                        child: Text("No data available in table"),
                       )
-                    ],
-                  ),
-                )
+                    : Container(
+                        padding: EdgeInsets.symmetric(horizontal: 17),
+                        width: 1076.w,
+                        height: 159,
+                        child: Column(
+                          children: [
+                            19.horizontalSpace,
+                            19.verticalSpace,
+                            Row(
+                              children: [
+                                SizedBox(
+                                    width: 300.w,
+                                    height: 35,
+                                    child: Align(
+                                      alignment: Alignment.topLeft,
+                                      child: item.stampColor != null
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 28.0),
+                                              child: Container(
+                                                width: 44,
+                                                height: 44,
+                                                decoration: BoxDecoration(
+                                                  color: HexColor.fromHex(
+                                                      item.stampColor!),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
+                                            )
+                                          : Icon(Icons.broken_image, size: 33),
+                                    )),
+                                SizedBox(
+                                  width: 273.w,
+                                  child: ReviewItembarname(
+                                    label:
+                                        "£ ${item.discount?.toString() ?? ''}",
+                                    color: Color(0xFF1B0701),
+                                    fontSize: 16.sp,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 255.w,
+                                  child: ReviewItembarname(
+                                    label:
+                                        item.minOrderValue?.toString() ?? '',
+                                    color: Color(0xFF1B0701),
+                                    fontSize: 16.sp,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 169.w,
+                                  child: ReviewItembarname(
+                                    label: item.stampNo?.toString() ?? '',
+                                    color: Color(0xFF1B0701),
+                                    fontSize: 16.sp,
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    context.navigateTo(LoyalityCardScreen(
+                                      loyaltyStamp: data.loyaltyStamp,
+                                    ));
+                                  },
+                                  child: Image.asset(
+                                    'assets/images/edit_java_go.png',
+                                    height: 43.h,
+                                    width: 43.w,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Divider(
+                              thickness: 1,
+                              color: const Color(0xFFC0987C),
+                            )
+                          ],
+                        ),
+                      )
               ],
             ),
           );

@@ -13,14 +13,8 @@ GetOrdersResponse _$GetOrdersResponseFromJson(Map<String, dynamic> json) =>
       individualOrders: (json['individualOrders'] as List<dynamic>?)
           ?.map((e) => GetOrder.fromJson(e as Map<String, dynamic>))
           .toList(),
-      groupCoffeeRunOrders:
-          (json['groupCoffeeRunOrders'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(
-            k,
-            (e as List<dynamic>)
-                .map((e) => GetOrder.fromJson(e as Map<String, dynamic>))
-                .toList()),
-      ),
+      groupCoffeeRunOrders: const GroupCoffeeRunOrdersConverter()
+          .fromJson(json['groupCoffeeRunOrders']),
     );
 
 Map<String, dynamic> _$GetOrdersResponseToJson(GetOrdersResponse instance) =>
@@ -28,7 +22,8 @@ Map<String, dynamic> _$GetOrdersResponseToJson(GetOrdersResponse instance) =>
       'status': instance.status,
       'message': instance.message,
       'individualOrders': instance.individualOrders,
-      'groupCoffeeRunOrders': instance.groupCoffeeRunOrders,
+      'groupCoffeeRunOrders': const GroupCoffeeRunOrdersConverter()
+          .toJson(instance.groupCoffeeRunOrders),
     };
 
 GetOrder _$GetOrderFromJson(Map<String, dynamic> json) => GetOrder(
@@ -54,6 +49,9 @@ GetOrder _$GetOrderFromJson(Map<String, dynamic> json) => GetOrder(
           : DateTime.parse(json['orderPlacedAtDate'] as String),
       orderDate: json['orderDate'] as String?,
       orderTime: json['orderTime'] as String?,
+      estimatedArrivalTime: json['estimated_arival_time'] as String?,
+      fullOrderCancelled: (json['is_full_order_cancelled'] as num?)?.toInt(),
+      refundStatus: json['refund_status'] as String?,
     );
 
 Map<String, dynamic> _$GetOrderToJson(GetOrder instance) => <String, dynamic>{
@@ -72,6 +70,9 @@ Map<String, dynamic> _$GetOrderToJson(GetOrder instance) => <String, dynamic>{
       'run_created_at': instance.runCreatedAt,
       'request_created_by': instance.requestCreatedBy,
       'request_created_by_name': instance.requestCreatedByName,
+      'estimated_arival_time': instance.estimatedArrivalTime,
+      'is_full_order_cancelled': instance.fullOrderCancelled,
+      'refund_status': instance.refundStatus,
       'orderPlacedAtDate': instance.orderPlacedAtDate?.toIso8601String(),
       'orderDate': instance.orderDate,
       'orderTime': instance.orderTime,

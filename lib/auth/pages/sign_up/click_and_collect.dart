@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:java_go/auth/params/click_and_collect_params.dart';
 import 'package:java_go/config/async_widget.dart';
 import 'package:java_go/config/common/button.dart';
 import 'package:java_go/config/common/extensions.dart';
@@ -118,7 +119,9 @@ class _ClickCollectState extends State<ClickCollect> {
   @override
   void initState() {
     super.initState();
-    _selected = widget.initialValue;
+    setState(() {
+      _selected = widget.initialValue;
+    });
   }
 
   void _updateSelection(String value) {
@@ -255,20 +258,28 @@ class ClickandCollectWidget extends ConsumerStatefulWidget {
 
 class _ClickandCollectWidgetState extends ConsumerState<ClickandCollectWidget> {
   bool showCafeHours = false;
-  int? selectedCapacity;
-  int? clickAndCollect;
   @override
   void initState() {
     super.initState();
-    selectedCapacity = widget.cafeModel?.cafeManagement?.maxOrdersClickCollect;
-    if (selectedCapacity == null || selectedCapacity == 0) {
-      selectedCapacity = 2;
-    }
-    clickAndCollect = widget.cafeModel?.cafeManagement?.clickAndCollect ?? 0;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.cafeModel!.cafeClickCollectTiming != null &&
+          widget.cafeModel!.cafeClickCollectTiming!.isNotEmpty) {
+        ref
+            .read(clickAndCollectParamProvider.notifier)
+            .updateClickAndCollectParam(cafeModel: widget.cafeModel!);
+      } else {
+        ref
+            .read(clickAndCollectParamProvider.notifier)
+            .updateClickAndCollectParamForInitial(cafeModel: widget.cafeModel!);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final clickAndCollect = ref.watch(clickAndCollectParamProvider);
+    final clickAndCollectNotifier =
+        ref.read(clickAndCollectParamProvider.notifier);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -279,27 +290,22 @@ class _ClickandCollectWidgetState extends ConsumerState<ClickandCollectWidget> {
             children: [
               88.verticalSpace,
               ClickCollect(
+                key: UniqueKey(),
                 title: 'Opt in to ‘click and collect’?',
                 yesLabel: 'Yes',
                 noLabel: 'No',
                 initialValue:
-                    widget.cafeModel?.cafeManagement?.clickAndCollect == 1
-                        ? "Yes"
-                        : "No",
+                    clickAndCollect.click_and_collect == 1 ? "Yes" : "No",
                 onChanged: (value) {
-                  setState(() {
-                    if (value == "Yes") {
-                      clickAndCollect = 1;
-                    } else {
-                      clickAndCollect = 0;
-                    }
-                  });
-                  ref.read(cafeInfoNotifierProvider.notifier).updateForm(
-                      key: 'clickAndCollect', value: clickAndCollect);
+                  if (value == "Yes") {
+                    clickAndCollectNotifier.updateClickAndCollect(1);
+                  } else {
+                    clickAndCollectNotifier.updateClickAndCollect(0);
+                  }
                 },
               ),
               44.verticalSpace,
-              if (clickAndCollect == 1) ...[
+              if (clickAndCollect.click_and_collect == 1) ...[
                 Row(
                   children: [
                     Expanded(
@@ -318,16 +324,14 @@ class _ClickandCollectWidgetState extends ConsumerState<ClickandCollectWidget> {
                           color: Colors.white,
                           shape: RoundedRectangleBorder(
                             side: BorderSide(width: 1, color: Colors.black),
-                            borderRadius: BorderRadius.circular(
-                                4), // Optional: add rounding
+                            borderRadius: BorderRadius.circular(4),
                           ),
                         ),
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 10), // For inner spacing
+                        padding: EdgeInsets.symmetric(horizontal: 10),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<int>(
                             isExpanded: true,
-                            value: selectedCapacity,
+                            value: clickAndCollect.max_orders_click_collect,
                             hint: Text("Select Capacity"),
                             items: List.generate(11, (index) {
                               final value = index + 2;
@@ -337,15 +341,8 @@ class _ClickandCollectWidgetState extends ConsumerState<ClickandCollectWidget> {
                               );
                             }),
                             onChanged: (value) {
-                              setState(() {
-                                selectedCapacity = value!;
-                                ref
-                                    .read(cafeInfoNotifierProvider
-                                        .notifier)
-                                    .updateForm(
-                                        key: 'maxOrders',
-                                        value: selectedCapacity);
-                              });
+                              clickAndCollectNotifier
+                                  .updateMaxOrder(value ?? 2);
                             },
                           ),
                         ),
@@ -355,10 +352,15 @@ class _ClickandCollectWidgetState extends ConsumerState<ClickandCollectWidget> {
                 ),
                 44.verticalSpace,
                 ClickCollect(
+                  key: ValueKey('Collection hours'),
                   title: 'Collection hours',
                   yesLabel: 'During opening hours',
                   noLabel: 'Edit',
-                  initialValue: 'During opening hours',
+                  initialValue:
+                      // clickAndCollect.clickAndCollectTime.isEmpty
+                      //     ? "During opening hours"
+                      //     :
+                      "During opening hours",
                   onChanged: (value) {
                     setState(() {
                       showCafeHours = !showCafeHours;
@@ -374,21 +376,11 @@ class _ClickandCollectWidgetState extends ConsumerState<ClickandCollectWidget> {
                         height: 400.h,
                         width: 500.w,
                         child: CafeHoursScreen1(
+                          key: ValueKey("CafeHoursScreen1"),
                           restrictCafeTime: widget.cafeModel?.timing ?? [],
-                          initialCafeTime:
-                              widget.cafeModel?.cafeClickCollectTiming ??
-                                  widget.cafeModel?.timing
-                                      ?.map((e) => CafeClickCollectTiming(
-                                          cafeId: e.cafeId,
-                                          day: e.day.toString(),
-                                          startTime: e.openTime,
-                                          endTime: e.closeTime,
-                                          isActive: null))
-                                      .toList(),
+                          initialCafeTime: clickAndCollect.initialCafeTime,
                           onTimeChanged: (List<CafeDayTime> cafeTime) {
-                            ref
-                                .read(cafeInfoNotifierProvider.notifier)
-                                .updateForm(key: 'cafeTimes', value: cafeTime);
+                            clickAndCollectNotifier.updateTiming(cafeTime);
                           },
                         ),
                       ),
@@ -406,15 +398,10 @@ class _ClickandCollectWidgetState extends ConsumerState<ClickandCollectWidget> {
               padding: const EdgeInsets.only(left: 40),
               child: PrimaryButton(
                 fixedSize: Size(178.w, 50.h),
-                isLoading: ref.watch(clickAndCollectNotifierProvider).isLoading,
+                isLoading: ref.watch(cafeInfoNotifierProvider).isLoading,
                 onClick: () {
-                  ref.read(clickAndCollectNotifierProvider.notifier).updateForm(
-                      key: 'clickAndCollect', value: clickAndCollect);
                   ref
-                      .read(clickAndCollectNotifierProvider.notifier)
-                      .updateForm(key: 'maxOrders', value: selectedCapacity);
-                  ref
-                      .read(clickAndCollectNotifierProvider.notifier)
+                      .read(cafeInfoNotifierProvider.notifier)
                       .updateClickAndCollect();
                 },
                 title: "Save Changes",

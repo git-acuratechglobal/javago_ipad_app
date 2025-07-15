@@ -24,7 +24,7 @@ class _CompletedScreenState extends ConsumerState<CompletedScreen> {
       resizeToAvoidBottomInset: false,
       backgroundColor: Color(0xFFF5F3F0),
       body: RefreshIndicator(
-        color:Color(0xFFC0987C),
+        color: Color(0xFFC0987C),
         onRefresh: () async {
           ref.invalidate(todayOrdersProvider);
         },
@@ -36,10 +36,17 @@ class _CompletedScreenState extends ConsumerState<CompletedScreen> {
             value: completedState,
             data: (data) {
               final orders = data.getCombinedUniqueOrders;
-              final completedOrders = orders.where((order) => order.orderCompleted == 1).toList()
+              final completedOrders = orders
+                  .where((order) =>
+                      order.orderCompleted == 1 ||
+                      order.refundStatus != null ||
+                      order.fullOrderCancelled != 0)
+                  .toList()
                 ..sort((a, b) {
-                  final aDateTime = a.orderPlacedAtDate ?? DateTime.fromMillisecondsSinceEpoch(0);
-                  final bDateTime = b.orderPlacedAtDate ?? DateTime.fromMillisecondsSinceEpoch(0);
+                  final aDateTime = a.orderPlacedAtDate ??
+                      DateTime.fromMillisecondsSinceEpoch(0);
+                  final bDateTime = b.orderPlacedAtDate ??
+                      DateTime.fromMillisecondsSinceEpoch(0);
                   return bDateTime.compareTo(aDateTime);
                 });
 
@@ -80,7 +87,8 @@ class _CompletedScreenState extends ConsumerState<CompletedScreen> {
                         padding: EdgeInsets.symmetric(horizontal: 2),
                         physics: NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
                           childAspectRatio: 1.72,
                           crossAxisSpacing: 50,
@@ -132,7 +140,8 @@ class CompletedOrderwidget extends ConsumerStatefulWidget {
       required this.total});
 
   @override
-  ConsumerState<CompletedOrderwidget> createState() => _CompletedOrderwidgetState();
+  ConsumerState<CompletedOrderwidget> createState() =>
+      _CompletedOrderwidgetState();
 }
 
 class _CompletedOrderwidgetState extends ConsumerState<CompletedOrderwidget> {
@@ -239,10 +248,11 @@ class _CompletedOrderwidgetState extends ConsumerState<CompletedOrderwidget> {
                       final id = widget.order.isIndividualOrder == 1
                           ? widget.order.id.toString()
                           : (widget.order.requestUniqueId ?? '');
-            
+
                       context.navigateTo(OrderScreen(
                         id: id,
-                        isIndividualOrder: widget.order.isIndividualOrder == 1 ? 1 : 0,
+                        isIndividualOrder:
+                            widget.order.isIndividualOrder == 1 ? 1 : 0,
                       ));
                       // context.navigateTo(OrderScreen(orderId: order.id));
                     },

@@ -6,7 +6,8 @@ part of 'cafetime_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_CafeDayTime _$CafeDayTimeFromJson(Map<String, dynamic> json) => _CafeDayTime(
+_$CafeDayTimeImpl _$$CafeDayTimeImplFromJson(Map<String, dynamic> json) =>
+    _$CafeDayTimeImpl(
       day: json['day'] as String,
       openingTime:
           const TimeOfDayConverter().fromJson(json['openingTime'] as String),
@@ -15,7 +16,7 @@ _CafeDayTime _$CafeDayTimeFromJson(Map<String, dynamic> json) => _CafeDayTime(
       isActive: (json['is_active'] as num?)?.toInt() ?? 1,
     );
 
-Map<String, dynamic> _$CafeDayTimeToJson(_CafeDayTime instance) =>
+Map<String, dynamic> _$$CafeDayTimeImplToJson(_$CafeDayTimeImpl instance) =>
     <String, dynamic>{
       'day': instance.day,
       'openingTime': const TimeOfDayConverter().toJson(instance.openingTime),

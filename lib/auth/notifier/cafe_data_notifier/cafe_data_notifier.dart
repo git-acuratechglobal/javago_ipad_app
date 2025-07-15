@@ -11,6 +11,7 @@ part 'cafe_data_notifier.g.dart';
 Future<CafeModel?> getCafeInfo(Ref ref) async {
   final data=  await ref.watch(authServiceProvider).getCafeData();
   ref.read(cafeInfoParamsNotifierProvider.notifier).updateFromCafeModel(data);
+
   return data;
 }
 

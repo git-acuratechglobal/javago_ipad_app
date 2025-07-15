@@ -1,4 +1,3 @@
-// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -10,74 +9,42 @@ part of 'item_param.dart';
 // FreezedGenerator
 // **************************************************************************
 
-// dart format off
 T _$identity<T>(T value) => value;
+
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+
+ItemParam _$ItemParamFromJson(Map<String, dynamic> json) {
+  return _ItemParam.fromJson(json);
+}
 
 /// @nodoc
 mixin _$ItemParam {
-  String get itemName;
-  int get itemCategoryId;
-  int get itemImageId;
-  String get itemDescription;
-  int get itemTypeId;
-  List<ItemSize> get item;
-  List<SelectedOption> get selectedOptions;
-  List<AddonItem> get addonItem;
+  String get itemName => throw _privateConstructorUsedError;
+  int get itemCategoryId => throw _privateConstructorUsedError;
+  int get itemImageId => throw _privateConstructorUsedError;
+  String get itemDescription => throw _privateConstructorUsedError;
+  int get itemTypeId => throw _privateConstructorUsedError;
+  List<ItemSize> get item => throw _privateConstructorUsedError;
+  List<SelectedOption> get selectedOptions =>
+      throw _privateConstructorUsedError;
+  List<AddonItem> get addonItem => throw _privateConstructorUsedError;
+  int? get cafe_menu_id => throw _privateConstructorUsedError;
+
+  /// Serializes this ItemParam to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of ItemParam
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
   $ItemParamCopyWith<ItemParam> get copyWith =>
-      _$ItemParamCopyWithImpl<ItemParam>(this as ItemParam, _$identity);
-
-  /// Serializes this ItemParam to a JSON map.
-  Map<String, dynamic> toJson();
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is ItemParam &&
-            (identical(other.itemName, itemName) ||
-                other.itemName == itemName) &&
-            (identical(other.itemCategoryId, itemCategoryId) ||
-                other.itemCategoryId == itemCategoryId) &&
-            (identical(other.itemImageId, itemImageId) ||
-                other.itemImageId == itemImageId) &&
-            (identical(other.itemDescription, itemDescription) ||
-                other.itemDescription == itemDescription) &&
-            (identical(other.itemTypeId, itemTypeId) ||
-                other.itemTypeId == itemTypeId) &&
-            const DeepCollectionEquality().equals(other.item, item) &&
-            const DeepCollectionEquality()
-                .equals(other.selectedOptions, selectedOptions) &&
-            const DeepCollectionEquality().equals(other.addonItem, addonItem));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      itemName,
-      itemCategoryId,
-      itemImageId,
-      itemDescription,
-      itemTypeId,
-      const DeepCollectionEquality().hash(item),
-      const DeepCollectionEquality().hash(selectedOptions),
-      const DeepCollectionEquality().hash(addonItem));
-
-  @override
-  String toString() {
-    return 'ItemParam(itemName: $itemName, itemCategoryId: $itemCategoryId, itemImageId: $itemImageId, itemDescription: $itemDescription, itemTypeId: $itemTypeId, item: $item, selectedOptions: $selectedOptions, addonItem: $addonItem)';
-  }
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract mixin class $ItemParamCopyWith<$Res> {
-  factory $ItemParamCopyWith(ItemParam value, $Res Function(ItemParam) _then) =
-      _$ItemParamCopyWithImpl;
+abstract class $ItemParamCopyWith<$Res> {
+  factory $ItemParamCopyWith(ItemParam value, $Res Function(ItemParam) then) =
+      _$ItemParamCopyWithImpl<$Res, ItemParam>;
   @useResult
   $Res call(
       {String itemName,
@@ -87,15 +54,19 @@ abstract mixin class $ItemParamCopyWith<$Res> {
       int itemTypeId,
       List<ItemSize> item,
       List<SelectedOption> selectedOptions,
-      List<AddonItem> addonItem});
+      List<AddonItem> addonItem,
+      int? cafe_menu_id});
 }
 
 /// @nodoc
-class _$ItemParamCopyWithImpl<$Res> implements $ItemParamCopyWith<$Res> {
-  _$ItemParamCopyWithImpl(this._self, this._then);
+class _$ItemParamCopyWithImpl<$Res, $Val extends ItemParam>
+    implements $ItemParamCopyWith<$Res> {
+  _$ItemParamCopyWithImpl(this._value, this._then);
 
-  final ItemParam _self;
-  final $Res Function(ItemParam) _then;
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
   /// Create a copy of ItemParam
   /// with the given fields replaced by the non-null parameter values.
@@ -110,48 +81,137 @@ class _$ItemParamCopyWithImpl<$Res> implements $ItemParamCopyWith<$Res> {
     Object? item = null,
     Object? selectedOptions = null,
     Object? addonItem = null,
+    Object? cafe_menu_id = freezed,
   }) {
-    return _then(_self.copyWith(
+    return _then(_value.copyWith(
       itemName: null == itemName
-          ? _self.itemName
+          ? _value.itemName
           : itemName // ignore: cast_nullable_to_non_nullable
               as String,
       itemCategoryId: null == itemCategoryId
-          ? _self.itemCategoryId
+          ? _value.itemCategoryId
           : itemCategoryId // ignore: cast_nullable_to_non_nullable
               as int,
       itemImageId: null == itemImageId
-          ? _self.itemImageId
+          ? _value.itemImageId
           : itemImageId // ignore: cast_nullable_to_non_nullable
               as int,
       itemDescription: null == itemDescription
-          ? _self.itemDescription
+          ? _value.itemDescription
           : itemDescription // ignore: cast_nullable_to_non_nullable
               as String,
       itemTypeId: null == itemTypeId
-          ? _self.itemTypeId
+          ? _value.itemTypeId
           : itemTypeId // ignore: cast_nullable_to_non_nullable
               as int,
       item: null == item
-          ? _self.item
+          ? _value.item
           : item // ignore: cast_nullable_to_non_nullable
               as List<ItemSize>,
       selectedOptions: null == selectedOptions
-          ? _self.selectedOptions
+          ? _value.selectedOptions
           : selectedOptions // ignore: cast_nullable_to_non_nullable
               as List<SelectedOption>,
       addonItem: null == addonItem
-          ? _self.addonItem
+          ? _value.addonItem
           : addonItem // ignore: cast_nullable_to_non_nullable
               as List<AddonItem>,
+      cafe_menu_id: freezed == cafe_menu_id
+          ? _value.cafe_menu_id
+          : cafe_menu_id // ignore: cast_nullable_to_non_nullable
+              as int?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$ItemParamImplCopyWith<$Res>
+    implements $ItemParamCopyWith<$Res> {
+  factory _$$ItemParamImplCopyWith(
+          _$ItemParamImpl value, $Res Function(_$ItemParamImpl) then) =
+      __$$ItemParamImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String itemName,
+      int itemCategoryId,
+      int itemImageId,
+      String itemDescription,
+      int itemTypeId,
+      List<ItemSize> item,
+      List<SelectedOption> selectedOptions,
+      List<AddonItem> addonItem,
+      int? cafe_menu_id});
+}
+
+/// @nodoc
+class __$$ItemParamImplCopyWithImpl<$Res>
+    extends _$ItemParamCopyWithImpl<$Res, _$ItemParamImpl>
+    implements _$$ItemParamImplCopyWith<$Res> {
+  __$$ItemParamImplCopyWithImpl(
+      _$ItemParamImpl _value, $Res Function(_$ItemParamImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of ItemParam
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? itemName = null,
+    Object? itemCategoryId = null,
+    Object? itemImageId = null,
+    Object? itemDescription = null,
+    Object? itemTypeId = null,
+    Object? item = null,
+    Object? selectedOptions = null,
+    Object? addonItem = null,
+    Object? cafe_menu_id = freezed,
+  }) {
+    return _then(_$ItemParamImpl(
+      itemName: null == itemName
+          ? _value.itemName
+          : itemName // ignore: cast_nullable_to_non_nullable
+              as String,
+      itemCategoryId: null == itemCategoryId
+          ? _value.itemCategoryId
+          : itemCategoryId // ignore: cast_nullable_to_non_nullable
+              as int,
+      itemImageId: null == itemImageId
+          ? _value.itemImageId
+          : itemImageId // ignore: cast_nullable_to_non_nullable
+              as int,
+      itemDescription: null == itemDescription
+          ? _value.itemDescription
+          : itemDescription // ignore: cast_nullable_to_non_nullable
+              as String,
+      itemTypeId: null == itemTypeId
+          ? _value.itemTypeId
+          : itemTypeId // ignore: cast_nullable_to_non_nullable
+              as int,
+      item: null == item
+          ? _value._item
+          : item // ignore: cast_nullable_to_non_nullable
+              as List<ItemSize>,
+      selectedOptions: null == selectedOptions
+          ? _value._selectedOptions
+          : selectedOptions // ignore: cast_nullable_to_non_nullable
+              as List<SelectedOption>,
+      addonItem: null == addonItem
+          ? _value._addonItem
+          : addonItem // ignore: cast_nullable_to_non_nullable
+              as List<AddonItem>,
+      cafe_menu_id: freezed == cafe_menu_id
+          ? _value.cafe_menu_id
+          : cafe_menu_id // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _ItemParam implements ItemParam {
-  const _ItemParam(
+class _$ItemParamImpl implements _ItemParam {
+  const _$ItemParamImpl(
       {required this.itemName,
       required this.itemCategoryId,
       required this.itemImageId,
@@ -159,12 +219,14 @@ class _ItemParam implements ItemParam {
       required this.itemTypeId,
       required final List<ItemSize> item,
       required final List<SelectedOption> selectedOptions,
-      required final List<AddonItem> addonItem})
+      required final List<AddonItem> addonItem,
+      this.cafe_menu_id})
       : _item = item,
         _selectedOptions = selectedOptions,
         _addonItem = addonItem;
-  factory _ItemParam.fromJson(Map<String, dynamic> json) =>
-      _$ItemParamFromJson(json);
+
+  factory _$ItemParamImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ItemParamImplFromJson(json);
 
   @override
   final String itemName;
@@ -200,26 +262,19 @@ class _ItemParam implements ItemParam {
     return EqualUnmodifiableListView(_addonItem);
   }
 
-  /// Create a copy of ItemParam
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$ItemParamCopyWith<_ItemParam> get copyWith =>
-      __$ItemParamCopyWithImpl<_ItemParam>(this, _$identity);
+  final int? cafe_menu_id;
 
   @override
-  Map<String, dynamic> toJson() {
-    return _$ItemParamToJson(
-      this,
-    );
+  String toString() {
+    return 'ItemParam(itemName: $itemName, itemCategoryId: $itemCategoryId, itemImageId: $itemImageId, itemDescription: $itemDescription, itemTypeId: $itemTypeId, item: $item, selectedOptions: $selectedOptions, addonItem: $addonItem, cafe_menu_id: $cafe_menu_id)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _ItemParam &&
+            other is _$ItemParamImpl &&
             (identical(other.itemName, itemName) ||
                 other.itemName == itemName) &&
             (identical(other.itemCategoryId, itemCategoryId) ||
@@ -234,7 +289,9 @@ class _ItemParam implements ItemParam {
             const DeepCollectionEquality()
                 .equals(other._selectedOptions, _selectedOptions) &&
             const DeepCollectionEquality()
-                .equals(other._addonItem, _addonItem));
+                .equals(other._addonItem, _addonItem) &&
+            (identical(other.cafe_menu_id, cafe_menu_id) ||
+                other.cafe_menu_id == cafe_menu_id));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -248,141 +305,103 @@ class _ItemParam implements ItemParam {
       itemTypeId,
       const DeepCollectionEquality().hash(_item),
       const DeepCollectionEquality().hash(_selectedOptions),
-      const DeepCollectionEquality().hash(_addonItem));
+      const DeepCollectionEquality().hash(_addonItem),
+      cafe_menu_id);
+
+  /// Create a copy of ItemParam
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ItemParamImplCopyWith<_$ItemParamImpl> get copyWith =>
+      __$$ItemParamImplCopyWithImpl<_$ItemParamImpl>(this, _$identity);
 
   @override
-  String toString() {
-    return 'ItemParam(itemName: $itemName, itemCategoryId: $itemCategoryId, itemImageId: $itemImageId, itemDescription: $itemDescription, itemTypeId: $itemTypeId, item: $item, selectedOptions: $selectedOptions, addonItem: $addonItem)';
+  Map<String, dynamic> toJson() {
+    return _$$ItemParamImplToJson(
+      this,
+    );
   }
 }
 
-/// @nodoc
-abstract mixin class _$ItemParamCopyWith<$Res>
-    implements $ItemParamCopyWith<$Res> {
-  factory _$ItemParamCopyWith(
-          _ItemParam value, $Res Function(_ItemParam) _then) =
-      __$ItemParamCopyWithImpl;
+abstract class _ItemParam implements ItemParam {
+  const factory _ItemParam(
+      {required final String itemName,
+      required final int itemCategoryId,
+      required final int itemImageId,
+      required final String itemDescription,
+      required final int itemTypeId,
+      required final List<ItemSize> item,
+      required final List<SelectedOption> selectedOptions,
+      required final List<AddonItem> addonItem,
+      final int? cafe_menu_id}) = _$ItemParamImpl;
+
+  factory _ItemParam.fromJson(Map<String, dynamic> json) =
+      _$ItemParamImpl.fromJson;
+
   @override
-  @useResult
-  $Res call(
-      {String itemName,
-      int itemCategoryId,
-      int itemImageId,
-      String itemDescription,
-      int itemTypeId,
-      List<ItemSize> item,
-      List<SelectedOption> selectedOptions,
-      List<AddonItem> addonItem});
-}
-
-/// @nodoc
-class __$ItemParamCopyWithImpl<$Res> implements _$ItemParamCopyWith<$Res> {
-  __$ItemParamCopyWithImpl(this._self, this._then);
-
-  final _ItemParam _self;
-  final $Res Function(_ItemParam) _then;
+  String get itemName;
+  @override
+  int get itemCategoryId;
+  @override
+  int get itemImageId;
+  @override
+  String get itemDescription;
+  @override
+  int get itemTypeId;
+  @override
+  List<ItemSize> get item;
+  @override
+  List<SelectedOption> get selectedOptions;
+  @override
+  List<AddonItem> get addonItem;
+  @override
+  int? get cafe_menu_id;
 
   /// Create a copy of ItemParam
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? itemName = null,
-    Object? itemCategoryId = null,
-    Object? itemImageId = null,
-    Object? itemDescription = null,
-    Object? itemTypeId = null,
-    Object? item = null,
-    Object? selectedOptions = null,
-    Object? addonItem = null,
-  }) {
-    return _then(_ItemParam(
-      itemName: null == itemName
-          ? _self.itemName
-          : itemName // ignore: cast_nullable_to_non_nullable
-              as String,
-      itemCategoryId: null == itemCategoryId
-          ? _self.itemCategoryId
-          : itemCategoryId // ignore: cast_nullable_to_non_nullable
-              as int,
-      itemImageId: null == itemImageId
-          ? _self.itemImageId
-          : itemImageId // ignore: cast_nullable_to_non_nullable
-              as int,
-      itemDescription: null == itemDescription
-          ? _self.itemDescription
-          : itemDescription // ignore: cast_nullable_to_non_nullable
-              as String,
-      itemTypeId: null == itemTypeId
-          ? _self.itemTypeId
-          : itemTypeId // ignore: cast_nullable_to_non_nullable
-              as int,
-      item: null == item
-          ? _self._item
-          : item // ignore: cast_nullable_to_non_nullable
-              as List<ItemSize>,
-      selectedOptions: null == selectedOptions
-          ? _self._selectedOptions
-          : selectedOptions // ignore: cast_nullable_to_non_nullable
-              as List<SelectedOption>,
-      addonItem: null == addonItem
-          ? _self._addonItem
-          : addonItem // ignore: cast_nullable_to_non_nullable
-              as List<AddonItem>,
-    ));
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ItemParamImplCopyWith<_$ItemParamImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+ItemSize _$ItemSizeFromJson(Map<String, dynamic> json) {
+  return _ItemSize.fromJson(json);
 }
 
 /// @nodoc
 mixin _$ItemSize {
-  int get itemSizeId;
-  double get itemPrice;
+  int get itemSizeId => throw _privateConstructorUsedError;
+  double get itemPrice => throw _privateConstructorUsedError;
+
+  /// Serializes this ItemSize to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of ItemSize
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
   $ItemSizeCopyWith<ItemSize> get copyWith =>
-      _$ItemSizeCopyWithImpl<ItemSize>(this as ItemSize, _$identity);
-
-  /// Serializes this ItemSize to a JSON map.
-  Map<String, dynamic> toJson();
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is ItemSize &&
-            (identical(other.itemSizeId, itemSizeId) ||
-                other.itemSizeId == itemSizeId) &&
-            (identical(other.itemPrice, itemPrice) ||
-                other.itemPrice == itemPrice));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, itemSizeId, itemPrice);
-
-  @override
-  String toString() {
-    return 'ItemSize(itemSizeId: $itemSizeId, itemPrice: $itemPrice)';
-  }
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract mixin class $ItemSizeCopyWith<$Res> {
-  factory $ItemSizeCopyWith(ItemSize value, $Res Function(ItemSize) _then) =
-      _$ItemSizeCopyWithImpl;
+abstract class $ItemSizeCopyWith<$Res> {
+  factory $ItemSizeCopyWith(ItemSize value, $Res Function(ItemSize) then) =
+      _$ItemSizeCopyWithImpl<$Res, ItemSize>;
   @useResult
   $Res call({int itemSizeId, double itemPrice});
 }
 
 /// @nodoc
-class _$ItemSizeCopyWithImpl<$Res> implements $ItemSizeCopyWith<$Res> {
-  _$ItemSizeCopyWithImpl(this._self, this._then);
+class _$ItemSizeCopyWithImpl<$Res, $Val extends ItemSize>
+    implements $ItemSizeCopyWith<$Res> {
+  _$ItemSizeCopyWithImpl(this._value, this._then);
 
-  final ItemSize _self;
-  final $Res Function(ItemSize) _then;
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
   /// Create a copy of ItemSize
   /// with the given fields replaced by the non-null parameter values.
@@ -392,13 +411,53 @@ class _$ItemSizeCopyWithImpl<$Res> implements $ItemSizeCopyWith<$Res> {
     Object? itemSizeId = null,
     Object? itemPrice = null,
   }) {
-    return _then(_self.copyWith(
+    return _then(_value.copyWith(
       itemSizeId: null == itemSizeId
-          ? _self.itemSizeId
+          ? _value.itemSizeId
           : itemSizeId // ignore: cast_nullable_to_non_nullable
               as int,
       itemPrice: null == itemPrice
-          ? _self.itemPrice
+          ? _value.itemPrice
+          : itemPrice // ignore: cast_nullable_to_non_nullable
+              as double,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$ItemSizeImplCopyWith<$Res>
+    implements $ItemSizeCopyWith<$Res> {
+  factory _$$ItemSizeImplCopyWith(
+          _$ItemSizeImpl value, $Res Function(_$ItemSizeImpl) then) =
+      __$$ItemSizeImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({int itemSizeId, double itemPrice});
+}
+
+/// @nodoc
+class __$$ItemSizeImplCopyWithImpl<$Res>
+    extends _$ItemSizeCopyWithImpl<$Res, _$ItemSizeImpl>
+    implements _$$ItemSizeImplCopyWith<$Res> {
+  __$$ItemSizeImplCopyWithImpl(
+      _$ItemSizeImpl _value, $Res Function(_$ItemSizeImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of ItemSize
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? itemSizeId = null,
+    Object? itemPrice = null,
+  }) {
+    return _then(_$ItemSizeImpl(
+      itemSizeId: null == itemSizeId
+          ? _value.itemSizeId
+          : itemSizeId // ignore: cast_nullable_to_non_nullable
+              as int,
+      itemPrice: null == itemPrice
+          ? _value.itemPrice
           : itemPrice // ignore: cast_nullable_to_non_nullable
               as double,
     ));
@@ -407,36 +466,27 @@ class _$ItemSizeCopyWithImpl<$Res> implements $ItemSizeCopyWith<$Res> {
 
 /// @nodoc
 @JsonSerializable()
-class _ItemSize implements ItemSize {
-  const _ItemSize({required this.itemSizeId, required this.itemPrice});
-  factory _ItemSize.fromJson(Map<String, dynamic> json) =>
-      _$ItemSizeFromJson(json);
+class _$ItemSizeImpl implements _ItemSize {
+  const _$ItemSizeImpl({required this.itemSizeId, required this.itemPrice});
+
+  factory _$ItemSizeImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ItemSizeImplFromJson(json);
 
   @override
   final int itemSizeId;
   @override
   final double itemPrice;
 
-  /// Create a copy of ItemSize
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$ItemSizeCopyWith<_ItemSize> get copyWith =>
-      __$ItemSizeCopyWithImpl<_ItemSize>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$ItemSizeToJson(
-      this,
-    );
+  String toString() {
+    return 'ItemSize(itemSizeId: $itemSizeId, itemPrice: $itemPrice)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _ItemSize &&
+            other is _$ItemSizeImpl &&
             (identical(other.itemSizeId, itemSizeId) ||
                 other.itemSizeId == itemSizeId) &&
             (identical(other.itemPrice, itemPrice) ||
@@ -447,102 +497,80 @@ class _ItemSize implements ItemSize {
   @override
   int get hashCode => Object.hash(runtimeType, itemSizeId, itemPrice);
 
+  /// Create a copy of ItemSize
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  String toString() {
-    return 'ItemSize(itemSizeId: $itemSizeId, itemPrice: $itemPrice)';
+  @pragma('vm:prefer-inline')
+  _$$ItemSizeImplCopyWith<_$ItemSizeImpl> get copyWith =>
+      __$$ItemSizeImplCopyWithImpl<_$ItemSizeImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ItemSizeImplToJson(
+      this,
+    );
   }
 }
 
-/// @nodoc
-abstract mixin class _$ItemSizeCopyWith<$Res>
-    implements $ItemSizeCopyWith<$Res> {
-  factory _$ItemSizeCopyWith(_ItemSize value, $Res Function(_ItemSize) _then) =
-      __$ItemSizeCopyWithImpl;
+abstract class _ItemSize implements ItemSize {
+  const factory _ItemSize(
+      {required final int itemSizeId,
+      required final double itemPrice}) = _$ItemSizeImpl;
+
+  factory _ItemSize.fromJson(Map<String, dynamic> json) =
+      _$ItemSizeImpl.fromJson;
+
   @override
-  @useResult
-  $Res call({int itemSizeId, double itemPrice});
-}
-
-/// @nodoc
-class __$ItemSizeCopyWithImpl<$Res> implements _$ItemSizeCopyWith<$Res> {
-  __$ItemSizeCopyWithImpl(this._self, this._then);
-
-  final _ItemSize _self;
-  final $Res Function(_ItemSize) _then;
+  int get itemSizeId;
+  @override
+  double get itemPrice;
 
   /// Create a copy of ItemSize
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? itemSizeId = null,
-    Object? itemPrice = null,
-  }) {
-    return _then(_ItemSize(
-      itemSizeId: null == itemSizeId
-          ? _self.itemSizeId
-          : itemSizeId // ignore: cast_nullable_to_non_nullable
-              as int,
-      itemPrice: null == itemPrice
-          ? _self.itemPrice
-          : itemPrice // ignore: cast_nullable_to_non_nullable
-              as double,
-    ));
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ItemSizeImplCopyWith<_$ItemSizeImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+SelectedOption _$SelectedOptionFromJson(Map<String, dynamic> json) {
+  return _SelectedOption.fromJson(json);
 }
 
 /// @nodoc
 mixin _$SelectedOption {
-  String get optionId;
-  double get price;
+  String get optionId => throw _privateConstructorUsedError;
+  double get price => throw _privateConstructorUsedError;
+
+  /// Serializes this SelectedOption to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of SelectedOption
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
   $SelectedOptionCopyWith<SelectedOption> get copyWith =>
-      _$SelectedOptionCopyWithImpl<SelectedOption>(
-          this as SelectedOption, _$identity);
-
-  /// Serializes this SelectedOption to a JSON map.
-  Map<String, dynamic> toJson();
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is SelectedOption &&
-            (identical(other.optionId, optionId) ||
-                other.optionId == optionId) &&
-            (identical(other.price, price) || other.price == price));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, optionId, price);
-
-  @override
-  String toString() {
-    return 'SelectedOption(optionId: $optionId, price: $price)';
-  }
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract mixin class $SelectedOptionCopyWith<$Res> {
+abstract class $SelectedOptionCopyWith<$Res> {
   factory $SelectedOptionCopyWith(
-          SelectedOption value, $Res Function(SelectedOption) _then) =
-      _$SelectedOptionCopyWithImpl;
+          SelectedOption value, $Res Function(SelectedOption) then) =
+      _$SelectedOptionCopyWithImpl<$Res, SelectedOption>;
   @useResult
   $Res call({String optionId, double price});
 }
 
 /// @nodoc
-class _$SelectedOptionCopyWithImpl<$Res>
+class _$SelectedOptionCopyWithImpl<$Res, $Val extends SelectedOption>
     implements $SelectedOptionCopyWith<$Res> {
-  _$SelectedOptionCopyWithImpl(this._self, this._then);
+  _$SelectedOptionCopyWithImpl(this._value, this._then);
 
-  final SelectedOption _self;
-  final $Res Function(SelectedOption) _then;
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
   /// Create a copy of SelectedOption
   /// with the given fields replaced by the non-null parameter values.
@@ -552,13 +580,53 @@ class _$SelectedOptionCopyWithImpl<$Res>
     Object? optionId = null,
     Object? price = null,
   }) {
-    return _then(_self.copyWith(
+    return _then(_value.copyWith(
       optionId: null == optionId
-          ? _self.optionId
+          ? _value.optionId
           : optionId // ignore: cast_nullable_to_non_nullable
               as String,
       price: null == price
-          ? _self.price
+          ? _value.price
+          : price // ignore: cast_nullable_to_non_nullable
+              as double,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$SelectedOptionImplCopyWith<$Res>
+    implements $SelectedOptionCopyWith<$Res> {
+  factory _$$SelectedOptionImplCopyWith(_$SelectedOptionImpl value,
+          $Res Function(_$SelectedOptionImpl) then) =
+      __$$SelectedOptionImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String optionId, double price});
+}
+
+/// @nodoc
+class __$$SelectedOptionImplCopyWithImpl<$Res>
+    extends _$SelectedOptionCopyWithImpl<$Res, _$SelectedOptionImpl>
+    implements _$$SelectedOptionImplCopyWith<$Res> {
+  __$$SelectedOptionImplCopyWithImpl(
+      _$SelectedOptionImpl _value, $Res Function(_$SelectedOptionImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of SelectedOption
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? optionId = null,
+    Object? price = null,
+  }) {
+    return _then(_$SelectedOptionImpl(
+      optionId: null == optionId
+          ? _value.optionId
+          : optionId // ignore: cast_nullable_to_non_nullable
+              as String,
+      price: null == price
+          ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
               as double,
     ));
@@ -567,36 +635,27 @@ class _$SelectedOptionCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _SelectedOption implements SelectedOption {
-  const _SelectedOption({required this.optionId, required this.price});
-  factory _SelectedOption.fromJson(Map<String, dynamic> json) =>
-      _$SelectedOptionFromJson(json);
+class _$SelectedOptionImpl implements _SelectedOption {
+  const _$SelectedOptionImpl({required this.optionId, required this.price});
+
+  factory _$SelectedOptionImpl.fromJson(Map<String, dynamic> json) =>
+      _$$SelectedOptionImplFromJson(json);
 
   @override
   final String optionId;
   @override
   final double price;
 
-  /// Create a copy of SelectedOption
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$SelectedOptionCopyWith<_SelectedOption> get copyWith =>
-      __$SelectedOptionCopyWithImpl<_SelectedOption>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$SelectedOptionToJson(
-      this,
-    );
+  String toString() {
+    return 'SelectedOption(optionId: $optionId, price: $price)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _SelectedOption &&
+            other is _$SelectedOptionImpl &&
             (identical(other.optionId, optionId) ||
                 other.optionId == optionId) &&
             (identical(other.price, price) || other.price == price));
@@ -606,99 +665,79 @@ class _SelectedOption implements SelectedOption {
   @override
   int get hashCode => Object.hash(runtimeType, optionId, price);
 
+  /// Create a copy of SelectedOption
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  String toString() {
-    return 'SelectedOption(optionId: $optionId, price: $price)';
+  @pragma('vm:prefer-inline')
+  _$$SelectedOptionImplCopyWith<_$SelectedOptionImpl> get copyWith =>
+      __$$SelectedOptionImplCopyWithImpl<_$SelectedOptionImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$SelectedOptionImplToJson(
+      this,
+    );
   }
 }
 
-/// @nodoc
-abstract mixin class _$SelectedOptionCopyWith<$Res>
-    implements $SelectedOptionCopyWith<$Res> {
-  factory _$SelectedOptionCopyWith(
-          _SelectedOption value, $Res Function(_SelectedOption) _then) =
-      __$SelectedOptionCopyWithImpl;
+abstract class _SelectedOption implements SelectedOption {
+  const factory _SelectedOption(
+      {required final String optionId,
+      required final double price}) = _$SelectedOptionImpl;
+
+  factory _SelectedOption.fromJson(Map<String, dynamic> json) =
+      _$SelectedOptionImpl.fromJson;
+
   @override
-  @useResult
-  $Res call({String optionId, double price});
-}
-
-/// @nodoc
-class __$SelectedOptionCopyWithImpl<$Res>
-    implements _$SelectedOptionCopyWith<$Res> {
-  __$SelectedOptionCopyWithImpl(this._self, this._then);
-
-  final _SelectedOption _self;
-  final $Res Function(_SelectedOption) _then;
+  String get optionId;
+  @override
+  double get price;
 
   /// Create a copy of SelectedOption
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? optionId = null,
-    Object? price = null,
-  }) {
-    return _then(_SelectedOption(
-      optionId: null == optionId
-          ? _self.optionId
-          : optionId // ignore: cast_nullable_to_non_nullable
-              as String,
-      price: null == price
-          ? _self.price
-          : price // ignore: cast_nullable_to_non_nullable
-              as double,
-    ));
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$SelectedOptionImplCopyWith<_$SelectedOptionImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+AddonItem _$AddonItemFromJson(Map<String, dynamic> json) {
+  return _AddonItem.fromJson(json);
 }
 
 /// @nodoc
 mixin _$AddonItem {
-  int get addonItemId;
+  int get addonItemId => throw _privateConstructorUsedError;
+
+  /// Serializes this AddonItem to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of AddonItem
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
   $AddonItemCopyWith<AddonItem> get copyWith =>
-      _$AddonItemCopyWithImpl<AddonItem>(this as AddonItem, _$identity);
-
-  /// Serializes this AddonItem to a JSON map.
-  Map<String, dynamic> toJson();
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is AddonItem &&
-            (identical(other.addonItemId, addonItemId) ||
-                other.addonItemId == addonItemId));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, addonItemId);
-
-  @override
-  String toString() {
-    return 'AddonItem(addonItemId: $addonItemId)';
-  }
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract mixin class $AddonItemCopyWith<$Res> {
-  factory $AddonItemCopyWith(AddonItem value, $Res Function(AddonItem) _then) =
-      _$AddonItemCopyWithImpl;
+abstract class $AddonItemCopyWith<$Res> {
+  factory $AddonItemCopyWith(AddonItem value, $Res Function(AddonItem) then) =
+      _$AddonItemCopyWithImpl<$Res, AddonItem>;
   @useResult
   $Res call({int addonItemId});
 }
 
 /// @nodoc
-class _$AddonItemCopyWithImpl<$Res> implements $AddonItemCopyWith<$Res> {
-  _$AddonItemCopyWithImpl(this._self, this._then);
+class _$AddonItemCopyWithImpl<$Res, $Val extends AddonItem>
+    implements $AddonItemCopyWith<$Res> {
+  _$AddonItemCopyWithImpl(this._value, this._then);
 
-  final AddonItem _self;
-  final $Res Function(AddonItem) _then;
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
   /// Create a copy of AddonItem
   /// with the given fields replaced by the non-null parameter values.
@@ -707,9 +746,44 @@ class _$AddonItemCopyWithImpl<$Res> implements $AddonItemCopyWith<$Res> {
   $Res call({
     Object? addonItemId = null,
   }) {
-    return _then(_self.copyWith(
+    return _then(_value.copyWith(
       addonItemId: null == addonItemId
-          ? _self.addonItemId
+          ? _value.addonItemId
+          : addonItemId // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$AddonItemImplCopyWith<$Res>
+    implements $AddonItemCopyWith<$Res> {
+  factory _$$AddonItemImplCopyWith(
+          _$AddonItemImpl value, $Res Function(_$AddonItemImpl) then) =
+      __$$AddonItemImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({int addonItemId});
+}
+
+/// @nodoc
+class __$$AddonItemImplCopyWithImpl<$Res>
+    extends _$AddonItemCopyWithImpl<$Res, _$AddonItemImpl>
+    implements _$$AddonItemImplCopyWith<$Res> {
+  __$$AddonItemImplCopyWithImpl(
+      _$AddonItemImpl _value, $Res Function(_$AddonItemImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of AddonItem
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? addonItemId = null,
+  }) {
+    return _then(_$AddonItemImpl(
+      addonItemId: null == addonItemId
+          ? _value.addonItemId
           : addonItemId // ignore: cast_nullable_to_non_nullable
               as int,
     ));
@@ -718,34 +792,25 @@ class _$AddonItemCopyWithImpl<$Res> implements $AddonItemCopyWith<$Res> {
 
 /// @nodoc
 @JsonSerializable()
-class _AddonItem implements AddonItem {
-  const _AddonItem({required this.addonItemId});
-  factory _AddonItem.fromJson(Map<String, dynamic> json) =>
-      _$AddonItemFromJson(json);
+class _$AddonItemImpl implements _AddonItem {
+  const _$AddonItemImpl({required this.addonItemId});
+
+  factory _$AddonItemImpl.fromJson(Map<String, dynamic> json) =>
+      _$$AddonItemImplFromJson(json);
 
   @override
   final int addonItemId;
 
-  /// Create a copy of AddonItem
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$AddonItemCopyWith<_AddonItem> get copyWith =>
-      __$AddonItemCopyWithImpl<_AddonItem>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$AddonItemToJson(
-      this,
-    );
+  String toString() {
+    return 'AddonItem(addonItemId: $addonItemId)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _AddonItem &&
+            other is _$AddonItemImpl &&
             (identical(other.addonItemId, addonItemId) ||
                 other.addonItemId == addonItemId));
   }
@@ -754,44 +819,35 @@ class _AddonItem implements AddonItem {
   @override
   int get hashCode => Object.hash(runtimeType, addonItemId);
 
+  /// Create a copy of AddonItem
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  String toString() {
-    return 'AddonItem(addonItemId: $addonItemId)';
+  @pragma('vm:prefer-inline')
+  _$$AddonItemImplCopyWith<_$AddonItemImpl> get copyWith =>
+      __$$AddonItemImplCopyWithImpl<_$AddonItemImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$AddonItemImplToJson(
+      this,
+    );
   }
 }
 
-/// @nodoc
-abstract mixin class _$AddonItemCopyWith<$Res>
-    implements $AddonItemCopyWith<$Res> {
-  factory _$AddonItemCopyWith(
-          _AddonItem value, $Res Function(_AddonItem) _then) =
-      __$AddonItemCopyWithImpl;
+abstract class _AddonItem implements AddonItem {
+  const factory _AddonItem({required final int addonItemId}) = _$AddonItemImpl;
+
+  factory _AddonItem.fromJson(Map<String, dynamic> json) =
+      _$AddonItemImpl.fromJson;
+
   @override
-  @useResult
-  $Res call({int addonItemId});
-}
-
-/// @nodoc
-class __$AddonItemCopyWithImpl<$Res> implements _$AddonItemCopyWith<$Res> {
-  __$AddonItemCopyWithImpl(this._self, this._then);
-
-  final _AddonItem _self;
-  final $Res Function(_AddonItem) _then;
+  int get addonItemId;
 
   /// Create a copy of AddonItem
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? addonItemId = null,
-  }) {
-    return _then(_AddonItem(
-      addonItemId: null == addonItemId
-          ? _self.addonItemId
-          : addonItemId // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$AddonItemImplCopyWith<_$AddonItemImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
-
-// dart format on

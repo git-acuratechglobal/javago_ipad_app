@@ -1,4 +1,3 @@
-// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -10,61 +9,42 @@ part of 'cafe_info_state.dart';
 // FreezedGenerator
 // **************************************************************************
 
-// dart format off
 T _$identity<T>(T value) => value;
+
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$CafeInfoState {
-  CafeEvent get cafeEvent;
-  String? get response;
-  CafeModel? get cafeModel;
+  CafeEvent get cafeEvent => throw _privateConstructorUsedError;
+  String? get response => throw _privateConstructorUsedError;
+  CafeModel? get cafeModel => throw _privateConstructorUsedError;
 
   /// Create a copy of CafeInfoState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
   $CafeInfoStateCopyWith<CafeInfoState> get copyWith =>
-      _$CafeInfoStateCopyWithImpl<CafeInfoState>(
-          this as CafeInfoState, _$identity);
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is CafeInfoState &&
-            (identical(other.cafeEvent, cafeEvent) ||
-                other.cafeEvent == cafeEvent) &&
-            (identical(other.response, response) ||
-                other.response == response) &&
-            (identical(other.cafeModel, cafeModel) ||
-                other.cafeModel == cafeModel));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, cafeEvent, response, cafeModel);
-
-  @override
-  String toString() {
-    return 'CafeInfoState(cafeEvent: $cafeEvent, response: $response, cafeModel: $cafeModel)';
-  }
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract mixin class $CafeInfoStateCopyWith<$Res> {
+abstract class $CafeInfoStateCopyWith<$Res> {
   factory $CafeInfoStateCopyWith(
-          CafeInfoState value, $Res Function(CafeInfoState) _then) =
-      _$CafeInfoStateCopyWithImpl;
+          CafeInfoState value, $Res Function(CafeInfoState) then) =
+      _$CafeInfoStateCopyWithImpl<$Res, CafeInfoState>;
   @useResult
   $Res call({CafeEvent cafeEvent, String? response, CafeModel? cafeModel});
 }
 
 /// @nodoc
-class _$CafeInfoStateCopyWithImpl<$Res>
+class _$CafeInfoStateCopyWithImpl<$Res, $Val extends CafeInfoState>
     implements $CafeInfoStateCopyWith<$Res> {
-  _$CafeInfoStateCopyWithImpl(this._self, this._then);
+  _$CafeInfoStateCopyWithImpl(this._value, this._then);
 
-  final CafeInfoState _self;
-  final $Res Function(CafeInfoState) _then;
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
   /// Create a copy of CafeInfoState
   /// with the given fields replaced by the non-null parameter values.
@@ -75,17 +55,62 @@ class _$CafeInfoStateCopyWithImpl<$Res>
     Object? response = freezed,
     Object? cafeModel = freezed,
   }) {
-    return _then(_self.copyWith(
+    return _then(_value.copyWith(
       cafeEvent: null == cafeEvent
-          ? _self.cafeEvent
+          ? _value.cafeEvent
           : cafeEvent // ignore: cast_nullable_to_non_nullable
               as CafeEvent,
       response: freezed == response
-          ? _self.response
+          ? _value.response
           : response // ignore: cast_nullable_to_non_nullable
               as String?,
       cafeModel: freezed == cafeModel
-          ? _self.cafeModel
+          ? _value.cafeModel
+          : cafeModel // ignore: cast_nullable_to_non_nullable
+              as CafeModel?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$CafeInfoStateImplCopyWith<$Res>
+    implements $CafeInfoStateCopyWith<$Res> {
+  factory _$$CafeInfoStateImplCopyWith(
+          _$CafeInfoStateImpl value, $Res Function(_$CafeInfoStateImpl) then) =
+      __$$CafeInfoStateImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({CafeEvent cafeEvent, String? response, CafeModel? cafeModel});
+}
+
+/// @nodoc
+class __$$CafeInfoStateImplCopyWithImpl<$Res>
+    extends _$CafeInfoStateCopyWithImpl<$Res, _$CafeInfoStateImpl>
+    implements _$$CafeInfoStateImplCopyWith<$Res> {
+  __$$CafeInfoStateImplCopyWithImpl(
+      _$CafeInfoStateImpl _value, $Res Function(_$CafeInfoStateImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of CafeInfoState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? cafeEvent = null,
+    Object? response = freezed,
+    Object? cafeModel = freezed,
+  }) {
+    return _then(_$CafeInfoStateImpl(
+      cafeEvent: null == cafeEvent
+          ? _value.cafeEvent
+          : cafeEvent // ignore: cast_nullable_to_non_nullable
+              as CafeEvent,
+      response: freezed == response
+          ? _value.response
+          : response // ignore: cast_nullable_to_non_nullable
+              as String?,
+      cafeModel: freezed == cafeModel
+          ? _value.cafeModel
           : cafeModel // ignore: cast_nullable_to_non_nullable
               as CafeModel?,
     ));
@@ -94,8 +119,8 @@ class _$CafeInfoStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _CafeInfoState implements CafeInfoState {
-  const _CafeInfoState(
+class _$CafeInfoStateImpl implements _CafeInfoState {
+  const _$CafeInfoStateImpl(
       {required this.cafeEvent, this.response, this.cafeModel});
 
   @override
@@ -105,19 +130,16 @@ class _CafeInfoState implements CafeInfoState {
   @override
   final CafeModel? cafeModel;
 
-  /// Create a copy of CafeInfoState
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$CafeInfoStateCopyWith<_CafeInfoState> get copyWith =>
-      __$CafeInfoStateCopyWithImpl<_CafeInfoState>(this, _$identity);
+  String toString() {
+    return 'CafeInfoState(cafeEvent: $cafeEvent, response: $response, cafeModel: $cafeModel)';
+  }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _CafeInfoState &&
+            other is _$CafeInfoStateImpl &&
             (identical(other.cafeEvent, cafeEvent) ||
                 other.cafeEvent == cafeEvent) &&
             (identical(other.response, response) ||
@@ -129,55 +151,32 @@ class _CafeInfoState implements CafeInfoState {
   @override
   int get hashCode => Object.hash(runtimeType, cafeEvent, response, cafeModel);
 
+  /// Create a copy of CafeInfoState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  String toString() {
-    return 'CafeInfoState(cafeEvent: $cafeEvent, response: $response, cafeModel: $cafeModel)';
-  }
+  @pragma('vm:prefer-inline')
+  _$$CafeInfoStateImplCopyWith<_$CafeInfoStateImpl> get copyWith =>
+      __$$CafeInfoStateImplCopyWithImpl<_$CafeInfoStateImpl>(this, _$identity);
 }
 
-/// @nodoc
-abstract mixin class _$CafeInfoStateCopyWith<$Res>
-    implements $CafeInfoStateCopyWith<$Res> {
-  factory _$CafeInfoStateCopyWith(
-          _CafeInfoState value, $Res Function(_CafeInfoState) _then) =
-      __$CafeInfoStateCopyWithImpl;
+abstract class _CafeInfoState implements CafeInfoState {
+  const factory _CafeInfoState(
+      {required final CafeEvent cafeEvent,
+      final String? response,
+      final CafeModel? cafeModel}) = _$CafeInfoStateImpl;
+
   @override
-  @useResult
-  $Res call({CafeEvent cafeEvent, String? response, CafeModel? cafeModel});
-}
-
-/// @nodoc
-class __$CafeInfoStateCopyWithImpl<$Res>
-    implements _$CafeInfoStateCopyWith<$Res> {
-  __$CafeInfoStateCopyWithImpl(this._self, this._then);
-
-  final _CafeInfoState _self;
-  final $Res Function(_CafeInfoState) _then;
+  CafeEvent get cafeEvent;
+  @override
+  String? get response;
+  @override
+  CafeModel? get cafeModel;
 
   /// Create a copy of CafeInfoState
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? cafeEvent = null,
-    Object? response = freezed,
-    Object? cafeModel = freezed,
-  }) {
-    return _then(_CafeInfoState(
-      cafeEvent: null == cafeEvent
-          ? _self.cafeEvent
-          : cafeEvent // ignore: cast_nullable_to_non_nullable
-              as CafeEvent,
-      response: freezed == response
-          ? _self.response
-          : response // ignore: cast_nullable_to_non_nullable
-              as String?,
-      cafeModel: freezed == cafeModel
-          ? _self.cafeModel
-          : cafeModel // ignore: cast_nullable_to_non_nullable
-              as CafeModel?,
-    ));
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$CafeInfoStateImplCopyWith<_$CafeInfoStateImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
-
-// dart format on

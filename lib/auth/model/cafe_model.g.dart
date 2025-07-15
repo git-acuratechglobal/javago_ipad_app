@@ -12,6 +12,7 @@ CafeModel _$CafeModelFromJson(Map<String, dynamic> json) => CafeModel(
       phone: json['phone'] as String?,
       bio: json['bio'] as String?,
       email: json['email'] as String?,
+      city: json['city'] as String?,
       bannerImage: json['banner_image'] as String?,
       address: json['address'] as String?,
       postcode: json['postcode'] as String?,
@@ -54,6 +55,8 @@ CafeModel _$CafeModelFromJson(Map<String, dynamic> json) => CafeModel(
           ?.map(
               (e) => CafeClickCollectTiming.fromJson(e as Map<String, dynamic>))
           .toList(),
+      squareOnboardingCompleted:
+          (json['square_onboarding_completed'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$CafeModelToJson(CafeModel instance) => <String, dynamic>{
@@ -64,6 +67,7 @@ Map<String, dynamic> _$CafeModelToJson(CafeModel instance) => <String, dynamic>{
       'email': instance.email,
       'banner_image': instance.bannerImage,
       'address': instance.address,
+      'city': instance.city,
       'postcode': instance.postcode,
       'latitude': instance.latitude,
       'longitude': instance.longitude,
@@ -89,6 +93,7 @@ Map<String, dynamic> _$CafeModelToJson(CafeModel instance) => <String, dynamic>{
       'otp_verified_at': instance.otpVerifiedAt,
       'transaction_id': instance.transactionId,
       'stripe_onboarding_completed': instance.stripeOnboardingCompleted,
+      'square_onboarding_completed': instance.squareOnboardingCompleted,
       'is_published': instance.isPublished,
       'is_admin_approved': instance.isAdminApproved,
       'timing': instance.timing,

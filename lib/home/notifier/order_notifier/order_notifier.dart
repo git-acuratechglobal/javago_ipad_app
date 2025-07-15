@@ -33,6 +33,21 @@ class OrderNotifier extends _$OrderNotifier {
     });
   }
 
+  Future<void> makeOrderRefund(
+      String orderId, int isindividual, int status, List<int> itemIds) async {
+    state = AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      if (itemIds.isNotEmpty) {
+        final result = await ref
+            .read(authServiceProvider)
+            .orderRefund(orderId, isindividual, itemIds.join(","));
+      }
+      return OrderState(
+          orderEvent: OrderEvent.orderRefundOrComplete,
+          response: "Order Refund");
+    });
+  }
+
   Future<void> makeOrderRefundOrComplete(
       String orderId, int isindividual, int status, List<int> itemIds) async {
     state = AsyncLoading();

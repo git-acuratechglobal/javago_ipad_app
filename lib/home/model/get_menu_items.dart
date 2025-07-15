@@ -10,7 +10,7 @@ class GetMenuItem {
   String? message;
 
   @JsonKey(name: "data")
-  Data? data;
+  MenuItemData? data;
 
   GetMenuItem({
     this.status,
@@ -23,7 +23,7 @@ class GetMenuItem {
 }
 
 @JsonSerializable()
-class Data {
+class MenuItemData {
   @JsonKey(name: "maxSizePrice")
   dynamic maxSizePrice;
 
@@ -54,7 +54,7 @@ class Data {
   @JsonKey(name: "addons")
   List<Addon>? addons;
 
-  Data({
+  MenuItemData({
     this.maxSizePrice,
     this.sizeNa,
     this.preDefinedItem,
@@ -67,8 +67,8 @@ class Data {
     this.addons,
   });
 
-  factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
-  Map<String, dynamic> toJson() => _$DataToJson(this);
+  factory MenuItemData.fromJson(Map<String, dynamic> json) => _$MenuItemDataFromJson(json);
+  Map<String, dynamic> toJson() => _$MenuItemDataToJson(this);
 
   /// Helper to group optionSizes under their option name
   Map<String, List<OptionSize>> get groupedOptions {

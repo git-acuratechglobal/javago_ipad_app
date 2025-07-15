@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:java_go/home/model/menu_items_data.dart';
 
 extension SnackBarExtension on BuildContext {
-  void showSnackBar(String message) {
+  void showSnackBar(String message,{Color? barColor=Colors.black}) {
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(
+        backgroundColor: barColor,
           content: Text(
         message,
         style: TextStyle(color: Colors.white, fontSize: 12),

@@ -7,7 +7,7 @@ part of 'click_and_collect_notifier.dart';
 // **************************************************************************
 
 String _$clickAndCollectNotifierHash() =>
-    r'b24a89c2ffcc023a8814139dd42dedf30f8c4f0c';
+    r'619c7da71235850532c098d1afd351e3b2219bb3';
 
 /// See also [ClickAndCollectNotifier].
 @ProviderFor(ClickAndCollectNotifier)

@@ -5,23 +5,19 @@ import 'package:flutter_svg/svg.dart';
 import 'package:java_go/Theme/navigation.dart';
 import 'package:java_go/auth/model/stamp_suggestion.dart';
 import 'package:java_go/auth/notifier/stamp_notifier/add_stamp_notifier.dart';
-import 'package:java_go/auth/pages/sign_up/reviewscreen.dart';
 import 'package:java_go/auth/params/add_stamp_params.dart';
 import 'package:java_go/config/async_widget.dart';
 import 'package:java_go/config/common/button.dart';
-import 'package:java_go/config/common/custom_model_options.dart';
 import 'package:java_go/config/common/extensions.dart';
-import 'package:java_go/config/common/widgets.dart';
 import 'package:java_go/config/widgets/app_text_field.dart';
-
-import '../../../config/common/cache_network_image.dart';
 import '../../../config/common/custom_dropdown.dart';
+import '../../model/getStamp.dart';
 import '../../notifier/stamp_notifier/get_stamp_notifier.dart';
 import '../../notifier/stamp_notifier/stamp_suggestion.dart';
 
 class LoyalityCardScreen extends ConsumerStatefulWidget {
-  const LoyalityCardScreen({super.key, required this.isEditMode});
-  final bool isEditMode;
+  const LoyalityCardScreen({super.key, this.loyaltyStamp});
+  final LoyaltyStamp? loyaltyStamp;
   @override
   ConsumerState<LoyalityCardScreen> createState() => _LoyalityCardScreenState();
 }
@@ -30,6 +26,14 @@ class _LoyalityCardScreenState extends ConsumerState<LoyalityCardScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.loyaltyStamp != null) {
+        ref
+            .read(addStampParamsNotifierProvider.notifier)
+            .updateAddStampParam(widget.loyaltyStamp!);
+      }
+    });
+
     ref.listenManual(addStampNotifierProvider, (_, next) {
       switch (next) {
         case AsyncData<String?> data when data.value != null:
@@ -49,23 +53,22 @@ class _LoyalityCardScreenState extends ConsumerState<LoyalityCardScreen> {
   Widget build(BuildContext context) {
     final stamp = ref.watch(getStampSuggestionProvider);
     final stampParam = ref.watch(addStampParamsNotifierProvider.notifier);
+    final updatedStampData = ref.watch(addStampParamsNotifierProvider);
     return Scaffold(
       backgroundColor: Color(0xFFF5F3F0),
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Color(0xFFF5F3F0),
-        leading: widget.isEditMode
-            ? InkWell(
-                onTap: () {
-                  context.pop();
-                },
-                child: Image.asset(
-                  'assets/images/ic_left_arrow.png',
-                  color: Color(0xFF461C10),
-                  height: 55.h,
-                  width: 55.w,
-                ))
-            : null,
+        leading: InkWell(
+            onTap: () {
+              context.pop();
+            },
+            child: Image.asset(
+              'assets/images/ic_left_arrow.png',
+              color: Color(0xFF461C10),
+              height: 55.h,
+              width: 55.w,
+            )),
         title: Text(
           'LOYALTY CARD',
           textAlign: TextAlign.center,
@@ -87,19 +90,25 @@ class _LoyalityCardScreenState extends ConsumerState<LoyalityCardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (widget.isEditMode)
-                    // Align(
-                    //     alignment: Alignment.centerRight,
-                    //     child: EditContainer(title: 'Save Changes')),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: PrimaryButton(
-                        fixedSize: Size(200, 50),
-                        isLoading: ref.watch(addStampNotifierProvider).isLoading,
-                        onClick: (){
-                          ref.read(addStampNotifierProvider.notifier).addStamp();
-                        },title: "Save Changes",),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: PrimaryButton(
+                      fixedSize: Size(200, 50),
+                      isLoading: ref.watch(addStampNotifierProvider).isLoading,
+                      onClick: () {
+                        if (widget.loyaltyStamp != null) {
+                          ref
+                              .read(addStampNotifierProvider.notifier)
+                              .updateStamp(widget.loyaltyStamp?.id ?? 0);
+                        } else {
+                          ref
+                              .read(addStampNotifierProvider.notifier)
+                              .addStamp();
+                        }
+                      },
+                      title: "Save Changes",
                     ),
+                  ),
                   49.verticalSpace,
                   Row(
                     children: [
@@ -123,7 +132,12 @@ class _LoyalityCardScreenState extends ConsumerState<LoyalityCardScreen> {
                               dropdownWidth: 520.w,
                               iconSize: 30,
                               hint: "Select Color",
-                              value: selectedColor,
+                              value: updatedStampData.stampColor.isEmpty? selectedColor
+                                  :
+                                  colorEntries?.firstWhere(
+                                        (e) => e.hexCode == updatedStampData.stampColor,
+
+                                  ),
                               dropdownItems: colorEntries ?? [],
                               getLabel: (item) => item.hexCode, // hex code
                               getImageUrl: (item) => item.imageUrl, // image url
@@ -145,6 +159,7 @@ class _LoyalityCardScreenState extends ConsumerState<LoyalityCardScreen> {
                           LoyalityText(title: 'No Of Total Stamp'),
                           16.verticalSpace,
                           SimpleCustomDropdown(
+                            initialValue: updatedStampData.stampNo.toString(),
                             backgroundColor: Colors.white,
                             width: 520.w,
                             height: 55,
@@ -169,6 +184,7 @@ class _LoyalityCardScreenState extends ConsumerState<LoyalityCardScreen> {
                           LoyalityText(title: 'Discount in % Or £ '),
                           16.verticalSpace,
                           SimpleCustomDropdown(
+                            initialValue: updatedStampData.discountType,
                             dropdownWidth: 520.w,
                             backgroundColor: Colors.white,
                             width: 520.w,
@@ -178,6 +194,7 @@ class _LoyalityCardScreenState extends ConsumerState<LoyalityCardScreen> {
                             hint: "Select discount",
                             items: data.discountTypes ?? [],
                             onChanged: (String? value) {
+                              print(value);
                               stampParam.updateDiscountType(value!);
                             },
                           ),
@@ -190,6 +207,8 @@ class _LoyalityCardScreenState extends ConsumerState<LoyalityCardScreen> {
                           LoyalityText(title: '% Or £XX Off Of Next Order '),
                           16.verticalSpace,
                           AppTextField(
+                            inputType: TextInputType.number,
+                            initialValue: updatedStampData.discount.toString(),
                             width: 520.w,
                             hint: "% Or £XX Off Of Next Order",
                             onChanged: (val) {
@@ -209,6 +228,7 @@ class _LoyalityCardScreenState extends ConsumerState<LoyalityCardScreen> {
                           LoyalityText(title: 'Exclude Item'),
                           16.verticalSpace,
                           MultiSelectCustomDropdown(
+                            initialSelectedIds: updatedStampData.excludeItems,
                             height: 55,
                             backgroundColor: Colors.white,
                             width: 520.w,
@@ -231,6 +251,9 @@ class _LoyalityCardScreenState extends ConsumerState<LoyalityCardScreen> {
                           LoyalityText(title: 'Minimum Order Value '),
                           16.verticalSpace,
                           AppTextField(
+                            inputType:  TextInputType.number,
+                            initialValue:
+                                updatedStampData.minOrderValue.toString(),
                             width: 520.w,
                             hint: "Minimum Order Value",
                             onChanged: (val) {
@@ -252,6 +275,8 @@ class _LoyalityCardScreenState extends ConsumerState<LoyalityCardScreen> {
                               title: 'Categories discount applies to '),
                           16.verticalSpace,
                           MultiSelectCustomDropdown(
+                            initialSelectedIds:
+                                updatedStampData.stampApplicableToCategories,
                             height: 55,
                             backgroundColor: Colors.white,
                             width: 520.w,
@@ -263,6 +288,7 @@ class _LoyalityCardScreenState extends ConsumerState<LoyalityCardScreen> {
                                     .toList() ??
                                 [],
                             onChanged: (List<String> value) {
+                              print(value);
                               stampParam
                                   .updateStampApplicableToCategories(value);
                             },
@@ -276,7 +302,11 @@ class _LoyalityCardScreenState extends ConsumerState<LoyalityCardScreen> {
                           LoyalityText(
                               title: 'Stamp Expiration (Days) "optional" '),
                           16.verticalSpace,
-                          AppTextField(width: 520.w, hint: "Stamp Expiration")
+                          AppTextField(
+                              inputType: TextInputType.number,
+                              initialValue: updatedStampData.expireIn ?? "",
+                              width: 520.w,
+                              hint: "Stamp Expiration")
                         ],
                       ),
                     ],

@@ -6,8 +6,8 @@ part of 'add_stamp_params.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_AddStampParams _$AddStampParamsFromJson(Map<String, dynamic> json) =>
-    _AddStampParams(
+_$AddStampParamsImpl _$$AddStampParamsImplFromJson(Map<String, dynamic> json) =>
+    _$AddStampParamsImpl(
       stampColor: json['stamp_color'] as String,
       stampNo: (json['stamp_no'] as num).toInt(),
       discountType: json['discount_type'] as String,
@@ -21,9 +21,11 @@ _AddStampParams _$AddStampParamsFromJson(Map<String, dynamic> json) =>
       excludeItems: (json['exclude_items'] as List<dynamic>)
           .map((e) => e as String)
           .toList(),
+      expireIn: json['stamp_expires_in'] as String,
     );
 
-Map<String, dynamic> _$AddStampParamsToJson(_AddStampParams instance) =>
+Map<String, dynamic> _$$AddStampParamsImplToJson(
+        _$AddStampParamsImpl instance) =>
     <String, dynamic>{
       'stamp_color': instance.stampColor,
       'stamp_no': instance.stampNo,
@@ -33,6 +35,7 @@ Map<String, dynamic> _$AddStampParamsToJson(_AddStampParams instance) =>
       'offer_text': instance.offerText,
       'stamp_applicable_to_categories': instance.stampApplicableToCategories,
       'exclude_items': instance.excludeItems,
+      'stamp_expires_in': instance.expireIn,
     };
 
 // **************************************************************************
@@ -40,7 +43,7 @@ Map<String, dynamic> _$AddStampParamsToJson(_AddStampParams instance) =>
 // **************************************************************************
 
 String _$addStampParamsNotifierHash() =>
-    r'581dd126d3af3fe315a4e7e84ca0f9bed10ea409';
+    r'f100a1f0aff22a51cee0d5268536e492dba0fe62';
 
 /// See also [AddStampParamsNotifier].
 @ProviderFor(AddStampParamsNotifier)

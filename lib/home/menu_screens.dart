@@ -313,183 +313,183 @@ class _ReviewtimingState extends State<Reviewtiming> {
   }
 }
 
-class ReviewItems extends ConsumerStatefulWidget {
-  const ReviewItems({super.key});
-
-  @override
-  ConsumerState<ReviewItems> createState() => _ReviewItemsState();
-}
-
-class _ReviewItemsState extends ConsumerState<ReviewItems> {
-  final List<Map<String, dynamic>> allItems = List.generate(
-    19,
-    (index) => {
-      'image': 'assets/images/icetea.png',
-      'name': 'Ice Tea $index',
-      'category': 'Drinks',
-      'price': '£ 9.5',
-      'desc': 'Lorem Ipsum is simply dummy text $index',
-      'tag': 'Vegan',
-      'tagIcon': 'assets/images/vegan_java_go.png',
-    },
-  );
-
-  final int itemsPerPage = 5;
-
-  @override
-  Widget build(BuildContext context) {
-    final currentPage = ref.watch(paginationProvider);
-    final startIndex = currentPage * itemsPerPage;
-    final endIndex = (startIndex + itemsPerPage).clamp(0, allItems.length);
-    final pageItems = allItems.sublist(startIndex, endIndex);
-
-    final totalPages = (allItems.length / itemsPerPage).ceil();
-
-    return Column(
-      children: [
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 25),
-          width: 1076.w,
-          height: 59.h,
-          decoration: BoxDecoration(color: Color(0xFF9B6842)),
-          child: Row(
-            //  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              SizedBox(
-                width: 74.w,
-                child: ReviewItembarname(
-                  label: 'Images',
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                ),
-              ),
-              SizedBox(
-                width: 121.w,
-                child: ReviewItembarname(
-                  label: 'Item Name',
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                ),
-              ),
-              SizedBox(
-                width: 102.w,
-                child: ReviewItembarname(
-                  label: 'Category',
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                ),
-              ),
-              SizedBox(
-                width: 70.w,
-                child: ReviewItembarname(
-                  label: 'Price',
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                ),
-              ),
-              SizedBox(
-                width: 212.w,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: ReviewItembarname(
-                    label: 'Description',
-                    color: Colors.white,
-                    fontSize: 16.sp,
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 100.w,
-                child: ReviewItembarname(
-                  label: 'Type',
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                ),
-              ),
-              SizedBox(
-                width: 120.w,
-                child: ReviewItembarname(
-                  label: 'Status',
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                ),
-              ),
-              SizedBox(
-                width: 120.w,
-                child: ReviewItembarname(
-                  label: 'Availability',
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                ),
-              ),
-            ],
-          ),
-        ),
-        22.verticalSpace,
-        ListView.builder(
-          physics: NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemCount: pageItems.length,
-          itemBuilder: (context, index) {
-            final item = pageItems[index];
-            return Container(
-              margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 24.w),
-              padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.white,
-              ),
-              child: Row(
-                children: [
-                  // Image
-                  Image.asset(item['image'], height: 40.h, width: 40.w),
-
-                  12.horizontalSpace,
-
-                  // Item details
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(item['name'],
-                            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500)),
-                        Text(item['category'], style: TextStyle(color: Colors.grey)),
-                      ],
-                    ),
-                  ),
-
-                  Expanded(child: Text(item['price'], style: TextStyle(fontSize: 15.sp))),
-
-                  Flexible(
-                      flex: 2,
-                      child: Text(item['desc'],
-                          style: TextStyle(fontSize: 14.sp), overflow: TextOverflow.ellipsis)),
-
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Image.asset(item['tagIcon'], width: 16.w, height: 16.h),
-                        6.horizontalSpace,
-                        Text(item['tag'], style: TextStyle(fontSize: 14.sp)),
-                      ],
-                    ),
-                  ),
-
-                  // Status and actions
-                  const StatusContainer(),
-                ],
-              ),
-            );
-          },
-        ),
-        24.verticalSpace,
-        PageIndex(totalPages: totalPages),
-      ],
-    );
-  }
-}
+// class ReviewItems extends ConsumerStatefulWidget {
+//   const ReviewItems({super.key});
+//
+//   @override
+//   ConsumerState<ReviewItems> createState() => _ReviewItemsState();
+// }
+//
+// class _ReviewItemsState extends ConsumerState<ReviewItems> {
+//   final List<Map<String, dynamic>> allItems = List.generate(
+//     19,
+//     (index) => {
+//       'image': 'assets/images/icetea.png',
+//       'name': 'Ice Tea $index',
+//       'category': 'Drinks',
+//       'price': '£ 9.5',
+//       'desc': 'Lorem Ipsum is simply dummy text $index',
+//       'tag': 'Vegan',
+//       'tagIcon': 'assets/images/vegan_java_go.png',
+//     },
+//   );
+//
+//   final int itemsPerPage = 5;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final currentPage = ref.watch(paginationProvider);
+//     final startIndex = currentPage * itemsPerPage;
+//     final endIndex = (startIndex + itemsPerPage).clamp(0, allItems.length);
+//     final pageItems = allItems.sublist(startIndex, endIndex);
+//
+//     final totalPages = (allItems.length / itemsPerPage).ceil();
+//
+//     return Column(
+//       children: [
+//         Container(
+//           padding: EdgeInsets.symmetric(horizontal: 25),
+//           width: 1076.w,
+//           height: 59.h,
+//           decoration: BoxDecoration(color: Color(0xFF9B6842)),
+//           child: Row(
+//             //  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//             children: [
+//               SizedBox(
+//                 width: 74.w,
+//                 child: ReviewItembarname(
+//                   label: 'Images',
+//                   color: Colors.white,
+//                   fontSize: 16.sp,
+//                 ),
+//               ),
+//               SizedBox(
+//                 width: 121.w,
+//                 child: ReviewItembarname(
+//                   label: 'Item Name',
+//                   color: Colors.white,
+//                   fontSize: 16.sp,
+//                 ),
+//               ),
+//               SizedBox(
+//                 width: 102.w,
+//                 child: ReviewItembarname(
+//                   label: 'Category',
+//                   color: Colors.white,
+//                   fontSize: 16.sp,
+//                 ),
+//               ),
+//               SizedBox(
+//                 width: 70.w,
+//                 child: ReviewItembarname(
+//                   label: 'Price',
+//                   color: Colors.white,
+//                   fontSize: 16.sp,
+//                 ),
+//               ),
+//               SizedBox(
+//                 width: 212.w,
+//                 child: Align(
+//                   alignment: Alignment.centerLeft,
+//                   child: ReviewItembarname(
+//                     label: 'Description',
+//                     color: Colors.white,
+//                     fontSize: 16.sp,
+//                   ),
+//                 ),
+//               ),
+//               SizedBox(
+//                 width: 100.w,
+//                 child: ReviewItembarname(
+//                   label: 'Type',
+//                   color: Colors.white,
+//                   fontSize: 16.sp,
+//                 ),
+//               ),
+//               SizedBox(
+//                 width: 120.w,
+//                 child: ReviewItembarname(
+//                   label: 'Status',
+//                   color: Colors.white,
+//                   fontSize: 16.sp,
+//                 ),
+//               ),
+//               SizedBox(
+//                 width: 120.w,
+//                 child: ReviewItembarname(
+//                   label: 'Availability',
+//                   color: Colors.white,
+//                   fontSize: 16.sp,
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//         22.verticalSpace,
+//         ListView.builder(
+//           physics: NeverScrollableScrollPhysics(),
+//           shrinkWrap: true,
+//           itemCount: pageItems.length,
+//           itemBuilder: (context, index) {
+//             final item = pageItems[index];
+//             return Container(
+//               margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 24.w),
+//               padding: EdgeInsets.all(12.w),
+//               decoration: BoxDecoration(
+//                 border: Border.all(color: Colors.grey.shade300),
+//                 borderRadius: BorderRadius.circular(8),
+//                 color: Colors.white,
+//               ),
+//               child: Row(
+//                 children: [
+//                   // Image
+//                   Image.asset(item['image'], height: 40.h, width: 40.w),
+//
+//                   12.horizontalSpace,
+//
+//                   // Item details
+//                   Expanded(
+//                     flex: 2,
+//                     child: Column(
+//                       crossAxisAlignment: CrossAxisAlignment.start,
+//                       children: [
+//                         Text(item['name'],
+//                             style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500)),
+//                         Text(item['category'], style: TextStyle(color: Colors.grey)),
+//                       ],
+//                     ),
+//                   ),
+//
+//                   Expanded(child: Text(item['price'], style: TextStyle(fontSize: 15.sp))),
+//
+//                   Flexible(
+//                       flex: 2,
+//                       child: Text(item['desc'],
+//                           style: TextStyle(fontSize: 14.sp), overflow: TextOverflow.ellipsis)),
+//
+//                   Expanded(
+//                     child: Row(
+//                       children: [
+//                         Image.asset(item['tagIcon'], width: 16.w, height: 16.h),
+//                         6.horizontalSpace,
+//                         Text(item['tag'], style: TextStyle(fontSize: 14.sp)),
+//                       ],
+//                     ),
+//                   ),
+//
+//                   // Status and actions
+//                   const StatusContainer(),
+//                 ],
+//               ),
+//             );
+//           },
+//         ),
+//         24.verticalSpace,
+//         PageIndex(totalPages: totalPages),
+//       ],
+//     );
+//   }
+// }
 
 class ReviewItembarname extends StatefulWidget {
   final String label;
@@ -573,7 +573,7 @@ class _StatusContainerState extends State<StatusContainer> {
         28.horizontalSpace,
         InkWell(
           onTap: () {
-            context.navigateTo(MenuScreen(isEditmode: true));
+            context.navigateTo(MenuScreen2(isEditmode: true));
           },
           child: Image.asset(
             'assets/images/edit_java_go.png',

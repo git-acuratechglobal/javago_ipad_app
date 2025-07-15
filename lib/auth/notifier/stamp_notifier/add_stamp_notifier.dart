@@ -18,4 +18,14 @@ class AddStampNotifier extends _$AddStampNotifier {
       return ref.watch(authServiceProvider).addStamp(addStampParams: addStamp);
     });
   }
+
+  Future<void> updateStamp(int id)async{
+    state= AsyncLoading();
+    state= await AsyncValue.guard(()async{
+      final addStamp = ref.watch(addStampParamsNotifierProvider);
+      return ref.watch(authServiceProvider).updateStamp(addStampParams: addStamp,id: id);
+    });
+  }
+
+
 }

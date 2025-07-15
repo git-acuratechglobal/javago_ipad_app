@@ -1,4 +1,3 @@
-// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -10,56 +9,41 @@ part of 'order_state.dart';
 // FreezedGenerator
 // **************************************************************************
 
-// dart format off
 T _$identity<T>(T value) => value;
+
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$OrderState {
-  OrderEvent get orderEvent;
-  String? get response;
+  OrderEvent get orderEvent => throw _privateConstructorUsedError;
+  String? get response => throw _privateConstructorUsedError;
 
   /// Create a copy of OrderState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
   $OrderStateCopyWith<OrderState> get copyWith =>
-      _$OrderStateCopyWithImpl<OrderState>(this as OrderState, _$identity);
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is OrderState &&
-            (identical(other.orderEvent, orderEvent) ||
-                other.orderEvent == orderEvent) &&
-            (identical(other.response, response) ||
-                other.response == response));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, orderEvent, response);
-
-  @override
-  String toString() {
-    return 'OrderState(orderEvent: $orderEvent, response: $response)';
-  }
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract mixin class $OrderStateCopyWith<$Res> {
+abstract class $OrderStateCopyWith<$Res> {
   factory $OrderStateCopyWith(
-          OrderState value, $Res Function(OrderState) _then) =
-      _$OrderStateCopyWithImpl;
+          OrderState value, $Res Function(OrderState) then) =
+      _$OrderStateCopyWithImpl<$Res, OrderState>;
   @useResult
   $Res call({OrderEvent orderEvent, String? response});
 }
 
 /// @nodoc
-class _$OrderStateCopyWithImpl<$Res> implements $OrderStateCopyWith<$Res> {
-  _$OrderStateCopyWithImpl(this._self, this._then);
+class _$OrderStateCopyWithImpl<$Res, $Val extends OrderState>
+    implements $OrderStateCopyWith<$Res> {
+  _$OrderStateCopyWithImpl(this._value, this._then);
 
-  final OrderState _self;
-  final $Res Function(OrderState) _then;
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
   /// Create a copy of OrderState
   /// with the given fields replaced by the non-null parameter values.
@@ -69,13 +53,53 @@ class _$OrderStateCopyWithImpl<$Res> implements $OrderStateCopyWith<$Res> {
     Object? orderEvent = null,
     Object? response = freezed,
   }) {
-    return _then(_self.copyWith(
+    return _then(_value.copyWith(
       orderEvent: null == orderEvent
-          ? _self.orderEvent
+          ? _value.orderEvent
           : orderEvent // ignore: cast_nullable_to_non_nullable
               as OrderEvent,
       response: freezed == response
-          ? _self.response
+          ? _value.response
+          : response // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$OrderStateImplCopyWith<$Res>
+    implements $OrderStateCopyWith<$Res> {
+  factory _$$OrderStateImplCopyWith(
+          _$OrderStateImpl value, $Res Function(_$OrderStateImpl) then) =
+      __$$OrderStateImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({OrderEvent orderEvent, String? response});
+}
+
+/// @nodoc
+class __$$OrderStateImplCopyWithImpl<$Res>
+    extends _$OrderStateCopyWithImpl<$Res, _$OrderStateImpl>
+    implements _$$OrderStateImplCopyWith<$Res> {
+  __$$OrderStateImplCopyWithImpl(
+      _$OrderStateImpl _value, $Res Function(_$OrderStateImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of OrderState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? orderEvent = null,
+    Object? response = freezed,
+  }) {
+    return _then(_$OrderStateImpl(
+      orderEvent: null == orderEvent
+          ? _value.orderEvent
+          : orderEvent // ignore: cast_nullable_to_non_nullable
+              as OrderEvent,
+      response: freezed == response
+          ? _value.response
           : response // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
@@ -84,27 +108,24 @@ class _$OrderStateCopyWithImpl<$Res> implements $OrderStateCopyWith<$Res> {
 
 /// @nodoc
 
-class _OrderState implements OrderState {
-  const _OrderState({required this.orderEvent, this.response});
+class _$OrderStateImpl implements _OrderState {
+  const _$OrderStateImpl({required this.orderEvent, this.response});
 
   @override
   final OrderEvent orderEvent;
   @override
   final String? response;
 
-  /// Create a copy of OrderState
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$OrderStateCopyWith<_OrderState> get copyWith =>
-      __$OrderStateCopyWithImpl<_OrderState>(this, _$identity);
+  String toString() {
+    return 'OrderState(orderEvent: $orderEvent, response: $response)';
+  }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _OrderState &&
+            other is _$OrderStateImpl &&
             (identical(other.orderEvent, orderEvent) ||
                 other.orderEvent == orderEvent) &&
             (identical(other.response, response) ||
@@ -114,49 +135,29 @@ class _OrderState implements OrderState {
   @override
   int get hashCode => Object.hash(runtimeType, orderEvent, response);
 
+  /// Create a copy of OrderState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  String toString() {
-    return 'OrderState(orderEvent: $orderEvent, response: $response)';
-  }
+  @pragma('vm:prefer-inline')
+  _$$OrderStateImplCopyWith<_$OrderStateImpl> get copyWith =>
+      __$$OrderStateImplCopyWithImpl<_$OrderStateImpl>(this, _$identity);
 }
 
-/// @nodoc
-abstract mixin class _$OrderStateCopyWith<$Res>
-    implements $OrderStateCopyWith<$Res> {
-  factory _$OrderStateCopyWith(
-          _OrderState value, $Res Function(_OrderState) _then) =
-      __$OrderStateCopyWithImpl;
+abstract class _OrderState implements OrderState {
+  const factory _OrderState(
+      {required final OrderEvent orderEvent,
+      final String? response}) = _$OrderStateImpl;
+
   @override
-  @useResult
-  $Res call({OrderEvent orderEvent, String? response});
-}
-
-/// @nodoc
-class __$OrderStateCopyWithImpl<$Res> implements _$OrderStateCopyWith<$Res> {
-  __$OrderStateCopyWithImpl(this._self, this._then);
-
-  final _OrderState _self;
-  final $Res Function(_OrderState) _then;
+  OrderEvent get orderEvent;
+  @override
+  String? get response;
 
   /// Create a copy of OrderState
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? orderEvent = null,
-    Object? response = freezed,
-  }) {
-    return _then(_OrderState(
-      orderEvent: null == orderEvent
-          ? _self.orderEvent
-          : orderEvent // ignore: cast_nullable_to_non_nullable
-              as OrderEvent,
-      response: freezed == response
-          ? _self.response
-          : response // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$OrderStateImplCopyWith<_$OrderStateImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
-
-// dart format on

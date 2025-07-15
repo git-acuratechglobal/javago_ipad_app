@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:java_go/auth/notifier/auth_notifier.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
+import '../../../config/common/api_end_points.dart';
 import '../../../home/notifier/cafe_info_notifier/cafe_info_notifier.dart';
 
 class CustomWebView extends ConsumerStatefulWidget {
-  const CustomWebView({super.key, this.initialUrl});
+  const CustomWebView({super.key, this.initialUrl, required this.title});
   final String? initialUrl;
+  final String title;
   @override
   ConsumerState<CustomWebView> createState() => _CustomWebViewState();
 }
 
 class _CustomWebViewState extends ConsumerState<CustomWebView> {
   late final WebViewController _controller;
-  int targetUrlHitCount = 0;
   bool isLoading = true;
   String? errorMessage;
-  String currentUrl = '';
 
   @override
   void initState() {
@@ -28,47 +26,43 @@ class _CustomWebViewState extends ConsumerState<CustomWebView> {
         NavigationDelegate(
           onPageStarted: (url) {
             print('Page started loading: $url');
-            setState(() {
-              isLoading = true;
-              errorMessage = null;
-              currentUrl = url;
-            });
+            if (url.contains(
+                "${Api.baseUrl}/cafe-api/square/oauth/callback?code")) {
+              ref
+                  .read(cafeInfoNotifierProvider.notifier)
+                  .squareAccountCreated();
+            }
+            if (mounted) {
+              setState(() {
+                isLoading = true;
+                errorMessage = null;
+              });
+            }
           },
           onPageFinished: (url) {
             print('Page finished loading: $url');
-            setState(() {
-              isLoading = false;
-              currentUrl = url;
-            });
-
-            // Check for target URL
-            if (url.contains("18.132.176.176/cafe/set-cafe-profile")) {
-              targetUrlHitCount++;
-              print('Target URL hit count: $targetUrlHitCount');
-              //
-              // if (targetUrlHitCount == 2) {
-              //   print('Navigating back - target URL hit twice');
-              //   Navigator.pop(context);
-              // }
+            if (mounted) {
+              setState(() {
+                isLoading = false;
+              });
             }
           },
           onWebResourceError: (error) {
             print('Web resource error: ${error.description}');
-            setState(() {
-              isLoading = false;
-              errorMessage = 'Failed to load page: ${error.description}';
-            });
+            if (mounted) {
+              setState(() {
+                isLoading = false;
+                errorMessage = 'Failed to load page: ${error.description}';
+              });
+            }
           },
           onNavigationRequest: (request) {
-            if (request.url ==
-                "http://18.132.176.176/api/stripe/onboarding/return") {
+            if (request.url == "${Api.baseUrl}/api/stripe/onboarding/return") {
               ref.read(cafeInfoNotifierProvider.notifier).stripAccountStatus();
             }
             return NavigationDecision.navigate;
           },
-          onUrlChange: (change) {
-
-          },
+          onUrlChange: (change) {},
         ),
       );
 
@@ -77,18 +71,22 @@ class _CustomWebViewState extends ConsumerState<CustomWebView> {
 
   void _loadUrl() async {
     try {
-      setState(() {
-        isLoading = true;
-        errorMessage = null;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+          errorMessage = null;
+        });
+      }
 
       await _controller.loadRequest(Uri.parse(widget.initialUrl!));
     } catch (e) {
       print('Error loading URL: $e');
-      setState(() {
-        errorMessage = 'Error loading URL: $e';
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          errorMessage = 'Error loading URL: $e';
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -96,13 +94,11 @@ class _CustomWebViewState extends ConsumerState<CustomWebView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Connect your Stripe Account"),
+        title: Text(widget.title),
       ),
       body: Stack(
         children: [
           WebViewWidget(controller: _controller),
-
-          // Loading indicator
           if (isLoading)
             Container(
               color: Colors.white.withOpacity(0.8),
@@ -128,8 +124,6 @@ class _CustomWebViewState extends ConsumerState<CustomWebView> {
                 ),
               ),
             ),
-
-          // Error message
           if (errorMessage != null && !isLoading)
             Container(
               color: Colors.white,
@@ -164,7 +158,6 @@ class _CustomWebViewState extends ConsumerState<CustomWebView> {
                       SizedBox(height: 24),
                       ElevatedButton.icon(
                         onPressed: () {
-                          targetUrlHitCount = 0; // Reset counter on retry
                           _loadUrl();
                         },
                         icon: Icon(Icons.refresh),

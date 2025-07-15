@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:json_annotation/json_annotation.dart';
-    part 'getStamp.g.dart';
+part 'getStamp.g.dart';
+
 @JsonSerializable()
 class GetStamp {
   @JsonKey(name: "status")
@@ -15,7 +18,8 @@ class GetStamp {
     this.loyaltyStamp,
   });
 
-  factory GetStamp.fromJson(Map<String, dynamic> json) => _$GetStampFromJson(json);
+  factory GetStamp.fromJson(Map<String, dynamic> json) =>
+      _$GetStampFromJson(json);
 
   Map<String, dynamic> toJson() => _$GetStampToJson(this);
 }
@@ -49,7 +53,7 @@ class LoyaltyStamp {
   @JsonKey(name: "updated_at")
   int? updatedAt;
   @JsonKey(name: "excludedItems")
-  List<dynamic>? excludedItems;
+  List<ExcludedItem>? excludedItems;
 
   LoyaltyStamp({
     this.id,
@@ -68,7 +72,52 @@ class LoyaltyStamp {
     this.excludedItems,
   });
 
-  factory LoyaltyStamp.fromJson(Map<String, dynamic> json) => _$LoyaltyStampFromJson(json);
+  factory LoyaltyStamp.fromJson(Map<String, dynamic> json) =>
+      _$LoyaltyStampFromJson(json);
 
   Map<String, dynamic> toJson() => _$LoyaltyStampToJson(this);
+  List<String> get decodedStampApplicableToCategories {
+    if (stampApplicableToCategories != null && stampApplicableToCategories!="null"&&
+        stampApplicableToCategories!.isNotEmpty) {
+      final raw = stampApplicableToCategories;
+      final decoded = jsonDecode(raw ?? '[]');
+      return List<String>.from(decoded);
+    } else {
+      return [];
+    }
+  }
+}
+
+@JsonSerializable()
+class ExcludedItem {
+  ExcludedItem({
+    required this.id,
+    required this.itemId,
+    required this.cafeMenuId,
+    required this.stampId,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  final int? id;
+
+  @JsonKey(name: 'item_id')
+  final int? itemId;
+
+  @JsonKey(name: 'cafe_menu_id')
+  final dynamic cafeMenuId;
+
+  @JsonKey(name: 'stamp_id')
+  final int? stampId;
+
+  @JsonKey(name: 'created_at')
+  final int? createdAt;
+
+  @JsonKey(name: 'updated_at')
+  final int? updatedAt;
+
+  factory ExcludedItem.fromJson(Map<String, dynamic> json) =>
+      _$ExcludedItemFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ExcludedItemToJson(this);
 }

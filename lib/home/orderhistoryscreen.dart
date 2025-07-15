@@ -28,7 +28,7 @@ class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            62.verticalSpace,
+            // 62.verticalSpace,
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 57),
               child: _buildSearchAndDropdown(),

@@ -7,10 +7,9 @@ import 'package:java_go/config/async_widget.dart';
 import 'package:java_go/config/common/cache_network_image.dart';
 import 'package:java_go/config/common/widgets.dart';
 import 'package:java_go/home/account.dart';
-
+import 'package:java_go/home/notifier/cafe_info_notifier/cafe_info_notifier.dart';
 import '../auth/pages/sign_up/reviewscreen.dart';
 import '../auth/pages/sign_up/cafe_info_screen.dart';
-import 'cafeinfotabscreen.dart';
 
 class CafeInformationScreen extends ConsumerStatefulWidget {
   final bool fromSettings;

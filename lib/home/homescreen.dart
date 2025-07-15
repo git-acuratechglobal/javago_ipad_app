@@ -10,6 +10,8 @@ import 'package:java_go/home/orderhistoryscreen.dart';
 
 import 'package:java_go/home/statsscreen.dart';
 
+import '../config/async_widget.dart';
+
 class Homescreen extends ConsumerStatefulWidget {
   const Homescreen({super.key});
 
@@ -17,7 +19,8 @@ class Homescreen extends ConsumerStatefulWidget {
   ConsumerState<Homescreen> createState() => _HomescreenState();
 }
 
-class _HomescreenState extends ConsumerState<Homescreen> with TickerProviderStateMixin {
+class _HomescreenState extends ConsumerState<Homescreen>
+    with TickerProviderStateMixin {
   late TabController _tabController;
   late TabController _tabControllerOrder;
   bool isTabbed = false;
@@ -27,7 +30,8 @@ class _HomescreenState extends ConsumerState<Homescreen> with TickerProviderStat
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _tabControllerOrder = TabController(initialIndex: 1, length: 3, vsync: this);
+    _tabControllerOrder =
+        TabController(initialIndex: 1, length: 3, vsync: this);
   }
 
   @override
@@ -60,7 +64,7 @@ class _HomescreenState extends ConsumerState<Homescreen> with TickerProviderStat
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xFFF5F3F0),
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(190),
+        preferredSize: const Size.fromHeight(150),
         child: CustomTabBarHomeScreenWidget(
           tabController: _tabController,
           tabControllerOrder: _tabControllerOrder,
@@ -74,6 +78,7 @@ class _HomescreenState extends ConsumerState<Homescreen> with TickerProviderStat
         ),
       ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Expanded(
             child: TabBarView(
@@ -106,21 +111,18 @@ class CustomTabBarHomeScreenWidget extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<CustomTabBarHomeScreenWidget> createState() => _CustomTabBarHomeScreenWidgetState();
+  ConsumerState<CustomTabBarHomeScreenWidget> createState() =>
+      _CustomTabBarHomeScreenWidgetState();
 }
 
-class _CustomTabBarHomeScreenWidgetState extends ConsumerState<CustomTabBarHomeScreenWidget> {
+class _CustomTabBarHomeScreenWidgetState
+    extends ConsumerState<CustomTabBarHomeScreenWidget> {
   int _selectedOrderTabIndex = 1;
 
   @override
   Widget build(BuildContext context) {
-    final orders = ref.watch(todayOrdersProvider);
-    final items = orders.value?.getCombinedUniqueOrders;
-    final inProgressOrders = items?.where((order) => order.orderCompleted != 1).toList().length;
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
-
       backgroundColor: const Color(0xFFF5F3F0),
       appBar: AppBar(
         backgroundColor: const Color(0xFFF5F3F0),
@@ -134,53 +136,60 @@ class _CustomTabBarHomeScreenWidgetState extends ConsumerState<CustomTabBarHomeS
           ),
         ),
         actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 57.w),
-            child: InkWell(
-              onTap: () {
-
-
-                widget.tabControllerOrder.animateTo(1);
-                setState(
-                  () {
-                    _selectedOrderTabIndex = 1;
-                  },
-                );
-              },
-              child: Container(
-                width: 158.w,
-                height: 48.h,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF5CF97F),
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x3F000000),
-                      blurRadius: 2,
-                      offset: Offset(0, 2),
-                      spreadRadius: 0,
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    "Orders: ${inProgressOrders}",
-                    style: TextStyle(
-                      color: Color(0xFF414141),
-                      fontSize: 20,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w800,
+          AsyncWidget(
+              wantToShowLoading: false,
+              height: 48.h,
+              value: ref.watch(todayOrdersProvider),
+              data: (ordersData) {
+                final items = ordersData.getCombinedUniqueOrders;
+                final inProgressOrders =
+                    items.where((order) => order.orderCompleted != 1).toList().length;
+                return           Padding(
+                  padding: EdgeInsets.only(right: 57.w),
+                  child: InkWell(
+                    onTap: () {
+                      widget.tabControllerOrder.animateTo(1);
+                      setState(
+                            () {
+                          _selectedOrderTabIndex = 1;
+                        },
+                      );
+                    },
+                    child: Container(
+                      width: 158.w,
+                      height: 48.h,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF5CF97F),
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x3F000000),
+                            blurRadius: 2,
+                            offset: Offset(0, 2),
+                            spreadRadius: 0,
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Orders: ${inProgressOrders}",
+                          style: TextStyle(
+                            color: Color(0xFF414141),
+                            fontSize: 20,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ),
-          )
+                );
+              })
+
         ],
       ),
       body: Column(
         children: [
-          24.verticalSpace,
           28.verticalSpace,
           TabBar(
             onTap: (index) {
@@ -198,7 +207,8 @@ class _CustomTabBarHomeScreenWidgetState extends ConsumerState<CustomTabBarHomeS
             indicatorColor: Colors.transparent,
             dividerColor: Colors.transparent,
             labelStyle: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
-            unselectedLabelStyle: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
+            unselectedLabelStyle:
+                TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
             tabs: [
               _buildTab(
                 iconPath: 'assets/images/ic_bar_chart.png',

@@ -1,4 +1,3 @@
-// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -10,58 +9,41 @@ part of 'auth_state.dart';
 // FreezedGenerator
 // **************************************************************************
 
-// dart format off
 T _$identity<T>(T value) => value;
+
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$AuthState {
-  AuthEvent get authEvent;
-  String? get response;
-  CafeModel? get cafeModel;
+  AuthEvent get authEvent => throw _privateConstructorUsedError;
+  String? get response => throw _privateConstructorUsedError;
+  CafeModel? get cafeModel => throw _privateConstructorUsedError;
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
   $AuthStateCopyWith<AuthState> get copyWith =>
-      _$AuthStateCopyWithImpl<AuthState>(this as AuthState, _$identity);
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is AuthState &&
-            (identical(other.authEvent, authEvent) ||
-                other.authEvent == authEvent) &&
-            (identical(other.response, response) ||
-                other.response == response) &&
-            (identical(other.cafeModel, cafeModel) ||
-                other.cafeModel == cafeModel));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, authEvent, response, cafeModel);
-
-  @override
-  String toString() {
-    return 'AuthState(authEvent: $authEvent, response: $response, cafeModel: $cafeModel)';
-  }
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract mixin class $AuthStateCopyWith<$Res> {
-  factory $AuthStateCopyWith(AuthState value, $Res Function(AuthState) _then) =
-      _$AuthStateCopyWithImpl;
+abstract class $AuthStateCopyWith<$Res> {
+  factory $AuthStateCopyWith(AuthState value, $Res Function(AuthState) then) =
+      _$AuthStateCopyWithImpl<$Res, AuthState>;
   @useResult
   $Res call({AuthEvent authEvent, String? response, CafeModel? cafeModel});
 }
 
 /// @nodoc
-class _$AuthStateCopyWithImpl<$Res> implements $AuthStateCopyWith<$Res> {
-  _$AuthStateCopyWithImpl(this._self, this._then);
+class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
+    implements $AuthStateCopyWith<$Res> {
+  _$AuthStateCopyWithImpl(this._value, this._then);
 
-  final AuthState _self;
-  final $Res Function(AuthState) _then;
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.
@@ -72,17 +54,62 @@ class _$AuthStateCopyWithImpl<$Res> implements $AuthStateCopyWith<$Res> {
     Object? response = freezed,
     Object? cafeModel = freezed,
   }) {
-    return _then(_self.copyWith(
+    return _then(_value.copyWith(
       authEvent: null == authEvent
-          ? _self.authEvent
+          ? _value.authEvent
           : authEvent // ignore: cast_nullable_to_non_nullable
               as AuthEvent,
       response: freezed == response
-          ? _self.response
+          ? _value.response
           : response // ignore: cast_nullable_to_non_nullable
               as String?,
       cafeModel: freezed == cafeModel
-          ? _self.cafeModel
+          ? _value.cafeModel
+          : cafeModel // ignore: cast_nullable_to_non_nullable
+              as CafeModel?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$AuthStateImplCopyWith<$Res>
+    implements $AuthStateCopyWith<$Res> {
+  factory _$$AuthStateImplCopyWith(
+          _$AuthStateImpl value, $Res Function(_$AuthStateImpl) then) =
+      __$$AuthStateImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({AuthEvent authEvent, String? response, CafeModel? cafeModel});
+}
+
+/// @nodoc
+class __$$AuthStateImplCopyWithImpl<$Res>
+    extends _$AuthStateCopyWithImpl<$Res, _$AuthStateImpl>
+    implements _$$AuthStateImplCopyWith<$Res> {
+  __$$AuthStateImplCopyWithImpl(
+      _$AuthStateImpl _value, $Res Function(_$AuthStateImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of AuthState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? authEvent = null,
+    Object? response = freezed,
+    Object? cafeModel = freezed,
+  }) {
+    return _then(_$AuthStateImpl(
+      authEvent: null == authEvent
+          ? _value.authEvent
+          : authEvent // ignore: cast_nullable_to_non_nullable
+              as AuthEvent,
+      response: freezed == response
+          ? _value.response
+          : response // ignore: cast_nullable_to_non_nullable
+              as String?,
+      cafeModel: freezed == cafeModel
+          ? _value.cafeModel
           : cafeModel // ignore: cast_nullable_to_non_nullable
               as CafeModel?,
     ));
@@ -91,8 +118,9 @@ class _$AuthStateCopyWithImpl<$Res> implements $AuthStateCopyWith<$Res> {
 
 /// @nodoc
 
-class _AuthState implements AuthState {
-  const _AuthState({required this.authEvent, this.response, this.cafeModel});
+class _$AuthStateImpl implements _AuthState {
+  const _$AuthStateImpl(
+      {required this.authEvent, this.response, this.cafeModel});
 
   @override
   final AuthEvent authEvent;
@@ -101,19 +129,16 @@ class _AuthState implements AuthState {
   @override
   final CafeModel? cafeModel;
 
-  /// Create a copy of AuthState
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$AuthStateCopyWith<_AuthState> get copyWith =>
-      __$AuthStateCopyWithImpl<_AuthState>(this, _$identity);
+  String toString() {
+    return 'AuthState(authEvent: $authEvent, response: $response, cafeModel: $cafeModel)';
+  }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _AuthState &&
+            other is _$AuthStateImpl &&
             (identical(other.authEvent, authEvent) ||
                 other.authEvent == authEvent) &&
             (identical(other.response, response) ||
@@ -125,54 +150,32 @@ class _AuthState implements AuthState {
   @override
   int get hashCode => Object.hash(runtimeType, authEvent, response, cafeModel);
 
+  /// Create a copy of AuthState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  String toString() {
-    return 'AuthState(authEvent: $authEvent, response: $response, cafeModel: $cafeModel)';
-  }
+  @pragma('vm:prefer-inline')
+  _$$AuthStateImplCopyWith<_$AuthStateImpl> get copyWith =>
+      __$$AuthStateImplCopyWithImpl<_$AuthStateImpl>(this, _$identity);
 }
 
-/// @nodoc
-abstract mixin class _$AuthStateCopyWith<$Res>
-    implements $AuthStateCopyWith<$Res> {
-  factory _$AuthStateCopyWith(
-          _AuthState value, $Res Function(_AuthState) _then) =
-      __$AuthStateCopyWithImpl;
+abstract class _AuthState implements AuthState {
+  const factory _AuthState(
+      {required final AuthEvent authEvent,
+      final String? response,
+      final CafeModel? cafeModel}) = _$AuthStateImpl;
+
   @override
-  @useResult
-  $Res call({AuthEvent authEvent, String? response, CafeModel? cafeModel});
-}
-
-/// @nodoc
-class __$AuthStateCopyWithImpl<$Res> implements _$AuthStateCopyWith<$Res> {
-  __$AuthStateCopyWithImpl(this._self, this._then);
-
-  final _AuthState _self;
-  final $Res Function(_AuthState) _then;
+  AuthEvent get authEvent;
+  @override
+  String? get response;
+  @override
+  CafeModel? get cafeModel;
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? authEvent = null,
-    Object? response = freezed,
-    Object? cafeModel = freezed,
-  }) {
-    return _then(_AuthState(
-      authEvent: null == authEvent
-          ? _self.authEvent
-          : authEvent // ignore: cast_nullable_to_non_nullable
-              as AuthEvent,
-      response: freezed == response
-          ? _self.response
-          : response // ignore: cast_nullable_to_non_nullable
-              as String?,
-      cafeModel: freezed == cafeModel
-          ? _self.cafeModel
-          : cafeModel // ignore: cast_nullable_to_non_nullable
-              as CafeModel?,
-    ));
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$AuthStateImplCopyWith<_$AuthStateImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
-
-// dart format on

@@ -12,6 +12,7 @@ class CafeModel {
     required this.phone,
     required this.bio,
     required this.email,
+    required this.city,
     required this.bannerImage,
     required this.address,
     required this.postcode,
@@ -44,6 +45,7 @@ class CafeModel {
     required this.timing,
     required this.cafeManagement,
     required this.cafeClickCollectTiming,
+    required this.squareOnboardingCompleted
   });
 
   final int? id;
@@ -57,6 +59,7 @@ class CafeModel {
   @JsonKey(name: 'banner_image')
   final String? bannerImage;
   final String? address;
+  final String? city;
   final String? postcode;
   final double? latitude;
   final double? longitude;
@@ -120,6 +123,9 @@ class CafeModel {
 
   @JsonKey(name: 'stripe_onboarding_completed')
   final int? stripeOnboardingCompleted;
+
+  @JsonKey(name: 'square_onboarding_completed')
+  final int? squareOnboardingCompleted;
 
   @JsonKey(name: 'is_published')
   final int? isPublished;

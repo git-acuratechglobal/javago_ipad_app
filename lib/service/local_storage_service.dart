@@ -20,9 +20,12 @@ class LocalStorageService {
   LocalStorageService(this._preferences);
 
   static const String _authTokenKey = "token";
+
   static const String _userLoginSaved = "user";
 
   static const String _stripAccountId = "accountId";
+
+  static const String _fcmTokenKey = "fcm_token";
 
   Future<void> setToken(String token) async {
     await _preferences.setString(_authTokenKey, token);
@@ -30,6 +33,14 @@ class LocalStorageService {
 
   String getToken() {
     return _preferences.getString(_authTokenKey) ?? "";
+  }
+
+  Future<void> setFcmToken(String fcmToken) async {
+    await _preferences.setString(_fcmTokenKey, fcmToken);
+  }
+
+  String? getFcmToken() {
+    return _preferences.getString(_fcmTokenKey);
   }
 
   Future<void> setUserLoginSaved(bool isLoginSaved) async {
@@ -51,5 +62,6 @@ class LocalStorageService {
   Future<void> clearSession() async {
     _preferences.remove(_authTokenKey);
     _preferences.remove(_userLoginSaved);
+
   }
 }

@@ -1,8 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 part 'stamp_suggestion.g.dart';
 
-
-
 @JsonSerializable()
 class StampSuggestion {
   @JsonKey(name: "colors")
@@ -24,7 +22,8 @@ class StampSuggestion {
     this.stampApplicableTo,
   });
 
-  factory StampSuggestion.fromJson(Map<String, dynamic> json) => _$StampSuggestionFromJson(json);
+  factory StampSuggestion.fromJson(Map<String, dynamic> json) =>
+      _$StampSuggestionFromJson(json);
   Map<String, dynamic> toJson() => _$StampSuggestionToJson(this);
 }
 
@@ -45,7 +44,8 @@ class ColorsModel {
     this.b0876B,
   });
 
-  factory ColorsModel.fromJson(Map<String, dynamic> json) => _$ColorsModelFromJson(json);
+  factory ColorsModel.fromJson(Map<String, dynamic> json) =>
+      _$ColorsModelFromJson(json);
   Map<String, dynamic> toJson() => _$ColorsModelToJson(this);
 }
 
@@ -53,14 +53,16 @@ extension ColorsExtension on ColorsModel {
   List<ColorItem> toColorItems() {
     final items = <ColorItem>[];
 
-    if (the461C10 != null) items.add(ColorItem(hexCode: "#461c10", imageUrl: the461C10!));
-    if (the9B6842 != null) items.add(ColorItem(hexCode: "#9B6842", imageUrl: the9B6842!));
-    if (b0876B != null) items.add(ColorItem(hexCode: "#B0876B", imageUrl: b0876B!));
+    if (the461C10 != null)
+      items.add(ColorItem(hexCode: "#461c10", imageUrl: the461C10!));
+    if (the9B6842 != null)
+      items.add(ColorItem(hexCode: "#9B6842", imageUrl: the9B6842!));
+    if (b0876B != null)
+      items.add(ColorItem(hexCode: "#B0876B", imageUrl: b0876B!));
 
     return items;
   }
 }
-
 
 class ColorItem {
   final String hexCode;
@@ -71,9 +73,9 @@ class ColorItem {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is ColorItem &&
-              runtimeType == other.runtimeType &&
-              hexCode == other.hexCode;
+      other is ColorItem &&
+          runtimeType == other.runtimeType &&
+          hexCode == other.hexCode;
 
   @override
   int get hashCode => hexCode.hashCode;
@@ -92,7 +94,7 @@ class StampApplicableTo {
     this.menuName,
   });
 
-factory StampApplicableTo.fromJson(Map<String, dynamic> json) =>
-    _$StampApplicableToFromJson(json);
-Map<String, dynamic> toJson() => _$StampApplicableToToJson(this);
+  factory StampApplicableTo.fromJson(Map<String, dynamic> json) =>
+      _$StampApplicableToFromJson(json);
+  Map<String, dynamic> toJson() => _$StampApplicableToToJson(this);
 }

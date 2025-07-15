@@ -1,14 +1,26 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../param/item_param/item_param.dart';
+
 class SizePrice {
   String size;
-  double ?price;
+  double? price;
 
   SizePrice({required this.size, required this.price});
 }
 
 class SizePriceNotifier extends StateNotifier<List<SizePrice>> {
   SizePriceNotifier() : super([SizePrice(size: '', price: null)]);
+
+  void setFromItemSizeList(List<ItemSize> itemSizes, Map<String, String> idToSizeMap) {
+    final initialized = itemSizes.map((e) {
+      return SizePrice(
+        size: idToSizeMap[e.itemSizeId.toString()] ?? '',
+        price: e.itemPrice,
+      );
+    }).toList();
+    state = initialized.isNotEmpty ? initialized : [SizePrice(size: '', price: null)];
+  }
 
   void add() {
     state = [...state, SizePrice(size: '', price: null)];
@@ -34,6 +46,6 @@ class SizePriceNotifier extends StateNotifier<List<SizePrice>> {
   }
 }
 
-
 final sizePriceProvider =
-    StateNotifierProvider.autoDispose<SizePriceNotifier, List<SizePrice>>((ref) => SizePriceNotifier());
+    StateNotifierProvider<SizePriceNotifier, List<SizePrice>>(
+        (ref) => SizePriceNotifier());

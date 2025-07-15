@@ -1,4 +1,3 @@
-// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -10,59 +9,40 @@ part of 'cafetime_model.dart';
 // FreezedGenerator
 // **************************************************************************
 
-// dart format off
 T _$identity<T>(T value) => value;
+
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+
+CafeDayTime _$CafeDayTimeFromJson(Map<String, dynamic> json) {
+  return _CafeDayTime.fromJson(json);
+}
 
 /// @nodoc
 mixin _$CafeDayTime {
-  String get day;
+  String get day => throw _privateConstructorUsedError;
   @TimeOfDayConverter()
-  TimeOfDay get openingTime;
+  TimeOfDay get openingTime => throw _privateConstructorUsedError;
   @TimeOfDayConverter()
-  TimeOfDay get closingTime;
+  TimeOfDay get closingTime => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_active')
-  int get isActive;
+  int get isActive => throw _privateConstructorUsedError;
+
+  /// Serializes this CafeDayTime to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of CafeDayTime
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
   $CafeDayTimeCopyWith<CafeDayTime> get copyWith =>
-      _$CafeDayTimeCopyWithImpl<CafeDayTime>(this as CafeDayTime, _$identity);
-
-  /// Serializes this CafeDayTime to a JSON map.
-  Map<String, dynamic> toJson();
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is CafeDayTime &&
-            (identical(other.day, day) || other.day == day) &&
-            (identical(other.openingTime, openingTime) ||
-                other.openingTime == openingTime) &&
-            (identical(other.closingTime, closingTime) ||
-                other.closingTime == closingTime) &&
-            (identical(other.isActive, isActive) ||
-                other.isActive == isActive));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, day, openingTime, closingTime, isActive);
-
-  @override
-  String toString() {
-    return 'CafeDayTime(day: $day, openingTime: $openingTime, closingTime: $closingTime, isActive: $isActive)';
-  }
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract mixin class $CafeDayTimeCopyWith<$Res> {
+abstract class $CafeDayTimeCopyWith<$Res> {
   factory $CafeDayTimeCopyWith(
-          CafeDayTime value, $Res Function(CafeDayTime) _then) =
-      _$CafeDayTimeCopyWithImpl;
+          CafeDayTime value, $Res Function(CafeDayTime) then) =
+      _$CafeDayTimeCopyWithImpl<$Res, CafeDayTime>;
   @useResult
   $Res call(
       {String day,
@@ -72,11 +52,14 @@ abstract mixin class $CafeDayTimeCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$CafeDayTimeCopyWithImpl<$Res> implements $CafeDayTimeCopyWith<$Res> {
-  _$CafeDayTimeCopyWithImpl(this._self, this._then);
+class _$CafeDayTimeCopyWithImpl<$Res, $Val extends CafeDayTime>
+    implements $CafeDayTimeCopyWith<$Res> {
+  _$CafeDayTimeCopyWithImpl(this._value, this._then);
 
-  final CafeDayTime _self;
-  final $Res Function(CafeDayTime) _then;
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
   /// Create a copy of CafeDayTime
   /// with the given fields replaced by the non-null parameter values.
@@ -88,21 +71,75 @@ class _$CafeDayTimeCopyWithImpl<$Res> implements $CafeDayTimeCopyWith<$Res> {
     Object? closingTime = null,
     Object? isActive = null,
   }) {
-    return _then(_self.copyWith(
+    return _then(_value.copyWith(
       day: null == day
-          ? _self.day
+          ? _value.day
           : day // ignore: cast_nullable_to_non_nullable
               as String,
       openingTime: null == openingTime
-          ? _self.openingTime
+          ? _value.openingTime
           : openingTime // ignore: cast_nullable_to_non_nullable
               as TimeOfDay,
       closingTime: null == closingTime
-          ? _self.closingTime
+          ? _value.closingTime
           : closingTime // ignore: cast_nullable_to_non_nullable
               as TimeOfDay,
       isActive: null == isActive
-          ? _self.isActive
+          ? _value.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$CafeDayTimeImplCopyWith<$Res>
+    implements $CafeDayTimeCopyWith<$Res> {
+  factory _$$CafeDayTimeImplCopyWith(
+          _$CafeDayTimeImpl value, $Res Function(_$CafeDayTimeImpl) then) =
+      __$$CafeDayTimeImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String day,
+      @TimeOfDayConverter() TimeOfDay openingTime,
+      @TimeOfDayConverter() TimeOfDay closingTime,
+      @JsonKey(name: 'is_active') int isActive});
+}
+
+/// @nodoc
+class __$$CafeDayTimeImplCopyWithImpl<$Res>
+    extends _$CafeDayTimeCopyWithImpl<$Res, _$CafeDayTimeImpl>
+    implements _$$CafeDayTimeImplCopyWith<$Res> {
+  __$$CafeDayTimeImplCopyWithImpl(
+      _$CafeDayTimeImpl _value, $Res Function(_$CafeDayTimeImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of CafeDayTime
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? day = null,
+    Object? openingTime = null,
+    Object? closingTime = null,
+    Object? isActive = null,
+  }) {
+    return _then(_$CafeDayTimeImpl(
+      day: null == day
+          ? _value.day
+          : day // ignore: cast_nullable_to_non_nullable
+              as String,
+      openingTime: null == openingTime
+          ? _value.openingTime
+          : openingTime // ignore: cast_nullable_to_non_nullable
+              as TimeOfDay,
+      closingTime: null == closingTime
+          ? _value.closingTime
+          : closingTime // ignore: cast_nullable_to_non_nullable
+              as TimeOfDay,
+      isActive: null == isActive
+          ? _value.isActive
           : isActive // ignore: cast_nullable_to_non_nullable
               as int,
     ));
@@ -111,14 +148,15 @@ class _$CafeDayTimeCopyWithImpl<$Res> implements $CafeDayTimeCopyWith<$Res> {
 
 /// @nodoc
 @JsonSerializable()
-class _CafeDayTime implements CafeDayTime {
-  const _CafeDayTime(
+class _$CafeDayTimeImpl implements _CafeDayTime {
+  const _$CafeDayTimeImpl(
       {required this.day,
       @TimeOfDayConverter() required this.openingTime,
       @TimeOfDayConverter() required this.closingTime,
       @JsonKey(name: 'is_active') this.isActive = 1});
-  factory _CafeDayTime.fromJson(Map<String, dynamic> json) =>
-      _$CafeDayTimeFromJson(json);
+
+  factory _$CafeDayTimeImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CafeDayTimeImplFromJson(json);
 
   @override
   final String day;
@@ -132,26 +170,16 @@ class _CafeDayTime implements CafeDayTime {
   @JsonKey(name: 'is_active')
   final int isActive;
 
-  /// Create a copy of CafeDayTime
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$CafeDayTimeCopyWith<_CafeDayTime> get copyWith =>
-      __$CafeDayTimeCopyWithImpl<_CafeDayTime>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$CafeDayTimeToJson(
-      this,
-    );
+  String toString() {
+    return 'CafeDayTime(day: $day, openingTime: $openingTime, closingTime: $closingTime, isActive: $isActive)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _CafeDayTime &&
+            other is _$CafeDayTimeImpl &&
             (identical(other.day, day) || other.day == day) &&
             (identical(other.openingTime, openingTime) ||
                 other.openingTime == openingTime) &&
@@ -166,63 +194,48 @@ class _CafeDayTime implements CafeDayTime {
   int get hashCode =>
       Object.hash(runtimeType, day, openingTime, closingTime, isActive);
 
+  /// Create a copy of CafeDayTime
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  String toString() {
-    return 'CafeDayTime(day: $day, openingTime: $openingTime, closingTime: $closingTime, isActive: $isActive)';
+  @pragma('vm:prefer-inline')
+  _$$CafeDayTimeImplCopyWith<_$CafeDayTimeImpl> get copyWith =>
+      __$$CafeDayTimeImplCopyWithImpl<_$CafeDayTimeImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$CafeDayTimeImplToJson(
+      this,
+    );
   }
 }
 
-/// @nodoc
-abstract mixin class _$CafeDayTimeCopyWith<$Res>
-    implements $CafeDayTimeCopyWith<$Res> {
-  factory _$CafeDayTimeCopyWith(
-          _CafeDayTime value, $Res Function(_CafeDayTime) _then) =
-      __$CafeDayTimeCopyWithImpl;
+abstract class _CafeDayTime implements CafeDayTime {
+  const factory _CafeDayTime(
+      {required final String day,
+      @TimeOfDayConverter() required final TimeOfDay openingTime,
+      @TimeOfDayConverter() required final TimeOfDay closingTime,
+      @JsonKey(name: 'is_active') final int isActive}) = _$CafeDayTimeImpl;
+
+  factory _CafeDayTime.fromJson(Map<String, dynamic> json) =
+      _$CafeDayTimeImpl.fromJson;
+
   @override
-  @useResult
-  $Res call(
-      {String day,
-      @TimeOfDayConverter() TimeOfDay openingTime,
-      @TimeOfDayConverter() TimeOfDay closingTime,
-      @JsonKey(name: 'is_active') int isActive});
-}
-
-/// @nodoc
-class __$CafeDayTimeCopyWithImpl<$Res> implements _$CafeDayTimeCopyWith<$Res> {
-  __$CafeDayTimeCopyWithImpl(this._self, this._then);
-
-  final _CafeDayTime _self;
-  final $Res Function(_CafeDayTime) _then;
+  String get day;
+  @override
+  @TimeOfDayConverter()
+  TimeOfDay get openingTime;
+  @override
+  @TimeOfDayConverter()
+  TimeOfDay get closingTime;
+  @override
+  @JsonKey(name: 'is_active')
+  int get isActive;
 
   /// Create a copy of CafeDayTime
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? day = null,
-    Object? openingTime = null,
-    Object? closingTime = null,
-    Object? isActive = null,
-  }) {
-    return _then(_CafeDayTime(
-      day: null == day
-          ? _self.day
-          : day // ignore: cast_nullable_to_non_nullable
-              as String,
-      openingTime: null == openingTime
-          ? _self.openingTime
-          : openingTime // ignore: cast_nullable_to_non_nullable
-              as TimeOfDay,
-      closingTime: null == closingTime
-          ? _self.closingTime
-          : closingTime // ignore: cast_nullable_to_non_nullable
-              as TimeOfDay,
-      isActive: null == isActive
-          ? _self.isActive
-          : isActive // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$CafeDayTimeImplCopyWith<_$CafeDayTimeImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
-
-// dart format on

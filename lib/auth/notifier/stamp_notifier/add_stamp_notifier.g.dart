@@ -6,7 +6,7 @@ part of 'add_stamp_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$addStampNotifierHash() => r'6f9a6b244572da4f20931673684d3431acdf629f';
+String _$addStampNotifierHash() => r'aaf6521fe9339b1c00160d3128a2a04531f36284';
 
 /// See also [AddStampNotifier].
 @ProviderFor(AddStampNotifier)

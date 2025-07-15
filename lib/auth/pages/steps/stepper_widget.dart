@@ -3,22 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
-import 'package:java_go/config/widgets/common_message_popup.dart';
+import 'package:java_go/config/common/extensions.dart';
 import 'package:java_go/home/notifier/cafe_info_notifier/cafe_info_notifier.dart';
 import 'package:java_go/home/state/cafe_info_state/cafe_info_state.dart';
-
 import '../../../config/common/widgets.dart';
-import '../../../home/bottombar.dart';
 import '../../../home/loyalitycardscreen.dart';
-import '../../../service/local_storage_service.dart';
 import '../sign_up/click_and_collect.dart';
 import '../sign_up/connect_strip_web_view.dart';
-import '../sign_up/loyalitycard.dart';
 import '../sign_up/menu.dart';
 import '../sign_up/publishscreen.dart';
 import '../sign_up/reviewscreen.dart';
 import '../sign_up/cafe_info_screen.dart';
 import '../sign_up/sign_up_screen.dart';
+import '../sign_up/stripe_account_setup.dart';
+import '../sign_up/submission_thankyou_screen.dart';
 
 final returnToReviewProvider = StateProvider<bool>((ref) => false);
 final cafePageControllerProvider = Provider<PageController>((ref) {
@@ -46,15 +44,16 @@ class _CafeStepsState extends ConsumerState<CafeSteps> {
       isFromSignUp: true,
     ),
     ClickAndCollect(isFromSignup: true),
-    ReviewItems(
-      isFromSignUp: true,
-    ),
+    SelectManually(
+        // isFromSignUp: true,
+        ),
     LoyalityCardScreen2(
       isOpenFromSignup: true,
     ),
     Reviewscreen(
       isOpenFromSignup: true,
     ),
+    StripeAccountSetup(),
     Publishscreen(),
   ];
 
@@ -66,9 +65,12 @@ class _CafeStepsState extends ConsumerState<CafeSteps> {
         case AsyncData<CafeInfoState?> data when data.value != null:
           final cafeState = data.value;
           final controller = ref.read(cafePageControllerProvider);
-          final saveUserLogin = ref.read(localStorageServiceProvider);
-          final shouldReturnToReview = ref.read(returnToReviewProvider);
-
+          if (cafeState?.cafeEvent == CafeEvent.downloadSampleFile) {
+            final url = cafeState?.response;
+            if (url != null) {
+              ref.read(cafeInfoNotifierProvider.notifier).launch(url);
+            }
+          }
           if (cafeState?.cafeEvent == CafeEvent.addCafeInfo) {
             // if (shouldReturnToReview) {
             //   ref.read(returnToReviewProvider.notifier).state = false;
@@ -101,29 +103,23 @@ class _CafeStepsState extends ConsumerState<CafeSteps> {
           if (cafeState?.cafeEvent == CafeEvent.createStripAccount) {
             final url = cafeState?.response;
             context.navigateTo(CustomWebView(
+              title: "Connect your Stripe Account",
               initialUrl: url,
             ));
+            return;
           }
           if (cafeState?.cafeEvent == CafeEvent.stripAccountStatus) {
             context.pop();
+            return;
           }
 
           if (cafeState?.cafeEvent == CafeEvent.publishCafe) {
-            await CommonPopUp.showMessageDialog(context,
-                message:
-                    "Your cafe has been sent for Admin Approval. Thank you!",
-            onPressed: (){
-              context.pop();
-            }
-            );
-            saveUserLogin.setUserLoginSaved(true);
-            context.navigateAndRemoveUntil(CustomBottomNavBar());
+            context.navigateAndRemoveUntil(SubmissionThankYouScreen());
+            return;
           }
 
         case AsyncError error:
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(error.error.toString())),
-          );
+          context.showSnackBar(error.error.toString(), barColor: Colors.red);
       }
     });
   }
@@ -192,7 +188,8 @@ class _StepperWidgetState extends State<StepperWidget> {
       (index: 4, name: 'Menu'),
       (index: 5, name: 'Loyalty card'),
       (index: 6, name: 'Review'),
-      (index: 7, name: 'Publish')
+      (index: 7, name: 'Stripe'),
+      (index: 8, name: 'Publish')
     ];
 
     return EasyStepper(

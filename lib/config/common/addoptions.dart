@@ -13,6 +13,7 @@ import 'package:java_go/home/notifiers/menu_items.dart';
 import 'package:collection/collection.dart';
 
 import '../../home/param/item_param/item_param.dart';
+import 'custom_dropdown.dart';
 
 // class Addoptions extends ConsumerWidget {
 //   const Addoptions({super.key});
@@ -50,9 +51,6 @@ class PriceTextField extends StatefulWidget {
   final String hintText;
   final Function(double) onPriceChanged;
   final double? initialValue;
-  final InputBorder? border;
-  final InputBorder? enableBorder;
-  final InputBorder? focusBorder;
   final int? maxLines;
   final double? radius;
   final bool? readOnly;
@@ -62,9 +60,6 @@ class PriceTextField extends StatefulWidget {
     required this.hintText,
     required this.onPriceChanged,
     this.initialValue,
-    this.border,
-    this.enableBorder,
-    this.focusBorder,
     this.maxLines,
     this.radius,
     this.readOnly,
@@ -109,7 +104,7 @@ class _PriceTextFieldState extends State<PriceTextField> {
               fontSize: 16,
             ),
           ),
-          const SizedBox(height: 6),
+          8.verticalSpace,
           Theme(
             data: Theme.of(context).copyWith(
               textSelectionTheme: const TextSelectionThemeData(
@@ -130,21 +125,18 @@ class _PriceTextFieldState extends State<PriceTextField> {
                 fillColor: const Color(0xFFF5F3F0),
                 counterText: '',
                 prefixText: '£ ',
-                border: widget.border ??
-                    OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(effectiveRadius),
-                      borderSide: const BorderSide(color: brown),
-                    ),
-                enabledBorder: widget.enableBorder ??
-                    OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(effectiveRadius),
-                      borderSide: const BorderSide(color: brown),
-                    ),
-                focusedBorder: widget.focusBorder ??
-                    OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(effectiveRadius),
-                      borderSide: const BorderSide(color: brown, width: 1),
-                    ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(effectiveRadius),
+                  borderSide: const BorderSide(color: brown),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(effectiveRadius),
+                  borderSide: const BorderSide(color: brown),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(effectiveRadius),
+                  borderSide: const BorderSide(color: brown, width: 1),
+                ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 10,
@@ -160,6 +152,9 @@ class _PriceTextFieldState extends State<PriceTextField> {
                   // Handle parsing error - value remains unchanged in the state
                   debugPrint('Invalid price input: $value');
                 }
+              },
+              onTapOutside: (val) {
+                FocusScope.of(context).unfocus();
               },
             ),
           ),
@@ -193,8 +188,10 @@ class GroupedDropdown extends StatelessWidget {
           enabled: false,
           child: Text(
             optionName,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, color: Colors.grey),
+            style:Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: Color(0xFF1C0E07)),
           ),
         ),
       );
@@ -228,7 +225,10 @@ class GroupedDropdown extends StatelessWidget {
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         hintText: 'Select Option',
-        hintStyle: const TextStyle(color: Color(0xFF6A442E)),
+        hintStyle: Theme.of(context)
+            .textTheme
+            .bodyMedium
+            ?.copyWith(color: Color(0xFF1C0E07)),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: Color(0xFF6A442E)),

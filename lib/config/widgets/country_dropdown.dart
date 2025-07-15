@@ -6,20 +6,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 
-
-
 class CountrySearchDropdown extends StatefulWidget {
   final ValueChanged<String> onCountrySelected;
-  final String ?initialSelectedCountry;
+  final String? initialSelectedCountry;
   final List<String> countries;
   final FormFieldValidator<String>? validator;
-
+final String? hintText;
   const CountrySearchDropdown({
     super.key,
     required this.onCountrySelected,
     required this.initialSelectedCountry,
     required this.countries,
     this.validator,
+    this.hintText
   });
 
   @override
@@ -29,6 +28,7 @@ class CountrySearchDropdown extends StatefulWidget {
 class _CountrySearchDropdownState extends State<CountrySearchDropdown> {
   List<String> filteredCountries = [];
   String? selectedCountry;
+  List<String> multiCountrySelect = [];
   final TextEditingController searchController = TextEditingController();
   final FocusNode focusNode = FocusNode();
   bool showDropdown = false;
@@ -36,7 +36,13 @@ class _CountrySearchDropdownState extends State<CountrySearchDropdown> {
   @override
   void initState() {
     super.initState();
-
+    if (widget.initialSelectedCountry != null &&
+        widget.initialSelectedCountry!.isNotEmpty) {
+      multiCountrySelect = widget.initialSelectedCountry!
+          .split(',')
+          .map((e) => e.trim())
+          .toList();
+    }
     filteredCountries = widget.countries;
     selectedCountry = widget.initialSelectedCountry;
     searchController.text = selectedCountry ?? '';
@@ -51,7 +57,8 @@ class _CountrySearchDropdownState extends State<CountrySearchDropdown> {
   void _onSearchChanged(String query) {
     setState(() {
       filteredCountries = widget.countries
-          .where((country) => country.toLowerCase().contains(query.toLowerCase()))
+          .where(
+              (country) => country.toLowerCase().contains(query.toLowerCase()))
           .toList();
       showDropdown = true;
     });
@@ -59,13 +66,23 @@ class _CountrySearchDropdownState extends State<CountrySearchDropdown> {
 
   void _selectCountry(String country, FormFieldState<String> field) {
     setState(() {
-      selectedCountry = country;
-      searchController.text = country;
+      if (multiCountrySelect.contains(country)) {
+        multiCountrySelect.remove(country);
+      } else {
+        multiCountrySelect.add(country);
+      }
+
+      selectedCountry = multiCountrySelect.join(", ");
+      searchController.text = selectedCountry!;
       showDropdown = false;
       focusNode.unfocus();
     });
-    field.didChange(country); // important for validation
-    widget.onCountrySelected(country);
+
+
+    field.didChange(selectedCountry);
+
+
+    widget.onCountrySelected(selectedCountry!);
   }
 
   @override
@@ -91,8 +108,8 @@ class _CountrySearchDropdownState extends State<CountrySearchDropdown> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 fillColor: const Color(0xFFF5F3F0),
-                hintText: 'Select Country',
-                hintStyle:  TextStyle(fontSize: 16.sp),
+                hintText: widget.hintText??'Select Country',
+                hintStyle: TextStyle(fontSize: 16.sp),
                 suffixIcon: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SvgPicture.asset(
@@ -121,19 +138,25 @@ class _CountrySearchDropdownState extends State<CountrySearchDropdown> {
                 ),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * 0.5,
+                    maxHeight: MediaQuery.of(context).size.height * 0.3,
                   ),
                   child: Scrollbar(
                     child: ListView.builder(
                       itemCount: filteredCountries.length,
                       itemBuilder: (context, index) {
                         final country = filteredCountries[index];
-                        return ListTile(
+                        return CheckboxListTile(
+                          value: multiCountrySelect.contains(country),
+                          onChanged: (bool? isChecked) {
+                            _selectCountry(country, field);
+                          },
                           title: Text(
                             country,
                             style: const TextStyle(color: Colors.black),
                           ),
-                          onTap: () => _selectCountry(country, field),
+                          controlAffinity: ListTileControlAffinity.leading,
+                          dense: true,
+                          activeColor: const Color(0xFF4C2F27), // Optional: for styling the checkbox
                         );
                       },
                     ),
@@ -148,8 +171,10 @@ class _CountrySearchDropdownState extends State<CountrySearchDropdown> {
 }
 
 
+
 Future<List<String>> loadCountryNames() async {
-  final String jsonString = await rootBundle.loadString('assets/json/country.json');
+  final String jsonString =
+      await rootBundle.loadString('assets/json/country.json');
   final List<dynamic> jsonData = json.decode(jsonString);
 
   // Extract the "name" field from each object

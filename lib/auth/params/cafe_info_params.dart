@@ -13,6 +13,7 @@ abstract class CafeInfoParams with _$CafeInfoParams {
       {required String name,
       required String phone,
       required String address,
+        required String city,
       required String postcode,
       required double latitude,
       required double longitude,
@@ -36,6 +37,7 @@ class CafeInfoParamsNotifier extends _$CafeInfoParamsNotifier {
   @override
   CafeInfoParams build() {
     return CafeInfoParams(
+      city: '',
       name: '',
       phone: '',
       address: '',
@@ -56,6 +58,8 @@ class CafeInfoParamsNotifier extends _$CafeInfoParamsNotifier {
   void updatePhone(String phone) => state = state.copyWith(phone: phone);
   void updateAddress(String address) =>
       state = state.copyWith(address: address);
+  void updateCity(String city) =>
+      state = state.copyWith(city: city);
   void updatePostcode(String postcode) =>
       state = state.copyWith(postcode: postcode);
   void updateLatitude(double lat) => state = state.copyWith(latitude: lat);
@@ -74,6 +78,7 @@ class CafeInfoParamsNotifier extends _$CafeInfoParamsNotifier {
 
   void updateFromCafeModel(CafeModel? model) {
     state = CafeInfoParams(
+      city: model?.city??"",
       name: model?.cafeName ?? '',
       phone: model?.phone ?? '',
       address: model?.address ?? '',

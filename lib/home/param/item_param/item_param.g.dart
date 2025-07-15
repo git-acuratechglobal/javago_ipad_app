@@ -6,7 +6,8 @@ part of 'item_param.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_ItemParam _$ItemParamFromJson(Map<String, dynamic> json) => _ItemParam(
+_$ItemParamImpl _$$ItemParamImplFromJson(Map<String, dynamic> json) =>
+    _$ItemParamImpl(
       itemName: json['itemName'] as String,
       itemCategoryId: (json['itemCategoryId'] as num).toInt(),
       itemImageId: (json['itemImageId'] as num).toInt(),
@@ -21,9 +22,10 @@ _ItemParam _$ItemParamFromJson(Map<String, dynamic> json) => _ItemParam(
       addonItem: (json['addonItem'] as List<dynamic>)
           .map((e) => AddonItem.fromJson(e as Map<String, dynamic>))
           .toList(),
+      cafe_menu_id: (json['cafe_menu_id'] as num?)?.toInt(),
     );
 
-Map<String, dynamic> _$ItemParamToJson(_ItemParam instance) =>
+Map<String, dynamic> _$$ItemParamImplToJson(_$ItemParamImpl instance) =>
     <String, dynamic>{
       'itemName': instance.itemName,
       'itemCategoryId': instance.itemCategoryId,
@@ -33,35 +35,40 @@ Map<String, dynamic> _$ItemParamToJson(_ItemParam instance) =>
       'item': instance.item,
       'selectedOptions': instance.selectedOptions,
       'addonItem': instance.addonItem,
+      'cafe_menu_id': instance.cafe_menu_id,
     };
 
-_ItemSize _$ItemSizeFromJson(Map<String, dynamic> json) => _ItemSize(
+_$ItemSizeImpl _$$ItemSizeImplFromJson(Map<String, dynamic> json) =>
+    _$ItemSizeImpl(
       itemSizeId: (json['itemSizeId'] as num).toInt(),
       itemPrice: (json['itemPrice'] as num).toDouble(),
     );
 
-Map<String, dynamic> _$ItemSizeToJson(_ItemSize instance) => <String, dynamic>{
+Map<String, dynamic> _$$ItemSizeImplToJson(_$ItemSizeImpl instance) =>
+    <String, dynamic>{
       'itemSizeId': instance.itemSizeId,
       'itemPrice': instance.itemPrice,
     };
 
-_SelectedOption _$SelectedOptionFromJson(Map<String, dynamic> json) =>
-    _SelectedOption(
+_$SelectedOptionImpl _$$SelectedOptionImplFromJson(Map<String, dynamic> json) =>
+    _$SelectedOptionImpl(
       optionId: json['optionId'] as String,
       price: (json['price'] as num).toDouble(),
     );
 
-Map<String, dynamic> _$SelectedOptionToJson(_SelectedOption instance) =>
+Map<String, dynamic> _$$SelectedOptionImplToJson(
+        _$SelectedOptionImpl instance) =>
     <String, dynamic>{
       'optionId': instance.optionId,
       'price': instance.price,
     };
 
-_AddonItem _$AddonItemFromJson(Map<String, dynamic> json) => _AddonItem(
+_$AddonItemImpl _$$AddonItemImplFromJson(Map<String, dynamic> json) =>
+    _$AddonItemImpl(
       addonItemId: (json['addonItemId'] as num).toInt(),
     );
 
-Map<String, dynamic> _$AddonItemToJson(_AddonItem instance) =>
+Map<String, dynamic> _$$AddonItemImplToJson(_$AddonItemImpl instance) =>
     <String, dynamic>{
       'addonItemId': instance.addonItemId,
     };
@@ -70,7 +77,7 @@ Map<String, dynamic> _$AddonItemToJson(_AddonItem instance) =>
 // RiverpodGenerator
 // **************************************************************************
 
-String _$itemParamNotifierHash() => r'280055013acffce39b4de4f3e0105d4eed648270';
+String _$itemParamNotifierHash() => r'16bc96166eee58c966842bea5c7494fd6f7a28b6';
 
 /// See also [ItemParamNotifier].
 @ProviderFor(ItemParamNotifier)

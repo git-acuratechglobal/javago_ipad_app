@@ -1,4 +1,3 @@
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../auth/model/cafe_model.dart';
@@ -12,16 +11,19 @@ abstract class CafeInfoState with _$CafeInfoState {
     String? response,
     CafeModel? cafeModel,
   }) = _CafeInfoState;
-
 }
 
 enum CafeEvent {
   addCafeInfo,
   updateClickAndCollect,
   updateCafeInfo,
-  updateDisplayName,
-  updateProfileImage,
   createStripAccount,
+  createSquareAccount,
+  squareAccountCreated,
   stripAccountStatus,
+  subscriptionPurchase,
   publishCafe,
+  syncMenuToSquare,
+  downloadSampleFile,
+  fileUploaded
 }

@@ -4,47 +4,46 @@ import 'package:java_go/Theme/extension.dart';
 
 class Themes {
   static final lightTheme = ThemeData(
-
+    scaffoldBackgroundColor: Color(0xFFF5F3F0),
     useMaterial3: true,
     brightness: Brightness.light,
     fontFamily: "Poppins",
     // scaffoldBackgroundColor: Color(0xFFD7ED5D),
     colorScheme: ColorScheme.light(primary: Colors.white),
-    
+
     textTheme: _textTheme.apply(
       bodyColor: Colors.black,
       displayColor: Colors.black,
     ),
 
-      textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            foregroundColor: Color(0xFFC0987C), // ok , cancel buttons
-          ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: Color(0xFFC0987C), // ok , cancel buttons
+      ),
+    ),
+    timePickerTheme: TimePickerThemeData(
+        backgroundColor: Colors.white,
+        dialHandColor: Color(0xFFC0987C),
+        dialBackgroundColor: Colors.white,
+        dialTextColor: WidgetStateColor.resolveWith((states) =>
+            states.contains(WidgetState.selected)
+                ? Colors.white
+                : Color(0xFFC0987C)),
+        entryModeIconColor: Colors.white,
+        hourMinuteTextColor: Colors.white,
+        hourMinuteColor: Color(0xFFC0987C),
+        helpTextStyle: TextStyle(color: Color(0xFFC0987C), fontSize: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
         ),
-     timePickerTheme: TimePickerThemeData(
-            
-            backgroundColor: Colors.white,
-            dialHandColor: Color(0xFFC0987C),
-            dialBackgroundColor: Colors.white,
-            dialTextColor: WidgetStateColor.resolveWith((states) =>
-                states.contains(WidgetState.selected)
-                    ? Colors.white
-                    : Color(0xFFC0987C)),
-            entryModeIconColor: Colors.white,
-            hourMinuteTextColor: Colors.white,
-            hourMinuteColor:Color(0xFFC0987C),
-            helpTextStyle: TextStyle(color: Color(0xFFC0987C), fontSize: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            dayPeriodColor: Color(0xFFC0987C),
-            dayPeriodTextColor: WidgetStateColor.resolveWith((states) =>
-              states.contains(WidgetState.selected)
-                  ? Colors.white
-                  : Color(0xFFC0987C)),
-                  dayPeriodBorderSide: BorderSide(color: Color(0xFFC0987C),)
-                  
-          ),
+        dayPeriodColor: Color(0xFFC0987C),
+        dayPeriodTextColor: WidgetStateColor.resolveWith((states) =>
+            states.contains(WidgetState.selected)
+                ? Colors.white
+                : Color(0xFFC0987C)),
+        dayPeriodBorderSide: BorderSide(
+          color: Color(0xFFC0987C),
+        )),
     inputDecorationTheme: InputDecorationTheme(
       border: OutlineInputBorder(
         borderSide: BorderSide(
@@ -79,10 +78,8 @@ class Themes {
         style: ElevatedButton.styleFrom(
       //minimumSize: Size.fromHeight(20),
       //maximumSize: Size.fromWidth(20),
-      shape:  RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4)
-      ),
-    //  padding:  EdgeInsets.all(20),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      //  padding:  EdgeInsets.all(20),
 
       //elevation: 4,
       backgroundColor: Color(0xFF461C10),
@@ -94,7 +91,6 @@ class Themes {
         fontWeight: FontWeight.w700,
       ),
     )),
-
   );
   static TextTheme get _textTheme {
     return Typography.englishLike2021.copyWith(

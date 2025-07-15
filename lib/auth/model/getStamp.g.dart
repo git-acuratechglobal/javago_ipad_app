@@ -35,7 +35,9 @@ LoyaltyStamp _$LoyaltyStampFromJson(Map<String, dynamic> json) => LoyaltyStamp(
           json['stamp_applicable_to_categories'] as String?,
       createdAt: (json['created_at'] as num?)?.toInt(),
       updatedAt: (json['updated_at'] as num?)?.toInt(),
-      excludedItems: json['excludedItems'] as List<dynamic>?,
+      excludedItems: (json['excludedItems'] as List<dynamic>?)
+          ?.map((e) => ExcludedItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$LoyaltyStampToJson(LoyaltyStamp instance) =>
@@ -54,4 +56,23 @@ Map<String, dynamic> _$LoyaltyStampToJson(LoyaltyStamp instance) =>
       'created_at': instance.createdAt,
       'updated_at': instance.updatedAt,
       'excludedItems': instance.excludedItems,
+    };
+
+ExcludedItem _$ExcludedItemFromJson(Map<String, dynamic> json) => ExcludedItem(
+      id: (json['id'] as num?)?.toInt(),
+      itemId: (json['item_id'] as num?)?.toInt(),
+      cafeMenuId: json['cafe_menu_id'],
+      stampId: (json['stamp_id'] as num?)?.toInt(),
+      createdAt: (json['created_at'] as num?)?.toInt(),
+      updatedAt: (json['updated_at'] as num?)?.toInt(),
+    );
+
+Map<String, dynamic> _$ExcludedItemToJson(ExcludedItem instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'item_id': instance.itemId,
+      'cafe_menu_id': instance.cafeMenuId,
+      'stamp_id': instance.stampId,
+      'created_at': instance.createdAt,
+      'updated_at': instance.updatedAt,
     };

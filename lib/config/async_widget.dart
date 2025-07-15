@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,17 +11,17 @@ class AsyncWidget<T> extends StatelessWidget {
   final bool skipLoadingOnReload;
   final bool skipLoadingOnRefresh;
   final bool skipError;
-
-  const AsyncWidget({
-    super.key,
-    required this.value,
-    required this.data,
-    this.onRetry,
-    this.skipLoadingOnReload = false,
-    this.skipLoadingOnRefresh = true,
-    this.skipError = false,
-    this.height = 200,
-  });
+  final bool wantToShowLoading;
+  const AsyncWidget(
+      {super.key,
+      required this.value,
+      required this.data,
+      this.onRetry,
+      this.skipLoadingOnReload = false,
+      this.skipLoadingOnRefresh = true,
+      this.skipError = false,
+      this.height = 200,
+      this.wantToShowLoading = true});
 
   @override
   Widget build(BuildContext context) {
@@ -30,16 +29,18 @@ class AsyncWidget<T> extends StatelessWidget {
       duration: const Duration(milliseconds: 250),
       child: value.when(
         data: data,
-        loading: () => LoadingWidget(
-          key: UniqueKey(),
-          height: height,
-        ),
-        error: (e, st) => ErrorCustomWidget(
+        loading: () => wantToShowLoading
+            ? LoadingWidget(
+                key: UniqueKey(),
+                height: height,
+              )
+            : SizedBox.shrink(),
+        error: (e, st) => wantToShowLoading?ErrorCustomWidget(
           key: UniqueKey(),
           error: e,
           height: height,
           onRetry: onRetry,
-        ),
+        ):SizedBox.shrink(),
         skipLoadingOnReload: skipLoadingOnReload,
         skipLoadingOnRefresh: skipLoadingOnRefresh,
         skipError: skipError,
@@ -114,7 +115,7 @@ class ErrorCustomWidget extends ConsumerWidget {
           children: [
             Icon(
               Icons.error,
-              color:Colors.amber,
+              color: Colors.amber,
             ),
             const SizedBox(height: 16),
             Text(
@@ -132,7 +133,7 @@ class ErrorCustomWidget extends ConsumerWidget {
               onPressed: onRetry,
               child: Text(
                 "Retry",
-                style: TextStyle(color:  Colors.black),
+                style: TextStyle(color: Colors.black),
               ),
             ),
           ],
@@ -161,7 +162,7 @@ class LoadingWidget extends StatelessWidget {
           LoadingAnimationWidget.twistingDots(
             size: 35,
             rightDotColor: Color(0xFF9B6842),
-            leftDotColor:  Color(0xFF9B6842),
+            leftDotColor: Color(0xFF9B6842),
           ),
           const SizedBox(height: 8),
           Text(

@@ -12,6 +12,7 @@ class GetOrdersResponse {
   final List<GetOrder>? individualOrders;
 
   @JsonKey(name: "groupCoffeeRunOrders")
+  @GroupCoffeeRunOrdersConverter()
   final Map<String, List<GetOrder>>? groupCoffeeRunOrders;
 
   GetOrdersResponse({
@@ -64,6 +65,29 @@ if(groupCoffeeRunOrders!=null&&groupCoffeeRunOrders!.isNotEmpty){
 
 
 }
+class GroupCoffeeRunOrdersConverter
+    implements JsonConverter<Map<String, List<GetOrder>>?, dynamic> {
+  const GroupCoffeeRunOrdersConverter();
+
+  @override
+  Map<String, List<GetOrder>>? fromJson(dynamic json) {
+    if (json is Map<String, dynamic>) {
+      return json.map((key, value) {
+        final List<GetOrder> orders =
+        (value as List).map((e) => GetOrder.fromJson(e)).toList();
+        return MapEntry(key, orders);
+      });
+    } else if (json is List) {
+      // If it's an empty list, return an empty map
+      return {};
+    }
+    return null;
+  }
+
+  @override
+  dynamic toJson(Map<String, List<GetOrder>>? object) => object;
+}
+
 
 @JsonSerializable()
 class GetOrder {
@@ -105,7 +129,12 @@ class GetOrder {
 
   @JsonKey(name: "request_created_by_name")
   final String? requestCreatedByName;
-
+  @JsonKey(name: "estimated_arival_time")
+  final String? estimatedArrivalTime;
+  @JsonKey(name: "is_full_order_cancelled")
+  final int ?fullOrderCancelled;
+  @JsonKey(name: "refund_status")
+  final String? refundStatus;
   // Derived fields
   DateTime? orderPlacedAtDate;
   String? orderDate;
@@ -130,6 +159,9 @@ class GetOrder {
     this.orderPlacedAtDate,
     this.orderDate,
     this.orderTime,
+    this.estimatedArrivalTime,
+    this.fullOrderCancelled,
+    this.refundStatus
   });
 
   factory GetOrder.fromJson(Map<String, dynamic> json) {

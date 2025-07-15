@@ -11,7 +11,7 @@ GetMenuItem _$GetMenuItemFromJson(Map<String, dynamic> json) => GetMenuItem(
       message: json['message'] as String?,
       data: json['data'] == null
           ? null
-          : Data.fromJson(json['data'] as Map<String, dynamic>),
+          : MenuItemData.fromJson(json['data'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$GetMenuItemToJson(GetMenuItem instance) =>
@@ -21,7 +21,7 @@ Map<String, dynamic> _$GetMenuItemToJson(GetMenuItem instance) =>
       'data': instance.data,
     };
 
-Data _$DataFromJson(Map<String, dynamic> json) => Data(
+MenuItemData _$MenuItemDataFromJson(Map<String, dynamic> json) => MenuItemData(
       maxSizePrice: json['maxSizePrice'],
       sizeNa: json['sizeNA'],
       preDefinedItem: (json['preDefinedItem'] as List<dynamic>?)
@@ -50,7 +50,8 @@ Data _$DataFromJson(Map<String, dynamic> json) => Data(
           .toList(),
     );
 
-Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{
+Map<String, dynamic> _$MenuItemDataToJson(MenuItemData instance) =>
+    <String, dynamic>{
       'maxSizePrice': instance.maxSizePrice,
       'sizeNA': instance.sizeNa,
       'preDefinedItem': instance.preDefinedItem,

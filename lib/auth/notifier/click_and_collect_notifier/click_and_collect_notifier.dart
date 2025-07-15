@@ -10,24 +10,24 @@ class ClickAndCollectNotifier extends _$ClickAndCollectNotifier {
     return null;
   }
 
-  Future<void> updateClickAndCollect() async {
-    state = AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      final message = await ref
-          .watch(authServiceProvider)
-          .updateClickAndCollect(
-              clickAndCollect: _clickAndCollectForm['clickAndCollect'],
-              maxOrders: _clickAndCollectForm['maxOrders']);
-      if (_clickAndCollectForm['cafeTimes'] != null) {
-        await ref
-            .watch(authServiceProvider)
-            .updateCollectionTime(cafeTimes: _clickAndCollectForm['cafeTimes']);
-      }
-      return message;
-    });
-  }
+  // Future<void> updateClickAndCollect() async {
+  //   state = AsyncLoading();
+  //   state = await AsyncValue.guard(() async {
+  //     final message = await ref
+  //         .watch(authServiceProvider)
+  //         .updateClickAndCollect(
+  //             clickAndCollect: _clickAndCollectForm['clickAndCollect'],
+  //             maxOrders: _clickAndCollectForm['maxOrders']);
+  //     if (_clickAndCollectForm['cafeTimes'] != null) {
+  //       await ref
+  //           .watch(authServiceProvider)
+  //           .updateCollectionTime(cafeTimes: _clickAndCollectForm['cafeTimes']);
+  //     }
+  //     return message;
+  //   });
+  // }
 
-  void updateForm({required String key, required dynamic value}) {
-    _clickAndCollectForm[key] = value;
-  }
+  // void updateForm({required String key, required dynamic value}) {
+  //   _clickAndCollectForm[key] = value;
+  // }
 }
