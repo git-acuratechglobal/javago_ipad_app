@@ -187,7 +187,6 @@ class _SquareWidgetState extends ConsumerState<_SquareWidget> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-
         Text("Connect your square account "),
         100.verticalSpace,
         SizedBox(

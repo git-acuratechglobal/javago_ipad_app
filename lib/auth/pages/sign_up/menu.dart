@@ -708,8 +708,8 @@ class _SelectManuallyState extends ConsumerState<SelectManually> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SizedBox(
-                            width: 600.sp,
-                            height: 120.sp,
+                            width: 500.sp,
+                            height: 80.sp,
                             child: ElevatedButton(
                               onPressed: () {
                                 setState(() {
@@ -723,7 +723,7 @@ class _SelectManuallyState extends ConsumerState<SelectManually> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 textStyle: TextStyle(
-                                  fontSize: 30.sp,
+                                  fontSize: 25.sp,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -732,8 +732,8 @@ class _SelectManuallyState extends ConsumerState<SelectManually> {
                           ),
                           54.verticalSpace,
                           SizedBox(
-                            width: 600.sp,
-                            height: 120.sp,
+                            width: 500.sp,
+                            height: 80.sp,
                             child: ElevatedButton(
                               onPressed: () {
                                 ref
@@ -747,7 +747,7 @@ class _SelectManuallyState extends ConsumerState<SelectManually> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 textStyle: TextStyle(
-                                  fontSize: 30.sp,
+                                  fontSize: 25.sp,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -756,8 +756,8 @@ class _SelectManuallyState extends ConsumerState<SelectManually> {
                           ),
                           54.verticalSpace,
                           SizedBox(
-                            width: 600.sp,
-                            height: 120.sp,
+                            width: 500.sp,
+                            height: 80.sp,
                             child: ElevatedButton(
                               onPressed: () {
                                 ref
@@ -776,13 +776,18 @@ class _SelectManuallyState extends ConsumerState<SelectManually> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 textStyle: TextStyle(
-                                  fontSize: 30.sp,
+                                  fontSize: 25.sp,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               child: Text('Upload spreadsheet'),
                             ),
                           ),
+                          40.verticalSpace,
+                          Text(
+                            "Note:The file should be .xlsx formate",
+                            style: TextStyle(color: Colors.red),
+                          )
                         ],
                       ),
                     ),

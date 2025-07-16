@@ -436,7 +436,7 @@ class AuthService {
         data: FormData.fromMap({
           'id': orderId,
           'is_individual_order': isIndividualOrder,
-          'item_ids': itemIds
+          'items': itemIds
         }),
         options: Options(
           headers: {

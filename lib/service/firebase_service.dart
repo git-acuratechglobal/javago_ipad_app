@@ -14,7 +14,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 void _handleMessage(RemoteMessage message) {
-  if (message.notification!=null) {
+  if (message.notification != null) {
     NotificationService.showNotification(
       id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
       title: message.notification?.title ?? "No Title",
@@ -25,7 +25,6 @@ void _handleMessage(RemoteMessage message) {
 
 class FirebaseMessageService {
   static Future<void> initialize() async {
-
     await Firebase.initializeApp();
 
     await FirebaseMessaging.instance.requestPermission(
@@ -37,13 +36,11 @@ class FirebaseMessageService {
     await NotificationService.initialize();
 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage
-    message) async {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       print("Notification received in foreground:");
       print("Title: ${message.notification?.title}");
       print("Body: ${message.notification?.body}");
-       _handleMessage(message);
+      _handleMessage(message);
     });
   }
 
@@ -64,6 +61,14 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   static Future<void> initialize() async {
+    await _notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
     final DarwinInitializationSettings iosSettings =
         DarwinInitializationSettings();
 

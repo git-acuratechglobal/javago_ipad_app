@@ -29,46 +29,7 @@ class Orders extends ConsumerStatefulWidget {
 }
 
 class _OrdersState extends ConsumerState<Orders> {
-  void _showDialog(BuildContext context) {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: "Dismiss",
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Align(
-            alignment: Alignment.center,
-            child: Material(
-              color: Colors.transparent,
-              child: Container(
-                  height: 265.h,
-                  width: 528.w,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: RefundPopWidget(
-                    orderId: widget.orderId ?? '',
-                    isIndividualOrder: widget.isIndividualOrder,
-                  )),
-            ),
-          ),
-        );
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(0.0, 1.0);
-        const end = Offset.zero;
-        const curve = Curves.easeIn;
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-        var offsetAnimation = animation.drive(tween);
 
-        return SlideTransition(position: offsetAnimation, child: child);
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -231,16 +192,17 @@ class _OrdersState extends ConsumerState<Orders> {
                         widget.orderId ?? '', widget.isIndividualOrder)),
                     data: (data) {
                       final statusMap = ref.watch(itemStatusProvider);
-                      final isButtonEnabled = data.orders?.every((order) =>
-                              statusMap.containsKey(order.itemName) &&
-                              (statusMap[order.itemName] == "complete" ||
-                                  statusMap[order.itemName] ==
-                                      "unavailable")) ??
+                      final isAllSelected = data.orders?.every((order) {
+                            final key = "${order.orderNumber}-${order.itemId}";
+                            final status = statusMap[key];
+                            return status == "complete" ||
+                                status == "unavailable";
+                          }) ??
                           false;
                       return Padding(
                         padding: EdgeInsets.only(bottom: 40.h),
                         child: InkWell(
-                          onTap: isButtonEnabled
+                          onTap: isAllSelected
                               ? () async {
                                   final values = statusMap.values;
                                   final hasUnavailable =
@@ -261,7 +223,7 @@ class _OrdersState extends ConsumerState<Orders> {
                             width: 288.w,
                             height: 45.h,
                             decoration: BoxDecoration(
-                              color: isButtonEnabled
+                              color: isAllSelected
                                   ? const Color(0xFF5CF97F)
                                   : const Color(0xFFE0E0E0),
                               borderRadius: BorderRadius.circular(8),
@@ -292,6 +254,46 @@ class _OrdersState extends ConsumerState<Orders> {
             }),
         if (isLoading) PageLoadingWidget()
       ],
+    );
+  }
+  void _showDialog(BuildContext context) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Dismiss",
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Align(
+            alignment: Alignment.center,
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                  height: 265.h,
+                  width: 528.w,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: RefundPopWidget(
+                    orderId: widget.orderId ?? '',
+                    isIndividualOrder: widget.isIndividualOrder,
+                  )),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(0.0, 1.0);
+        const end = Offset.zero;
+        const curve = Curves.easeIn;
+        var tween =
+        Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        var offsetAnimation = animation.drive(tween);
+
+        return SlideTransition(position: offsetAnimation, child: child);
+      },
     );
   }
 }
@@ -462,26 +464,26 @@ class OrderDetailCard extends ConsumerStatefulWidget {
 }
 
 class _OrderDetailCardState extends ConsumerState<OrderDetailCard> {
-  late String itemName;
-
+  late String key;
   @override
   void initState() {
     super.initState();
-    itemName = widget.order?.itemName ?? widget.label;
+    key = "${widget.order?.orderNumber ?? ""}-${widget.order?.itemId}";
   }
 
   void _updateSelection(String status) {
     final statusMap = ref.read(itemStatusProvider);
     ref.read(itemStatusProvider.notifier).state = {
       ...statusMap,
-      itemName: status,
+      key: status,
     };
   }
 
   @override
   Widget build(BuildContext context) {
     final statusMap = ref.watch(itemStatusProvider);
-    final selectedStatus = statusMap[itemName];
+
+    final selectedStatus = statusMap[key];
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -659,15 +661,10 @@ class RefundPopWidget extends ConsumerWidget {
 
                   final statusMap = ref.read(itemStatusProvider);
 
-                  final unavailableItemIds = allOrders
-                      .asMap()
-                      .entries
-                      .where((entry) => statusMap[entry.value.itemName] == 'unavailable')
-                      .map((entry) => entry.value.itemId)
-                      .whereType<int>()
-                      .toList();
                   final hasAllUnavailable = statusMap.values
                       .every((status) => status == "unavailable");
+                  final unavailableItemIds =
+                      formatStatusMap(allOrders, statusMap);
                   if (hasAllUnavailable) {
                     ref.read(orderNotifierProvider.notifier).makeOrderRefund(
                         orderId, isIndividualOrder, 1, unavailableItemIds);
@@ -677,7 +674,6 @@ class RefundPopWidget extends ConsumerWidget {
                         .makeOrderRefundOrComplete(
                             orderId, isIndividualOrder, 1, unavailableItemIds);
                   }
-
                 },
                 title: "Refund",
               ),
@@ -703,5 +699,24 @@ class RefundPopWidget extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  String formatStatusMap(List<Order> allItems, Map<String, String> statusMap) {
+    final grouped = <String, List<int>>{};
+
+    for (final item in allItems) {
+      final key="${item.orderNumber}-${item.itemId}";
+      final itemId = item.itemId??0;
+      final orderNumber = item.orderNumber;
+      final status = statusMap[key];
+
+      if (status == "unavailable") {
+        grouped.putIfAbsent(orderNumber!, () => []).add(itemId);
+      }
+    }
+
+    return grouped.entries
+        .map((e) => "${e.key}-[${e.value.join(',')}]")
+        .join(",");
   }
 }

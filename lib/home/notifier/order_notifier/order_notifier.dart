@@ -34,14 +34,13 @@ class OrderNotifier extends _$OrderNotifier {
   }
 
   Future<void> makeOrderRefund(
-      String orderId, int isindividual, int status, List<int> itemIds) async {
+      String orderId, int isindividual, int status, String itemsIds) async {
     state = AsyncLoading();
     state = await AsyncValue.guard(() async {
-      if (itemIds.isNotEmpty) {
-        final result = await ref
-            .read(authServiceProvider)
-            .orderRefund(orderId, isindividual, itemIds.join(","));
-      }
+      final result = await ref
+          .read(authServiceProvider)
+          .orderRefund(orderId, isindividual, itemsIds);
+
       return OrderState(
           orderEvent: OrderEvent.orderRefundOrComplete,
           response: "Order Refund");
@@ -49,17 +48,18 @@ class OrderNotifier extends _$OrderNotifier {
   }
 
   Future<void> makeOrderRefundOrComplete(
-      String orderId, int isindividual, int status, List<int> itemIds) async {
+      String orderId, int isindividual, int status, String itemIds) async {
     state = AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final result = await ref
-          .read(authServiceProvider)
-          .completeOrder(orderId, isindividual, status);
       if (itemIds.isNotEmpty) {
         final result = await ref
             .read(authServiceProvider)
-            .orderRefund(orderId, isindividual, itemIds.join(","));
+            .orderRefund(orderId, isindividual, itemIds);
       }
+      final result = await ref
+          .read(authServiceProvider)
+          .completeOrder(orderId, isindividual, status);
+
       return OrderState(
           orderEvent: OrderEvent.orderRefundOrComplete,
           response: "Order Complete");

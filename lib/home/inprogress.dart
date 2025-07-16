@@ -209,7 +209,7 @@ class _OrderWidgetState extends ConsumerState<OrderWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${widget.peopleCount} people',
+                  '${widget.peopleCount} person',
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w400,

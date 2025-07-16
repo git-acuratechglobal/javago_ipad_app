@@ -124,10 +124,13 @@ class _PublishscreenState extends ConsumerState<Publishscreen> {
                                 },
                               ),
                               Expanded(
-                                child: Text(
-                                  'I have reviewed my account and can confirm the information I have provided is correct',
-                                  style: TextStyle(
-                                      color: Colors.brown, fontSize: 14.sp),
+                                child: RichText(
+                                  text: TextSpan(
+                                    text:
+                                        'I have reviewed my account and can confirm the information I have provided is correct',
+                                    style: TextStyle(
+                                        color: Colors.brown, fontSize: 13.sp),
+                                  ),
                                 ),
                               ),
                             ],
@@ -145,9 +148,12 @@ class _PublishscreenState extends ConsumerState<Publishscreen> {
                                 child: RichText(
                                   text: TextSpan(
                                     style: TextStyle(
-                                        color: Colors.brown, fontSize: 14.sp),
+                                        color: Colors.brown, fontSize: 13.sp),
                                     children: [
                                       TextSpan(
+                                          style: TextStyle(
+                                              color: Colors.brown,
+                                              fontSize: 13.sp),
                                           text:
                                               'I have read and agree to the '),
                                       TextSpan(

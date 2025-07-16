@@ -258,22 +258,26 @@ class ClickandCollectWidget extends ConsumerStatefulWidget {
 
 class _ClickandCollectWidgetState extends ConsumerState<ClickandCollectWidget> {
   bool showCafeHours = false;
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.cafeModel!.cafeClickCollectTiming != null &&
-          widget.cafeModel!.cafeClickCollectTiming!.isNotEmpty) {
-        ref
-            .read(clickAndCollectParamProvider.notifier)
-            .updateClickAndCollectParam(cafeModel: widget.cafeModel!);
-      } else {
-        ref
-            .read(clickAndCollectParamProvider.notifier)
-            .updateClickAndCollectParamForInitial(cafeModel: widget.cafeModel!);
-      }
-    });
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     if (widget.cafeModel!.cafeClickCollectTiming != null &&
+  //         widget.cafeModel!.cafeClickCollectTiming!.isNotEmpty) {
+  //       ref
+  //           .read(clickAndCollectParamProvider.notifier)
+  //           .updateClickAndCollectParam(cafeModel: widget.cafeModel!);
+  //     } else {
+  //       ref
+  //           .read(clickAndCollectParamProvider.notifier)
+  //           .updateClickAndCollectParamForInitial(cafeModel: widget.cafeModel!);
+  //     }
+  //   });
+  // }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {

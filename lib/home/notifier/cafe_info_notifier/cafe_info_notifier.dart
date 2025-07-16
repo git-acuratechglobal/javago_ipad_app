@@ -66,6 +66,7 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
           response: message,
         );
       }
+      ref.invalidate(getCafeInfoProvider);
       return CafeInfoState(
         cafeEvent: CafeEvent.updateClickAndCollect,
         response: message,
@@ -211,9 +212,11 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
   Future<String> _pickFile() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['xlsx'],
       );
       if (result != null && result.files.single.path != null) {
-        File file = File(result.files.single.path!);
+        File file = File(result.files.single.path!,);
 
         String fileName = file.path;
         return fileName;

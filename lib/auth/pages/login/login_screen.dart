@@ -46,7 +46,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 MapEntry(3, profile?.menuCompleted),
                 MapEntry(4, profile?.loyaltyCompleted),
                 MapEntry(6, profile?.stripeOnboardingCompleted),
-                MapEntry(6, profile?.isPublished == 0 ? 0 : 1),
+                MapEntry(6, profile?.squareOnboardingCompleted),
+                MapEntry(7, profile?.isPublished == 0 ? 0 : 1),
               ];
 
               final nextStepPage = steps
