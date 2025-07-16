@@ -28,7 +28,6 @@
 .pub/
 /build/
 
-
 # Android related
 **/android/**/gradle-wrapper.jar
 **/android/.gradle
@@ -80,3 +79,6 @@ linux/flutter/generated_plugins.cmake
 macos/Flutter/Flutter-Debug.xcconfig
 macos/Flutter/Flutter-Release.xcconfig
 macos/Flutter/GeneratedPluginRegistrant.swift
+
+# FVM Version Cache
+.fvm/
