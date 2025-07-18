@@ -785,7 +785,7 @@ class _SelectManuallyState extends ConsumerState<SelectManually> {
                           ),
                           40.verticalSpace,
                           Text(
-                            "Note:The file should be .xlsx formate",
+                            "Note:The file should be .xlsx format",
                             style: TextStyle(color: Colors.red),
                           )
                         ],

@@ -12,7 +12,7 @@ part 'click_and_collect_params.g.dart';
 abstract class ClickAndCollectParams with _$ClickAndCollectParams {
   const factory ClickAndCollectParams(
       {@Default(1) int click_and_collect,
-      @Default(2) int max_orders_click_collect,
+      @Default(12) int max_orders_click_collect,
       required List<CafeDayTime> clickAndCollectTime,
       required List<CafeClickCollectTiming> initialCafeTime
       }) = _ClickAndCollectParams;

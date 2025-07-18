@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:java_go/Theme/navigation.dart';
 import 'package:java_go/auth/notifier/cafe_data_notifier/cafe_data_notifier.dart';
+import 'package:java_go/auth/pages/sign_up/widgets/places_field.dart';
 import 'package:java_go/auth/params/cafe_info_params.dart';
 import 'package:java_go/config/common/widgets.dart';
 import 'package:java_go/config/validator.dart';
@@ -152,20 +153,33 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                       }
                                     },
                                   ),
-                                  AppTextField(
-                                    validator: (val) =>
-                                        validator.validateAddress(val!),
-                                    width: 240,
-                                    initialValue: cafeData?.address,
-                                    maxLines: 1,
-                                    label: 'Address Line 1',
-                                    hint: "Enter your address line1",
+                                  PlacesField(
                                     onSaved: (val) {
                                       if (val != null) {
                                         cafeInfoNotifier.updateAddress(val);
                                       }
                                     },
+                                    validator: (val) =>
+                                        validator.validateAddress(val!),
+                                    initialValue: cafeData?.address,
+                                    width: 280,
+                                    label: 'Address Line 1',
                                   ),
+
+                                  // AppTextField(
+                                  //   validator: (val) =>
+                                  //       validator.validateAddress(val!),
+                                  //   width: 240,
+                                  //   initialValue: cafeData?.address,
+                                  //   maxLines: 1,
+                                  //   label: 'Address Line 1',
+                                  //   hint: "Enter your address line1",
+                                  //   onSaved: (val) {
+                                  //     if (val != null) {
+                                  //       cafeInfoNotifier.updateAddress(val);
+                                  //     }
+                                  //   },
+                                  // ),
                                   AppTextField(
                                     validator: (val) =>
                                         validator.validateAddress(val!),

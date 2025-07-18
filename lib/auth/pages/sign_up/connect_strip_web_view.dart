@@ -26,12 +26,6 @@ class _CustomWebViewState extends ConsumerState<CustomWebView> {
         NavigationDelegate(
           onPageStarted: (url) {
             print('Page started loading: $url');
-            if (url.contains(
-                "${Api.baseUrl}/cafe-api/square/oauth/callback?code")) {
-              ref
-                  .read(cafeInfoNotifierProvider.notifier)
-                  .squareAccountCreated();
-            }
             if (mounted) {
               setState(() {
                 isLoading = true;
@@ -45,6 +39,11 @@ class _CustomWebViewState extends ConsumerState<CustomWebView> {
               setState(() {
                 isLoading = false;
               });
+            }
+            if (url.startsWith("${Api.baseUrl}/cafe-api/square/oauth/callback")) {
+              ref
+                  .read(cafeInfoNotifierProvider.notifier)
+                  .squareAccountCreated();
             }
           },
           onWebResourceError: (error) {

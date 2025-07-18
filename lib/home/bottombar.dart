@@ -50,32 +50,7 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
               Account(),
             ],
           ),
-          // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-          // floatingActionButton: Container(
-          //   decoration: ShapeDecoration(
-          //     color: Colors.white,
-          //     shape: OvalBorder(
-          //       side: BorderSide(
-          //         width: 2,
-          //         color: const Color(0xFFC0987C),
-          //       ),
-          //     ),
-          //   ),
-          //   height: 89.h,
-          //   width: 89.w,
-          //   child: FloatingActionButton(
-          //     onPressed: () {
-          //       _onItemTapped(1);
-          //     },
-          //     backgroundColor: Colors.white,
-          //     shape: const CircleBorder(),
-          //     child: Image.asset(
-          //       'assets/images/ic_coffee_mug_bar.png',
-          //       width: 42.74,
-          //       height: 53.87,
-          //     ),
-          //   ),
-          // ),
+
           bottomNavigationBar: ClipRRect(
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(30),
@@ -93,7 +68,7 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
                   _buildNavItem(
                     label: 'Order',
                     index: 1,
-                    verticalOffset: 30.0,
+                    verticalOffset: 0.02.sh,
                   ),
                   _buildNavItem(
                     label: 'Account',

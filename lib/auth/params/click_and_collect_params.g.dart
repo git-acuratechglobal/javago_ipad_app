@@ -11,7 +11,7 @@ _$ClickAndCollectParamsImpl _$$ClickAndCollectParamsImplFromJson(
     _$ClickAndCollectParamsImpl(
       click_and_collect: (json['click_and_collect'] as num?)?.toInt() ?? 1,
       max_orders_click_collect:
-          (json['max_orders_click_collect'] as num?)?.toInt() ?? 2,
+          (json['max_orders_click_collect'] as num?)?.toInt() ?? 12,
       clickAndCollectTime: (json['clickAndCollectTime'] as List<dynamic>)
           .map((e) => CafeDayTime.fromJson(e as Map<String, dynamic>))
           .toList(),

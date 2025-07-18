@@ -154,7 +154,7 @@ class __$$ClickAndCollectParamsImplCopyWithImpl<$Res>
 class _$ClickAndCollectParamsImpl implements _ClickAndCollectParams {
   const _$ClickAndCollectParamsImpl(
       {this.click_and_collect = 1,
-      this.max_orders_click_collect = 2,
+      this.max_orders_click_collect = 12,
       required final List<CafeDayTime> clickAndCollectTime,
       required final List<CafeClickCollectTiming> initialCafeTime})
       : _clickAndCollectTime = clickAndCollectTime,

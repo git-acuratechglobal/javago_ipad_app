@@ -7,7 +7,7 @@ part of 'add_menu_items_notifier.dart';
 // **************************************************************************
 
 String _$addMenuItemsNotifierHash() =>
-    r'9406eb170138c1a62487bc6bd14cb6780baa5ea7';
+    r'bd6f0aa3e3c91d60e8838e99ec0c099db0c73675';
 
 /// See also [AddMenuItemsNotifier].
 @ProviderFor(AddMenuItemsNotifier)

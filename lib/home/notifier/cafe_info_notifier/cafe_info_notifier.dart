@@ -110,7 +110,7 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
     state = await AsyncValue.guard(() async {
       final path = await _pickFile();
       final data = await ref.watch(authServiceProvider).uploadFile(path);
-        ref.watch(authServiceProvider).syncMenuToSquare().ignore();
+      ref.watch(authServiceProvider).syncMenuToSquare().ignore();
       ref.invalidate(showMenuItemssProvider);
       return CafeInfoState(
         cafeEvent: CafeEvent.fileUploaded,
@@ -144,6 +144,9 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
   Future<void> squareAccountCreated() async {
     state = AsyncLoading();
     state = await AsyncValue.guard(() async {
+      ref.watch(authServiceProvider).syncMenuCategory().then((val) {
+        ref.watch(authServiceProvider).syncMenuToSquare().ignore();
+      });
       return CafeInfoState(
         cafeEvent: CafeEvent.squareAccountCreated,
         response: "Your Square Account Connected",
@@ -195,9 +198,6 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
     });
   }
 
-
-
-
   Future<void> launch(String url) async {
     final uri = Uri.parse(url);
     await _launchUrl(uri);
@@ -216,7 +216,9 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
         allowedExtensions: ['xlsx'],
       );
       if (result != null && result.files.single.path != null) {
-        File file = File(result.files.single.path!,);
+        File file = File(
+          result.files.single.path!,
+        );
 
         String fileName = file.path;
         return fileName;

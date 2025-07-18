@@ -54,7 +54,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
               ];
               return GridView.builder(
                 shrinkWrap: true,
-                padding: EdgeInsets.symmetric(horizontal: 180, vertical: 0),
+                padding: EdgeInsets.symmetric(horizontal: 180,),
                 itemCount: updatedStats.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
