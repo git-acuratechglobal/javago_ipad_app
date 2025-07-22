@@ -176,12 +176,15 @@ class _CafeInformationScreenState extends ConsumerState<CafeInformationScreen> {
                                           color: Color(0xFF694233),
                                         )),
                                 11.verticalSpace,
-                                Text(
-                                  data?.address ?? "",
-                                  style: TextStyle(
-                                    color: const Color(0xFF1B0701),
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w500,
+                                SizedBox(
+                                  width: 350,
+                                  child: Text(
+                                    data?.address ?? "",
+                                    style: TextStyle(
+                                      color: const Color(0xFF1B0701),
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 )
                               ],
@@ -225,6 +228,7 @@ class _CafeInformationScreenState extends ConsumerState<CafeInformationScreen> {
                             height: 300.h,
                             width: 350.w,
                             child: Reviewtiming(
+                              key: UniqueKey(),
                               timings: data?.timing ?? [],
                             ),
                           ),

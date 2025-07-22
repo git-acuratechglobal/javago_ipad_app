@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:java_go/Theme/navigation.dart';
 import 'package:java_go/auth/notifier/cafe_data_notifier/cafe_data_notifier.dart';
 import 'package:java_go/auth/pages/sign_up/widgets/places_field.dart';
 import 'package:java_go/auth/params/cafe_info_params.dart';
+import 'package:java_go/config/common/extensions.dart';
 import 'package:java_go/config/common/widgets.dart';
 import 'package:java_go/config/validator.dart';
 import 'package:java_go/config/widgets/app_text_field.dart';
+import 'package:java_go/config/widgets/page_loading_widget.dart';
 import 'package:java_go/home/notifier/cafe_info_notifier/cafe_info_notifier.dart';
+import 'package:rename_app/utils.dart';
 import '../../../config/async_widget.dart';
 import '../../../config/common/button.dart';
 import '../../../config/common/custom_dropdown.dart';
@@ -33,439 +37,466 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
   final TextEditingController coffeeRoastController = TextEditingController();
   TextEditingController SpecialtyController = TextEditingController();
   final _fkey = GlobalKey<FormState>();
-
+  String? city;
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
     final cafeInfoNotifier = ref.read(cafeInfoParamsNotifierProvider.notifier);
     final filters = ref.watch(getCafeTimeAndCategoryProvider);
     final validator = ref.watch(validatorsProvider);
     final cafeInfo = ref.watch(getCafeInfoProvider);
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F3F0),
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: !widget.isFromSignUp
-            ? InkWell(
-                onTap: () {
-                  context.pop();
-                },
-                child: Image.asset(
-                  'assets/images/ic_left_arrow.png',
-                  color: Color(0xFF461C10),
-                  height: 55.h,
-                  width: 55.w,
-                ))
-            : null,
-        backgroundColor: Color(0xFFF5F3F0),
-        title: Text(
-          widget.isFromSignUp ? 'Sign up' : 'Edit Profile',
-          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                color: Color(0xFF461C10),
-              ),
-        ),
-        centerTitle: true,
-      ),
-      body: AsyncWidget(
-          value: cafeInfo,
-          data: (cafeData) {
-            return SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 24),
-              child: Form(
-                key: _fkey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    24.verticalSpace,
-                    Row(
+    return Stack(
+      children: [
+        Scaffold(
+          backgroundColor: const Color(0xFFF5F3F0),
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            leading: !widget.isFromSignUp
+                ? InkWell(
+                    onTap: () {
+                      context.pop();
+                    },
+                    child: Image.asset(
+                      'assets/images/ic_left_arrow.png',
+                      color: Color(0xFF461C10),
+                      height: 55.h,
+                      width: 55.w,
+                    ))
+                : null,
+            backgroundColor: Color(0xFFF5F3F0),
+            title: Text(
+              widget.isFromSignUp ? 'Sign up' : 'Edit Profile',
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                    color: Color(0xFF461C10),
+                  ),
+            ),
+            centerTitle: true,
+          ),
+          body: AsyncWidget(
+              value: cafeInfo,
+              data: (cafeData) {
+                return SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(horizontal: 24),
+                  child: Form(
+                    key: _fkey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AppTextField(
-                          validator: (val) => validator.validateName(val!),
-                          initialValue: cafeData?.cafeName,
-                          label: 'Cafe Name',
-                          hint: "Enter cafe name",
-                          onSaved: (val) {
-                            if (val != null) {
-                              cafeInfoNotifier.updateName(val);
-                            }
-                          },
-                        ),
-                        Spacer(),
-                        23.horizontalSpace,
-                        if (!widget.isFromSignUp)
-                          SizedBox(
-                            height: 50,
-                            width: 200,
-                            child: PrimaryButton(
-                              title: "Save Changes",
-                              isLoading:
-                                  ref.watch(cafeInfoNotifierProvider).isLoading,
-                              backgroundColor: const Color(0xFFC0987C),
-                              onClick: () {
-                                if (_fkey.currentState!.validate()) {
-                                  _fkey.currentState!.save();
-                                  ref
-                                      .read(cafeInfoNotifierProvider.notifier)
-                                      .updateCafeInformation();
+                        24.verticalSpace,
+                        Row(
+                          children: [
+                            AppTextField(
+                              validator: (val) => validator.validateName(val!),
+                              initialValue: cafeData?.cafeName,
+                              label: 'Cafe Name',
+                              hint: "Enter cafe name",
+                              onSaved: (val) {
+                                if (val != null) {
+                                  cafeInfoNotifier.updateName(val);
                                 }
                               },
                             ),
-                          )
-                      ],
-                    ),
-                    18.verticalSpace,
-                    Row(
-                      children: [
-                        ImagePickerForm(
-                          image: cafeData?.bannerImage,
-                          validator: (value) => cafeData?.bannerImage == null
-                              ? validator.validateImage(value?.path)
-                              : null,
-                          autovalidate: true,
-                          context: context,
-                          onSaved: (val) {
-                            if (val != null) {
-                              cafeInfoNotifier.updateImage(val.path);
-                            }
-                          },
+                            Spacer(),
+                            23.horizontalSpace,
+                            if (!widget.isFromSignUp)
+                              SizedBox(
+                                height: 50,
+                                width: 200,
+                                child: PrimaryButton(
+                                  title: "Save Changes",
+                                  isLoading:
+                                      ref.watch(cafeInfoNotifierProvider).isLoading,
+                                  backgroundColor: const Color(0xFFC0987C),
+                                  onClick: () {
+                                    if (_fkey.currentState!.validate()) {
+                                      _fkey.currentState!.save();
+                                      ref
+                                          .read(cafeInfoNotifierProvider.notifier)
+                                          .updateCafeInformation();
+                                    }
+                                  },
+                                ),
+                              )
+                          ],
                         ),
-                        40.horizontalSpace,
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                        18.verticalSpace,
+                        Row(
+                          children: [
+                            ImagePickerForm(
+                              image: cafeData?.bannerImage,
+                              validator: (value) => cafeData?.bannerImage == null
+                                  ? validator.validateImage(value?.path)
+                                  : null,
+                              autovalidate: true,
+                              context: context,
+                              onSaved: (val) {
+                                if (val != null) {
+                                  cafeInfoNotifier.updateImage(val.path);
+                                }
+                              },
+                            ),
+                            40.horizontalSpace,
+                            Expanded(
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  AppTextField(
-                                    inputType: TextInputType.phone,
-                                    validator: (val) =>
-                                        validator.validatePhone(val!),
-                                    width: 160,
-                                    initialValue: cafeData?.phone,
-                                    label: 'Phone Number',
-                                    hint: "Enter cafe number",
-                                    onSaved: (val) {
-                                      if (val != null) {
-                                        cafeInfoNotifier.updatePhone(val);
-                                      }
-                                    },
-                                  ),
-                                  PlacesField(
-                                    onSaved: (val) {
-                                      if (val != null) {
-                                        cafeInfoNotifier.updateAddress(val);
-                                      }
-                                    },
-                                    validator: (val) =>
-                                        validator.validateAddress(val!),
-                                    initialValue: cafeData?.address,
-                                    width: 280,
-                                    label: 'Address Line 1',
-                                  ),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      AppTextField(
+                                        maxLength: 10,
+                                        inputType: TextInputType.phone,
+                                        validator: (val) =>
+                                            validator.validatePhone(val!),
+                                        width: 160,
+                                        initialValue: cafeData?.phone,
+                                        label: 'Phone Number',
+                                        hint: "Enter cafe number",
+                                        onSaved: (val) {
+                                          if (val != null) {
+                                            cafeInfoNotifier.updatePhone(val);
+                                          }
+                                        },
+                                      ),
+                                      PlacesField(
+                                        onSaved: (prediction) async {
+                                          if (prediction?.description == null) return;
 
-                                  // AppTextField(
-                                  //   validator: (val) =>
-                                  //       validator.validateAddress(val!),
-                                  //   width: 240,
-                                  //   initialValue: cafeData?.address,
-                                  //   maxLines: 1,
-                                  //   label: 'Address Line 1',
-                                  //   hint: "Enter your address line1",
-                                  //   onSaved: (val) {
-                                  //     if (val != null) {
-                                  //       cafeInfoNotifier.updateAddress(val);
-                                  //     }
-                                  //   },
-                                  // ),
-                                  AppTextField(
-                                    validator: (val) =>
-                                        validator.validateAddress(val!),
-                                    width: 100,
-                                    initialValue: cafeData?.city,
-                                    maxLines: 1,
-                                    label: 'City',
-                                    hint: "Enter your city",
-                                    onSaved: (val) {
-                                      if (val != null) {
-                                        cafeInfoNotifier.updateCity(val);
-                                      }
-                                    },
+                                          // Update address immediately
+                                          cafeInfoNotifier.updateAddress(prediction!.description!);
+
+                                          // Only proceed if coordinates are available
+                                          if (prediction.lat == null || prediction.lng == null) {
+                                            context.showSnackBar("Coordinates not found");
+                                            return;
+                                          }
+
+                                          setState(() => isLoading = true);
+
+                                          try {
+                                            final lat = double.parse(prediction.lat!);
+                                            final lng = double.parse(prediction.lng!);
+
+                                            final placemarks = await placemarkFromCoordinates(lat, lng);
+
+                                            if (placemarks.isNotEmpty) {
+                                              final placemark = placemarks.first;
+                                               city = placemark.locality ??
+                                                  placemark.subAdministrativeArea ??
+                                                  placemark.administrativeArea;
+
+                                              if (city != null) {
+                                                cafeInfoNotifier.updateCity(city!);
+                                              }
+                                            }
+                                          } catch (e) {
+                                            context.showSnackBar("Error getting location details: ${e.toString()}");
+                                          } finally {
+                                            if (mounted) setState(() => isLoading = false);
+                                          }
+                                        },
+
+                                        validator: (val) =>
+                                            validator.validateAddress(val!),
+                                        initialValue: cafeData?.address,
+                                        width: 280,
+                                        label: 'Address Line 1',
+                                      ),
+                                      AppTextField(
+                                        key: UniqueKey(),
+                                        validator: (val) =>
+                                            validator.validateAddress(val!),
+                                        width: 100,
+                                        initialValue: city ?? cafeData?.city,
+                                        maxLines: 1,
+                                        label: 'City',
+                                        hint: "Enter your city",
+                                        onSaved: (val) {
+                                          if (val != null) {
+                                            cafeInfoNotifier.updateCity(val);
+                                          }
+                                        },
+                                      ),
+                                      AppTextField(
+                                        maxLength: 7,
+                                        validator: (val) =>
+                                            validator.validateZipCode(val!),
+                                        inputType: TextInputType.phone,
+                                        width: 150,
+                                        initialValue: cafeData?.postcode,
+                                        label: 'Postcode',
+                                        hint: "Enter your postcode",
+                                        onSaved: (val) {
+                                          if (val != null) {
+                                            cafeInfoNotifier.updatePostcode(val);
+                                          }
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                  AppTextField(
-                                    validator: (val) =>
-                                        validator.validateZipCode(val!),
-                                    inputType: TextInputType.phone,
-                                    width: 150,
-                                    initialValue: cafeData?.postcode,
-                                    label: 'Postcode',
-                                    hint: "Enter your postcode",
-                                    onSaved: (val) {
-                                      if (val != null) {
-                                        cafeInfoNotifier.updatePostcode(val);
-                                      }
-                                    },
+                                  57.verticalSpace,
+                                  Text(
+                                    'Categories',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall
+                                        ?.copyWith(
+                                            color: Color(0xFF694233),
+                                            fontWeight: FontWeight.w600),
+                                  ),
+                                  SizedBox(
+                                    height: 200,
+                                    width: 300,
+                                    child: AsyncWidget(
+                                        onRetry: () => ref.refresh(
+                                            getCafeTimeAndCategoryProvider),
+                                        value: filters,
+                                        data: (data) {
+                                          List<CafeFilter> selectedItems = [];
+                                          final List<int> selectedIds = (cafeData
+                                                      ?.cafeFilter ??
+                                                  '')
+                                              .split(',')
+                                              .map((e) => int.tryParse(e.trim()))
+                                              .whereType<int>()
+                                              .toList();
+                                          if (selectedIds.isNotEmpty) {
+                                            selectedItems = data.cafeFilters!
+                                                .where((filter) =>
+                                                    selectedIds.contains(filter.id))
+                                                .toList();
+                                          }
+                                          return Wrap(children: [
+                                            CheckboxFormField(
+                                              validator: (value) =>
+                                                  validator.validateCheckBox(value),
+                                              items: data.cafeFilters
+                                                      ?.where((e) =>
+                                                          e.name != "All" &&
+                                                          e.name != "Favorites" &&
+                                                          e.name != "Vegetarian ")
+                                                      .toList() ??
+                                                  [],
+                                              onSelectionChanged: (val) {
+                                                cafeInfoNotifier
+                                                    .updateCategories(val);
+                                              },
+                                              initialValue: selectedItems,
+                                            )
+                                          ]);
+                                        }),
                                   ),
                                 ],
                               ),
-                              57.verticalSpace,
-                              Text(
-                                'Categories',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall
-                                    ?.copyWith(
-                                        color: Color(0xFF694233),
-                                        fontWeight: FontWeight.w600),
-                              ),
-                              SizedBox(
-                                height: 200,
-                                width: 300,
-                                child: AsyncWidget(
-                                    onRetry: () => ref.refresh(
-                                        getCafeTimeAndCategoryProvider),
-                                    value: filters,
-                                    data: (data) {
-                                      List<CafeFilter> selectedItems = [];
-                                      final List<int> selectedIds = (cafeData
-                                                  ?.cafeFilter ??
-                                              '')
-                                          .split(',')
-                                          .map((e) => int.tryParse(e.trim()))
-                                          .whereType<int>()
-                                          .toList();
-                                      if (selectedIds.isNotEmpty) {
-                                        selectedItems = data.cafeFilters!
-                                            .where((filter) =>
-                                                selectedIds.contains(filter.id))
-                                            .toList();
-                                      }
-                                      return Wrap(children: [
-                                        CheckboxFormField(
-                                          validator: (value) =>
-                                              validator.validateCheckBox(value),
-                                          items: data.cafeFilters
-                                                  ?.where((e) =>
-                                                      e.name != "All" &&
-                                                      e.name != "Favorites" &&
-                                                      e.name != "Vegetarian ")
-                                                  .toList() ??
-                                              [],
-                                          onSelectionChanged: (val) {
-                                            cafeInfoNotifier
-                                                .updateCategories(val);
-                                          },
-                                          initialValue: selectedItems,
-                                        )
-                                      ]);
-                                    }),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    40.verticalSpace,
-                    AppTextField(
-                      validator: (val) => validator.validateBio(val!),
-                      initialValue: cafeData?.bio,
-                      width: 975,
-                      label: "Bio",
-                      hint: "Cafe bio",
-                      onSaved: (val) {
-                        if (val != null) {
-                          cafeInfoNotifier.updateBio(val);
-                        }
-                      },
-                    ),
-                    70.verticalSpace,
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Cafe Hours',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(
-                                  color: Color(0xFF694233),
-                                  fontWeight: FontWeight.w600),
+                        40.verticalSpace,
+                        AppTextField(
+                          validator: (val) => validator.validateBio(val!),
+                          initialValue: cafeData?.bio,
+                          width: 975,
+                          label: "Bio",
+                          hint: "Cafe bio",
+                          onSaved: (val) {
+                            if (val != null) {
+                              cafeInfoNotifier.updateBio(val);
+                            }
+                          },
                         ),
-                        //   9.verticalSpace,
-                        Row(
+                        70.verticalSpace,
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                                child: AsyncWidget(
-                                    onRetry: () => ref.refresh(
-                                        getCafeTimeAndCategoryProvider),
-                                    value: filters,
-                                    data: (data) {
-                                      return CafeHoursScreen(
-                                        initialCafeTime: cafeData?.timing ??
-                                            data.cafeTimings,
-                                        onTimeChanged:
-                                            (List<CafeDayTime> cafeTime) {
-                                          print(cafeTime);
-                                          if (cafeTime.isNotEmpty) {
+                            Text(
+                              'Cafe Hours',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(
+                                      color: Color(0xFF694233),
+                                      fontWeight: FontWeight.w600),
+                            ),
+                            //   9.verticalSpace,
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                    child: AsyncWidget(
+                                        onRetry: () => ref.refresh(
+                                            getCafeTimeAndCategoryProvider),
+                                        value: filters,
+                                        data: (data) {
+                                          return CafeHoursScreen(
+                                            initialCafeTime: cafeData?.timing ??
+                                                data.cafeTimings,
+                                            onTimeChanged:
+                                                (List<CafeDayTime> cafeTime) {
+                                              print(cafeTime);
+                                              if (cafeTime.isNotEmpty) {
+                                                cafeInfoNotifier
+                                                    .updateCafeHours(cafeTime);
+                                              }
+                                            },
+                                          );
+                                        })),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Coffee Origin',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall
+                                          ?.copyWith(
+                                              color: Color(0xFF694233),
+                                              fontWeight: FontWeight.w600),
+                                    ),
+                                    9.verticalSpace,
+                                    SimpleCustomDropdown(
+                                        height: 55,
+                                        borderRadius: 8,
+                                        hint: "Coffee Origin",
+                                        validator: (val) =>
+                                            validator.validateCoffeeOrigin(val),
+                                        initialValue:
+                                            cafeData?.cafeManagement?.coffeeOrigin,
+                                        items: coffeeOriginTypes.toSet().toList(),
+                                        onChanged: (val) {
+                                          cafeInfoNotifier.updateCoffeeOrigin(val!);
+                                        }),
+                                    68.verticalSpace,
+                                    Text(
+                                      'Country Of Origin',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall
+                                          ?.copyWith(
+                                              color: Color(0xFF694233),
+                                              fontWeight: FontWeight.w600),
+                                    ),
+                                    9.verticalSpace,
+                                    SizedBox(
+                                        width: 252,
+                                        child: CountrySearchDropdown(
+                                          validator: (value) => validator
+                                              .validateCountryOrigin(value!),
+                                          initialSelectedCountry: cafeData
+                                              ?.cafeManagement?.coffeeOriginCountry,
+                                          countries: originCountries,
+                                          onCountrySelected:
+                                              (String selectedCountry) {
                                             cafeInfoNotifier
-                                                .updateCafeHours(cafeTime);
-                                          }
+                                                .updateCoffeeOriginCountry(
+                                                    selectedCountry);
+                                          },
+                                        )),
+                                  ],
+                                ),
+                                80.horizontalSpace,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Coffee Roast',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall
+                                          ?.copyWith(
+                                              color: Color(0xFF694233),
+                                              fontWeight: FontWeight.w600),
+                                    ),
+                                    9.verticalSpace,
+                                    SizedBox(
+                                      width: 252,
+                                      child: CountrySearchDropdown(
+                                        hintText: "Coffee Roast",
+                                        validator: (value) =>
+                                            validator.validateCoffeeRoast(value),
+                                        onCountrySelected: (String value) {
+                                          cafeInfoNotifier.updateCoffeeRoast(value);
                                         },
-                                      );
-                                    })),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Coffee Origin',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall
-                                      ?.copyWith(
-                                          color: Color(0xFF694233),
-                                          fontWeight: FontWeight.w600),
+                                        initialSelectedCountry:
+                                            cafeData?.cafeManagement?.coffeeRoast,
+                                        countries:
+                                            coffeeRoastTypes.toSet().toList(),
+                                      ),
+                                    ),
+                                    66.verticalSpace,
+                                    Text(
+                                      'Specialty Coffee',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall
+                                          ?.copyWith(
+                                              color: Color(0xFF694233),
+                                              fontWeight: FontWeight.w600),
+                                    ),
+                                    9.verticalSpace,
+                                    SimpleCustomDropdown(
+                                        height: 55,
+                                        hint: "Select speciality",
+                                        validator: (value) => validator
+                                            .validateSpecialityCoffee(value),
+                                        initialValue:
+                                            cafeData?.cafeManagement != null
+                                                ? (cafeData?.cafeManagement!
+                                                            .speciallityCoffee ==
+                                                        1
+                                                    ? "Yes"
+                                                    : "No")
+                                                : null,
+                                        items: items.toSet().toList(),
+                                        onChanged: (val) {
+                                          if (val == "Yes") {
+                                            cafeInfoNotifier
+                                                .updateSpecialityCoffee(1);
+                                          } else {
+                                            cafeInfoNotifier
+                                                .updateSpecialityCoffee(0);
+                                          }
+                                        }),
+                                  ],
                                 ),
-                                9.verticalSpace,
-                                SimpleCustomDropdown(
-                                    height: 55,
-                                    borderRadius: 8,
-                                    hint: "Coffee Origin",
-                                    validator: (val) =>
-                                        validator.validateCoffeeOrigin(val),
-                                    initialValue:
-                                        cafeData?.cafeManagement?.coffeeOrigin,
-                                    items: coffeeOriginTypes.toSet().toList(),
-                                    onChanged: (val) {
-                                      cafeInfoNotifier.updateCoffeeOrigin(val!);
-                                    }),
-                                68.verticalSpace,
-                                Text(
-                                  'Country Of Origin',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall
-                                      ?.copyWith(
-                                          color: Color(0xFF694233),
-                                          fontWeight: FontWeight.w600),
-                                ),
-                                9.verticalSpace,
-                                SizedBox(
-                                    width: 252,
-                                    child: CountrySearchDropdown(
-                                      validator: (value) => validator
-                                          .validateCountryOrigin(value!),
-                                      initialSelectedCountry: cafeData
-                                          ?.cafeManagement?.coffeeOriginCountry,
-                                      countries: originCountries,
-                                      onCountrySelected:
-                                          (String selectedCountry) {
-                                        cafeInfoNotifier
-                                            .updateCoffeeOriginCountry(
-                                                selectedCountry);
-                                      },
-                                    )),
+                                // 150.horizontalSpace,
                               ],
                             ),
-                            80.horizontalSpace,
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Coffee Roast',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall
-                                      ?.copyWith(
-                                          color: Color(0xFF694233),
-                                          fontWeight: FontWeight.w600),
-                                ),
-                                9.verticalSpace,
-                                SizedBox(
-                                  width: 252,
-                                  child: CountrySearchDropdown(
-                                    hintText: "Coffee Roast",
-                                    validator: (value) =>
-                                        validator.validateCoffeeRoast(value),
-                                    onCountrySelected: (String value) {
-                                      cafeInfoNotifier.updateCoffeeRoast(value);
-                                    },
-                                    initialSelectedCountry:
-                                        cafeData?.cafeManagement?.coffeeRoast,
-                                    countries:
-                                        coffeeRoastTypes.toSet().toList(),
-                                  ),
-                                ),
-                                66.verticalSpace,
-                                Text(
-                                  'Specialty Coffee',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall
-                                      ?.copyWith(
-                                          color: Color(0xFF694233),
-                                          fontWeight: FontWeight.w600),
-                                ),
-                                9.verticalSpace,
-                                SimpleCustomDropdown(
-                                    height: 55,
-                                    hint: "Select speciality",
-                                    validator: (value) => validator
-                                        .validateSpecialityCoffee(value),
-                                    initialValue:
-                                        cafeData?.cafeManagement != null
-                                            ? (cafeData?.cafeManagement!
-                                                        .speciallityCoffee ==
-                                                    1
-                                                ? "Yes"
-                                                : "No")
-                                            : null,
-                                    items: items.toSet().toList(),
-                                    onChanged: (val) {
-                                      if (val == "Yes") {
-                                        cafeInfoNotifier
-                                            .updateSpecialityCoffee(1);
-                                      } else {
-                                        cafeInfoNotifier
-                                            .updateSpecialityCoffee(0);
-                                      }
-                                    }),
-                              ],
-                            ),
-                            // 150.horizontalSpace,
                           ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-            );
-          }),
-      floatingActionButton: widget.isFromSignUp
-          ? Padding(
-              padding: const EdgeInsets.only(top: 70, right: 40),
-              child: SizedBox(
-                width: 55,
-                height: 53,
-                child: PrimaryButton(
-                  isLoading: ref.watch(cafeInfoNotifierProvider).isLoading,
-                  backgroundColor: const Color(0xFFC0987C),
-                  onClick: () {
-                    if (_fkey.currentState!.validate()) {
-                      _fkey.currentState!.save();
-                      ref
-                          .read(cafeInfoNotifierProvider.notifier)
-                          .addCafeInformation();
-                    }
-                  },
-                  isIconButton: true,
-                ),
-              ),
-            )
-          : null,
+                  ),
+                );
+              }),
+          floatingActionButton: widget.isFromSignUp
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 70, right: 40),
+                  child: SizedBox(
+                    width: 55,
+                    height: 53,
+                    child: PrimaryButton(
+                      isLoading: ref.watch(cafeInfoNotifierProvider).isLoading ,
+                      backgroundColor: const Color(0xFFC0987C),
+                      onClick: () {
+                        if (_fkey.currentState!.validate()) {
+                          _fkey.currentState!.save();
+                          ref
+                              .read(cafeInfoNotifierProvider.notifier)
+                              .addCafeInformation();
+                        }
+                      },
+                      isIconButton: true,
+                    ),
+                  ),
+                )
+              : null,
+        ),
+        if(isLoading)
+          PageLoadingWidget()
+      ],
     );
   }
 

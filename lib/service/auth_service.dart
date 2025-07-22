@@ -955,22 +955,22 @@ class AuthService {
     });
   }
 
-  // Future<String> syncMenu() async {
-  //   final token = await getTokens();
-  //   return await asyncGuard(() async {
-  //     final response = await _dio.post(
-  //       '/sync-menu-to-square-new',
-  //       options: Options(
-  //         headers: {
-  //           'x-access-token': '$token',
-  //           'Accept': 'application/json',
-  //         },
-  //       ),
-  //     );
-  //     final result=  response.data['message'];
-  //     return result;
-  //   });
-  // }
+  Future<String> syncMenuFromSquare() async {
+    final token = await getTokens();
+    return await asyncGuard(() async {
+      final response = await _dio.get(
+        '/sync-menu-from-square',
+        options: Options(
+          headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+      final result=  response.data['message'];
+      return result;
+    });
+  }
 
   // Future<String> syncAddon() async {
   //   final token = await getTokens();

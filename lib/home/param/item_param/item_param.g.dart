@@ -10,7 +10,6 @@ _$ItemParamImpl _$$ItemParamImplFromJson(Map<String, dynamic> json) =>
     _$ItemParamImpl(
       itemName: json['itemName'] as String,
       itemCategoryId: (json['itemCategoryId'] as num).toInt(),
-      itemImageId: (json['itemImageId'] as num).toInt(),
       itemDescription: json['itemDescription'] as String,
       itemTypeId: (json['itemTypeId'] as num).toInt(),
       item: (json['item'] as List<dynamic>)
@@ -29,7 +28,6 @@ Map<String, dynamic> _$$ItemParamImplToJson(_$ItemParamImpl instance) =>
     <String, dynamic>{
       'itemName': instance.itemName,
       'itemCategoryId': instance.itemCategoryId,
-      'itemImageId': instance.itemImageId,
       'itemDescription': instance.itemDescription,
       'itemTypeId': instance.itemTypeId,
       'item': instance.item,
@@ -77,7 +75,7 @@ Map<String, dynamic> _$$AddonItemImplToJson(_$AddonItemImpl instance) =>
 // RiverpodGenerator
 // **************************************************************************
 
-String _$itemParamNotifierHash() => r'16bc96166eee58c966842bea5c7494fd6f7a28b6';
+String _$itemParamNotifierHash() => r'ad370aa7b95437d4004c987e67a6ea655b4266ba';
 
 /// See also [ItemParamNotifier].
 @ProviderFor(ItemParamNotifier)

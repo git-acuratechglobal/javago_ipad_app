@@ -1205,24 +1205,15 @@ class _ReviewtimingState extends State<Reviewtiming> {
     6: 'Saturday',
   };
 
-  final Map<String, TimeOfDay> openingTimes = {};
-  final Map<String, TimeOfDay> closingTimes = {};
-
+  // final Map<String, TimeOfDay> openingTimes = {};
+  // final Map<String, TimeOfDay> closingTimes = {};
+  // List<String> activeDays = [];
+  late List<CafeTiming> activeDays;
   @override
   void initState() {
     super.initState();
-
-    for (int i = 0; i <= 6; i++) {
-      final dayName = dayNames[i]!;
-
-      final timing = widget.timings.firstWhere(
-        (e) => e.day == i,
-        orElse: () => CafeTiming(openTime: "09:00", closeTime: "22:00"),
-      );
-
-      openingTimes[dayName] = _parseTime(timing.openTime ?? "09:00");
-      closingTimes[dayName] = _parseTime(timing.closeTime ?? "22:00");
-    }
+    activeDays =
+        widget.timings.where((timing) => timing.isActive == 1).toList();
   }
 
   TimeOfDay _parseTime(String time) {
@@ -1238,10 +1229,12 @@ class _ReviewtimingState extends State<Reviewtiming> {
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         padding: EdgeInsets.zero,
-        itemCount: dayNames.length,
+        itemCount: activeDays.length,
         itemBuilder: (context, index) {
-          final day = dayNames.values.toList()[index];
-
+          final timing = activeDays[index];
+          final dayName = dayNames[timing.day]!;
+          final openTime = _parseTime(timing.openTime ?? "09:00");
+          final closeTime = _parseTime(timing.closeTime ?? "22:00");
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -1249,7 +1242,7 @@ class _ReviewtimingState extends State<Reviewtiming> {
                 SizedBox(
                   width: 100,
                   child: Text(
-                    day,
+                    dayName,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -1260,7 +1253,7 @@ class _ReviewtimingState extends State<Reviewtiming> {
                 const Text(":"),
                 const SizedBox(width: 10),
                 Text(
-                  openingTimes[day]!.format(context),
+                  openTime.format(context),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -1271,7 +1264,7 @@ class _ReviewtimingState extends State<Reviewtiming> {
                 const Text("-"),
                 const SizedBox(width: 10),
                 Text(
-                  closingTimes[day]!.format(context),
+                  closeTime.format(context),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -1404,11 +1397,11 @@ class _ReviewItemsState extends ConsumerState<ReviewItems> {
                       decoration: const BoxDecoration(color: Color(0xFF9B6842)),
                       child: Row(
                         children: [
-                          SizedBox(
-                              width: 74.w,
-                              child: Text('Images',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 16.sp))),
+                          // SizedBox(
+                          //     width: 74.w,
+                          //     child: Text('Images',
+                          //         style: TextStyle(
+                          //             color: Colors.white, fontSize: 16.sp))),
                           15.horizontalSpace,
                           SizedBox(
                               width: 121.w,
@@ -1479,15 +1472,15 @@ class _ReviewItemsState extends ConsumerState<ReviewItems> {
                             child: Row(
                               spacing: 10,
                               children: [
-                                SizedBox(
-                                  height: 40.h,
-                                  width: 40.w,
-                                  child: item.itemImage != null
-                                      ? Image.network(item.itemImage!,
-                                          fit: BoxFit.cover)
-                                      : const Icon(Icons.image_not_supported),
-                                ),
-                                25.horizontalSpace,
+                                // SizedBox(
+                                //   height: 40.h,
+                                //   width: 40.w,
+                                //   child: item.itemImage != null
+                                //       ? Image.network(item.itemImage!,
+                                //           fit: BoxFit.cover)
+                                //       : const Icon(Icons.image_not_supported),
+                                // ),
+                                // 25.horizontalSpace,
                                 SizedBox(
                                     width: 100.w,
                                     child: Text(item.itemName ?? "-",
@@ -1714,7 +1707,7 @@ class _StatusContainerState extends ConsumerState<StatusContainer> {
                         'Available',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 16.sp,
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                         ),
                       )
@@ -1722,18 +1715,18 @@ class _StatusContainerState extends ConsumerState<StatusContainer> {
                         'Unavailable',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 16.sp,
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
               )),
-          10.horizontalSpace,
+          60.horizontalSpace,
           CupertinoSwitch(
               activeColor: const Color(0xFFC0987C),
               trackColor: const Color(0xFF757575),
               value: _isSwitched,
               onChanged: _handleSwitch),
-          (widget.editOption ?? false) ? 3.horizontalSpace : 2.horizontalSpace,
+          (widget.editOption ?? false) ? 10.horizontalSpace : 2.horizontalSpace,
           if (widget.editOption)
             Row(
               children: [
@@ -1770,7 +1763,7 @@ class _StatusContainerState extends ConsumerState<StatusContainer> {
                 ),
               ],
             ),
-          5.horizontalSpace,
+          10.horizontalSpace,
           if (!widget.isFromAddition!)
             InkWell(
               onTap: widget.onEdit,
@@ -1780,7 +1773,7 @@ class _StatusContainerState extends ConsumerState<StatusContainer> {
                 width: 43.w,
               ),
             ),
-          5.horizontalSpace,
+          10.horizontalSpace,
           InkWell(
             onTap: widget.onDelete,
             child: Image.asset(

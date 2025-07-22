@@ -6,7 +6,7 @@ part of 'cafe_info_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$cafeInfoNotifierHash() => r'f1da94a3944ad61720d6da640ec27935e30e117e';
+String _$cafeInfoNotifierHash() => r'a317a62a72d2fd87602daa2d5f1f47e06f67bbf2';
 
 /// See also [CafeInfoNotifier].
 @ProviderFor(CafeInfoNotifier)

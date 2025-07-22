@@ -442,7 +442,6 @@ class _MenuInfoScreenState extends ConsumerState<MenuInfoScreen>
                           color: Colors.white,
                         ),
                         child: Row(
-                          spacing: 0,
                           children: [
                             SizedBox(
                               height: 40.h,
@@ -543,6 +542,7 @@ class _MenuUploadWidgetState extends ConsumerState<_MenuUploadWidget> {
                 Navigator.pop(context);
                 context.navigateTo(const MenuScreen2(
                   isEditmode: false,
+                  fromAdd: true,
                 ));
               },
               child: const Text("Add Manually"),

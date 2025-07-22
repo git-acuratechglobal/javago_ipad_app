@@ -59,9 +59,11 @@ class LocalStorageService {
     return _preferences.getString(_stripAccountId);
   }
 
+
+
   Future<void> clearSession() async {
     _preferences.remove(_authTokenKey);
     _preferences.remove(_userLoginSaved);
-
+    _preferences.remove(_stripAccountId);
   }
 }

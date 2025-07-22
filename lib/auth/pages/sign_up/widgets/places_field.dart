@@ -16,7 +16,7 @@ class PlacesField extends StatefulWidget {
   final double? height;
   final String? initialValue;
   final String? Function(String?)? validator;
-  final void Function(String?) onSaved;
+  final void Function(Prediction?) onSaved;
   @override
   State<PlacesField> createState() => _PlacesFieldState();
 }
@@ -40,12 +40,9 @@ class _PlacesFieldState extends State<PlacesField> {
           height: widget.height,
           width: widget.width,
           child: GooglePlacesAutoCompleteTextFormField(
-            maxHeight: 400,
-              onChanged: widget.onSaved,
+              maxLines: 1,
+              maxHeight: 400,
               validator: widget.validator,
-              onTapOutside: (va) {
-                FocusScope.of(context).unfocus();
-              },
               initialValue: widget.initialValue,
               decoration: InputDecoration(
                 hintText: "Enter your address line1",
@@ -66,12 +63,12 @@ class _PlacesFieldState extends State<PlacesField> {
               countries: ["uk"],
               fetchCoordinates: true,
               onPlaceDetailsWithCoordinatesReceived: (prediction) {
-                print("Coordinates: (${prediction.lat},${prediction.lng})");
+                widget.onSaved(prediction);
               },
               onSuggestionClicked: (prediction) {
                 placeController.text = prediction.description!;
-                placeController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: prediction.description!.length));
+                // widget.onSaved(prediction);
+                FocusScope.of(context).unfocus();
               }),
         ),
       ],

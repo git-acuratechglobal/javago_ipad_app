@@ -68,8 +68,7 @@ class _MenuScreen2State extends ConsumerState<MenuScreen2> {
         appBar: AppBar(
           automaticallyImplyLeading: false,
           backgroundColor: const Color(0xFFF5F3F0),
-          leading: widget.isEditmode
-              ? InkWell(
+          leading:  InkWell(
                   onTap: () => context.pop(),
                   child: Image.asset(
                     'assets/images/ic_left_arrow.png',
@@ -77,8 +76,8 @@ class _MenuScreen2State extends ConsumerState<MenuScreen2> {
                     height: 55.h,
                     width: 55.w,
                   ),
-                )
-              : null,
+                ),
+
           title: widget.isEditmode
               ? Text(
                   widget.fromAdd! ? "Add Item" : 'Menu',
@@ -89,7 +88,15 @@ class _MenuScreen2State extends ConsumerState<MenuScreen2> {
                     fontWeight: FontWeight.w600,
                   ),
                 )
-              : null,
+              :  Text(
+            "Add Item" ,
+            style: const TextStyle(
+              color: Color(0xFF461C10),
+              fontSize: 32,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           centerTitle: true,
         ),
         body: AsyncWidget(
@@ -112,37 +119,37 @@ class _MenuScreen2State extends ConsumerState<MenuScreen2> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                CustomDropdownWithImage<PreDefinedItem>(
-                                  value: itemsData.itemImageId == 0
-                                      ? selectedItem
-                                      : items?.preDefinedItem?.firstWhere(
-                                          (e) =>
-                                              e.id == itemsData.itemImageId &&
-                                              e.id != 0,
-                                        ),
-                                  hint: "Select Name",
-                                  dropdownItems: items?.preDefinedItem ?? [],
-                                  onChanged: (value) {
-                                    if (value != null) {
-                                      menuItemParam.updateImageId(value.id);
-                                      setState(() {
-                                        selectedItem = value;
-                                      });
-                                    }
-                                  },
-                                  getLabel: (item) => item.itemName ?? "",
-                                  getImageUrl: (item) => item.itemImage ?? "",
-                                  customBtn: CustomButtonForIcon(
-                                    selectedItem: itemsData.itemImageId == 0
-                                        ? selectedItem
-                                        : items?.preDefinedItem?.firstWhere(
-                                            (e) =>
-                                                e.id == itemsData.itemImageId &&
-                                                e.id != 0,
-                                          ),
-                                  ),
-                                ),
-                                70.horizontalSpace,
+                                // CustomDropdownWithImage<PreDefinedItem>(
+                                //   value: itemsData.itemImageId == 0
+                                //       ? selectedItem
+                                //       : items?.preDefinedItem?.firstWhere(
+                                //           (e) =>
+                                //               e.id == itemsData.itemImageId &&
+                                //               e.id != 0,
+                                //         ),
+                                //   hint: "Select Name",
+                                //   dropdownItems: items?.preDefinedItem ?? [],
+                                //   onChanged: (value) {
+                                //     if (value != null) {
+                                //       menuItemParam.updateImageId(value.id);
+                                //       setState(() {
+                                //         selectedItem = value;
+                                //       });
+                                //     }
+                                //   },
+                                //   getLabel: (item) => item.itemName ?? "",
+                                //   getImageUrl: (item) => item.itemImage ?? "",
+                                //   customBtn: CustomButtonForIcon(
+                                //     selectedItem: itemsData.itemImageId == 0
+                                //         ? selectedItem
+                                //         : items?.preDefinedItem?.firstWhere(
+                                //             (e) =>
+                                //                 e.id == itemsData.itemImageId &&
+                                //                 e.id != 0,
+                                //           ),
+                                //   ),
+                                // ),
+                                // 70.horizontalSpace,
                                 AppTextField(
                                   height: 45,
                                   width: 250,
@@ -597,7 +604,7 @@ class _MenuScreen2State extends ConsumerState<MenuScreen2> {
                                   width: 145.w,
                                   child: ElevatedButton(
                                       onPressed: () {
-                                        // ref.read(showMenuEditScreenProvider.notifier).state = false;
+                                       context.pop();
                                       },
                                       child: const Text('CANCEL')),
                                 ),

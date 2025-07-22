@@ -21,7 +21,8 @@ class AppTextField extends StatelessWidget {
       this.readOnly = false,
       this.onChanged,
       this.inputType,
-      this.fillColor=Colors.white
+      this.fillColor=Colors.white,
+        this.maxLength
       }) {
     if (initialValue != null) {
       controller?.text = initialValue ?? "";
@@ -45,6 +46,7 @@ class AppTextField extends StatelessWidget {
   final bool? readOnly;
   final TextInputType? inputType;
   final Color fillColor;
+  final int? maxLength;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -62,6 +64,7 @@ class AppTextField extends StatelessWidget {
           height: height,
           width: width,
           child: TextFormField(
+            maxLength: maxLength,
             keyboardType: inputType,
             readOnly: readOnly!,
             maxLines: maxLines,
@@ -72,6 +75,7 @@ class AppTextField extends StatelessWidget {
             controller: controller,
             obscureText: obscureText!,
             decoration: InputDecoration(
+              counterText: "",
               filled: true,
               fillColor: fillColor,
               errorMaxLines: 2,

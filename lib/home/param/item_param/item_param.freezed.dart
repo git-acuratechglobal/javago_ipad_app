@@ -22,7 +22,6 @@ ItemParam _$ItemParamFromJson(Map<String, dynamic> json) {
 mixin _$ItemParam {
   String get itemName => throw _privateConstructorUsedError;
   int get itemCategoryId => throw _privateConstructorUsedError;
-  int get itemImageId => throw _privateConstructorUsedError;
   String get itemDescription => throw _privateConstructorUsedError;
   int get itemTypeId => throw _privateConstructorUsedError;
   List<ItemSize> get item => throw _privateConstructorUsedError;
@@ -49,7 +48,6 @@ abstract class $ItemParamCopyWith<$Res> {
   $Res call(
       {String itemName,
       int itemCategoryId,
-      int itemImageId,
       String itemDescription,
       int itemTypeId,
       List<ItemSize> item,
@@ -75,7 +73,6 @@ class _$ItemParamCopyWithImpl<$Res, $Val extends ItemParam>
   $Res call({
     Object? itemName = null,
     Object? itemCategoryId = null,
-    Object? itemImageId = null,
     Object? itemDescription = null,
     Object? itemTypeId = null,
     Object? item = null,
@@ -91,10 +88,6 @@ class _$ItemParamCopyWithImpl<$Res, $Val extends ItemParam>
       itemCategoryId: null == itemCategoryId
           ? _value.itemCategoryId
           : itemCategoryId // ignore: cast_nullable_to_non_nullable
-              as int,
-      itemImageId: null == itemImageId
-          ? _value.itemImageId
-          : itemImageId // ignore: cast_nullable_to_non_nullable
               as int,
       itemDescription: null == itemDescription
           ? _value.itemDescription
@@ -135,7 +128,6 @@ abstract class _$$ItemParamImplCopyWith<$Res>
   $Res call(
       {String itemName,
       int itemCategoryId,
-      int itemImageId,
       String itemDescription,
       int itemTypeId,
       List<ItemSize> item,
@@ -159,7 +151,6 @@ class __$$ItemParamImplCopyWithImpl<$Res>
   $Res call({
     Object? itemName = null,
     Object? itemCategoryId = null,
-    Object? itemImageId = null,
     Object? itemDescription = null,
     Object? itemTypeId = null,
     Object? item = null,
@@ -175,10 +166,6 @@ class __$$ItemParamImplCopyWithImpl<$Res>
       itemCategoryId: null == itemCategoryId
           ? _value.itemCategoryId
           : itemCategoryId // ignore: cast_nullable_to_non_nullable
-              as int,
-      itemImageId: null == itemImageId
-          ? _value.itemImageId
-          : itemImageId // ignore: cast_nullable_to_non_nullable
               as int,
       itemDescription: null == itemDescription
           ? _value.itemDescription
@@ -214,7 +201,6 @@ class _$ItemParamImpl implements _ItemParam {
   const _$ItemParamImpl(
       {required this.itemName,
       required this.itemCategoryId,
-      required this.itemImageId,
       required this.itemDescription,
       required this.itemTypeId,
       required final List<ItemSize> item,
@@ -232,8 +218,6 @@ class _$ItemParamImpl implements _ItemParam {
   final String itemName;
   @override
   final int itemCategoryId;
-  @override
-  final int itemImageId;
   @override
   final String itemDescription;
   @override
@@ -267,7 +251,7 @@ class _$ItemParamImpl implements _ItemParam {
 
   @override
   String toString() {
-    return 'ItemParam(itemName: $itemName, itemCategoryId: $itemCategoryId, itemImageId: $itemImageId, itemDescription: $itemDescription, itemTypeId: $itemTypeId, item: $item, selectedOptions: $selectedOptions, addonItem: $addonItem, cafe_menu_id: $cafe_menu_id)';
+    return 'ItemParam(itemName: $itemName, itemCategoryId: $itemCategoryId, itemDescription: $itemDescription, itemTypeId: $itemTypeId, item: $item, selectedOptions: $selectedOptions, addonItem: $addonItem, cafe_menu_id: $cafe_menu_id)';
   }
 
   @override
@@ -279,8 +263,6 @@ class _$ItemParamImpl implements _ItemParam {
                 other.itemName == itemName) &&
             (identical(other.itemCategoryId, itemCategoryId) ||
                 other.itemCategoryId == itemCategoryId) &&
-            (identical(other.itemImageId, itemImageId) ||
-                other.itemImageId == itemImageId) &&
             (identical(other.itemDescription, itemDescription) ||
                 other.itemDescription == itemDescription) &&
             (identical(other.itemTypeId, itemTypeId) ||
@@ -300,7 +282,6 @@ class _$ItemParamImpl implements _ItemParam {
       runtimeType,
       itemName,
       itemCategoryId,
-      itemImageId,
       itemDescription,
       itemTypeId,
       const DeepCollectionEquality().hash(_item),
@@ -328,7 +309,6 @@ abstract class _ItemParam implements ItemParam {
   const factory _ItemParam(
       {required final String itemName,
       required final int itemCategoryId,
-      required final int itemImageId,
       required final String itemDescription,
       required final int itemTypeId,
       required final List<ItemSize> item,
@@ -343,8 +323,6 @@ abstract class _ItemParam implements ItemParam {
   String get itemName;
   @override
   int get itemCategoryId;
-  @override
-  int get itemImageId;
   @override
   String get itemDescription;
   @override

@@ -20,6 +20,7 @@ enum CafeEvent {
   createStripAccount,
   createSquareAccount,
   squareAccountCreated,
+  syncItemFromSquare,
   stripAccountStatus,
   subscriptionPurchase,
   publishCafe,

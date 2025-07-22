@@ -80,17 +80,33 @@ class _AccountState extends ConsumerState<Account> {
                         ),
                         24.verticalSpace,
                         _AccountWidget(
-                            onTap: data?.squareOnboardingCompleted == 0
-                                ? () {
+                            onTap:
+                            // data?.squareOnboardingCompleted == 0
+                            //     ?
+                                () {
                                     ref
                                         .read(cafeInfoNotifierProvider.notifier)
                                         .createSquareAccount();
-                                  }
-                                : null,
+                                  },
+                                // : null,
                             imagePath: 'assets/images/logoutcurve.png',
                             title: data?.squareOnboardingCompleted == 0
                                 ? 'Connect Square'
                                 : 'Square Connected'),
+                        24.verticalSpace,
+                        Divider(
+                          thickness: 1,
+                          color: Color(0x33461C10),
+                        ),
+                        24.verticalSpace,
+                        _AccountWidget(
+                            onTap: () {
+                              ref
+                                  .read(cafeInfoNotifierProvider.notifier)
+                                  .syncMenuFromSquare();
+                            },
+                            imagePath: 'assets/images/logoutcurve.png',
+                            title: 'Sync from square'),
                         24.verticalSpace,
                         Divider(
                           thickness: 1,
@@ -111,7 +127,9 @@ class _AccountState extends ConsumerState<Account> {
                         24.verticalSpace,
                         _AccountWidget(
                             onTap: () {
-                             ref.read(cafeInfoNotifierProvider.notifier).syncMenuToSquare();
+                              ref
+                                  .read(cafeInfoNotifierProvider.notifier)
+                                  .syncMenuToSquare();
                             },
                             imagePath: 'assets/images/ic_account_frame.png',
                             title: 'Sync Menu to Square'),
@@ -263,53 +281,55 @@ class _AppBarWidgetState extends ConsumerState<AppBarWidget> {
           ),
         ),
         actions: [
-
           AsyncWidget(
               wantToShowLoading: false,
               height: 48.h,
               value: ref.watch(todayOrdersProvider),
               data: (ordersData) {
                 final items = ordersData.getCombinedUniqueOrders;
-                final inProgressOrders =
-                    items.where((order) => order.orderCompleted != 1).toList().length;
-                return                Padding(
+                final inProgressOrders = items
+                    .where((order) => order.orderCompleted != 1)
+                    .toList()
+                    .length;
+                return Padding(
                   padding: EdgeInsets.only(right: 57),
                   child: widget.myOrders
                       ? InkWell(
-                    onTap: () {
-                      ref.read(bottomBarTabProvider.notifier).update((_) => 1);
-                    },
-                    child: Container(
-                        width: 158.w,
-                        height: 48.h,
-                        decoration: BoxDecoration(
-                          color: Color(0xFF5CF97F),
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0x3F000000),
-                              blurRadius: 2,
-                              offset: Offset(0, 2),
-                              spreadRadius: 0,
-                            )
-                          ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Orders: ${inProgressOrders}',
-                            style: TextStyle(
-                              color: const Color(0xFF414141),
-                              fontSize: 20,
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        )),
-                  )
+                          onTap: () {
+                            ref
+                                .read(bottomBarTabProvider.notifier)
+                                .update((_) => 1);
+                          },
+                          child: Container(
+                              width: 158.w,
+                              height: 48.h,
+                              decoration: BoxDecoration(
+                                color: Color(0xFF5CF97F),
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0x3F000000),
+                                    blurRadius: 2,
+                                    offset: Offset(0, 2),
+                                    spreadRadius: 0,
+                                  )
+                                ],
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'Orders: ${inProgressOrders}',
+                                  style: TextStyle(
+                                    color: const Color(0xFF414141),
+                                    fontSize: 20,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              )),
+                        )
                       : null,
                 );
               }),
-
         ]);
   }
 }

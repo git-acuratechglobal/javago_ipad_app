@@ -145,6 +145,7 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
     state = AsyncLoading();
     state = await AsyncValue.guard(() async {
       ref.watch(authServiceProvider).syncMenuCategory().then((val) {
+         ref.watch(authServiceProvider).syncMenuFromSquare().ignore();
         ref.watch(authServiceProvider).syncMenuToSquare().ignore();
       });
       return CafeInfoState(
@@ -153,6 +154,19 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
       );
     });
   }
+
+  Future<void> syncMenuFromSquare() async {
+    state= AsyncLoading();
+    state= await AsyncValue.guard(()async{
+      await ref.watch(authServiceProvider).syncMenuFromSquare();
+      ref.invalidate(showMenuItemssProvider);
+      return CafeInfoState(
+        cafeEvent: CafeEvent.syncItemFromSquare,
+        response: "Items synced from Square",
+      );
+    });
+  }
+
 
   Future<void> stripAccountStatus() async {
     state = AsyncLoading();

@@ -314,9 +314,18 @@ class _ClickandCollectWidgetState extends ConsumerState<ClickandCollectWidget> {
                   children: [
                     Expanded(
                       flex: 3,
-                      child: Text(
-                        'Maximum capacity of orders?',
-                        style: Theme.of(context).textTheme.titleLarge,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Maximum capacity of orders?',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          10.verticalSpace,
+                          Text("*maximum click and collect orders you can receive at once",style: TextStyle(
+                            fontSize: 12
+                          ),)
+                        ],
                       ),
                     ),
                     Padding(

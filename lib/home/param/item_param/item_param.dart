@@ -13,7 +13,6 @@ abstract class ItemParam with _$ItemParam {
   const factory ItemParam({
     required String itemName,
     required int itemCategoryId,
-    required int itemImageId,
     required String itemDescription,
     required int itemTypeId,
     required List<ItemSize> item,
@@ -63,7 +62,6 @@ extension ItemParamSerializer on ItemParam {
     final Map<String, dynamic> data = {
       "item_name": itemName,
       "item_category_id": itemCategoryId,
-      "item_image_id": itemImageId,
       "item_description": itemDescription,
       "item_type_id": itemTypeId,
     };
@@ -104,7 +102,6 @@ class ItemParamNotifier extends _$ItemParamNotifier {
     return ItemParam(
       itemName: '',
       itemCategoryId: 0,
-      itemImageId: 0,
       itemDescription: '',
       itemTypeId: 0,
       item: [],
@@ -115,7 +112,6 @@ class ItemParamNotifier extends _$ItemParamNotifier {
 
   void updateName(String name) => state = state.copyWith(itemName: name);
   void updateCategoryId(int id) => state = state.copyWith(itemCategoryId: id);
-  void updateImageId(int id) => state = state.copyWith(itemImageId: id);
   void updateDescription(String desc) =>
       state = state.copyWith(itemDescription: desc);
   void updateTypeId(int id) => state = state.copyWith(itemTypeId: id);
@@ -138,7 +134,6 @@ class ItemParamNotifier extends _$ItemParamNotifier {
       state = ItemParam(
           itemName: menuItemData.itemName ?? "",
           itemCategoryId: menuItemData.itemCategory ?? 0,
-          itemImageId: menuItemData.itemImageId ?? 0,
           itemDescription: menuItemData.itemDescription ?? "",
           itemTypeId: menuItemData.itemType ?? 0,
           item: menuItemData.itemSizePrices?.map((e) {
@@ -161,7 +156,6 @@ class ItemParamNotifier extends _$ItemParamNotifier {
       state = ItemParam(
         itemName: '',
         itemCategoryId: 0,
-        itemImageId: 0,
         itemDescription: '',
         itemTypeId: 0,
         item: [],
