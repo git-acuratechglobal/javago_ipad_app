@@ -91,7 +91,7 @@ class _CustomTabBarState extends ConsumerState<CustomTabBar> {
           tabAlignment: TabAlignment.fill,
           indicatorSize: TabBarIndicatorSize.tab,
           labelColor: const Color(0xFF461C10),
-          unselectedLabelColor: const Color(0xFFC0987C),
+          unselectedLabelColor: Colors.white,
           indicatorColor: Colors.transparent,
           dividerColor: Colors.transparent,
           labelStyle: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
@@ -162,7 +162,7 @@ class _CustomTabBarState extends ConsumerState<CustomTabBar> {
             Text(
               label,
               style: TextStyle(
-                color: Colors.white,
+                // color: Colors.white,
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w400,
               ),
@@ -275,7 +275,7 @@ class _CustomTabBarCafeInfoState extends ConsumerState<CustomTabBarCafeInfo> {
           tabAlignment: TabAlignment.fill,
           indicatorSize: TabBarIndicatorSize.tab,
           labelColor: const Color(0xFF461C10),
-          unselectedLabelColor: const Color(0xFFC0987C),
+          unselectedLabelColor: Colors.white,
           indicatorColor: Colors.transparent,
           dividerColor: Colors.transparent,
           labelStyle: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w500),
@@ -323,7 +323,7 @@ class _CustomTabBarCafeInfoState extends ConsumerState<CustomTabBarCafeInfo> {
           child: Text(
             label,
             style: TextStyle(
-              color: Colors.white,
+              // color: Colors.white,
               fontSize: 16.sp,
               fontWeight: FontWeight.w400,
             ),

@@ -6,13 +6,10 @@ import 'package:java_go/home/account.dart';
 import 'package:java_go/home/cafeinfotabscreen.dart';
 import 'package:java_go/home/homescreen.dart';
 
-
-
-final bottomBarTabProvider=StateProvider.autoDispose((ref)=>1);
-
+final bottomBarTabProvider = StateProvider.autoDispose((ref) => 1);
 
 class CustomBottomNavBar extends ConsumerStatefulWidget {
- final bool? homescreen;
+  final bool? homescreen;
   CustomBottomNavBar({super.key, this.homescreen = false});
 
   @override
@@ -20,24 +17,21 @@ class CustomBottomNavBar extends ConsumerStatefulWidget {
 }
 
 class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
-
-
   @override
   void initState() {
     super.initState();
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       // _onItemTapped(1);
     });
-
   }
 
   void _onItemTapped(int index) {
-   ref.read(bottomBarTabProvider.notifier).update((_)=>index);
+    ref.read(bottomBarTabProvider.notifier).update((_) => index);
   }
 
   @override
   Widget build(BuildContext context) {
-    final bottomBarTab=ref.watch(bottomBarTabProvider);
+    final bottomBarTab = ref.watch(bottomBarTabProvider);
     return Stack(
       children: [
         Scaffold(
@@ -50,7 +44,6 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
               Account(),
             ],
           ),
-
           bottomNavigationBar: ClipRRect(
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(30),
@@ -153,16 +146,15 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
     );
   }
 }
-  // void _onItemTapped(int index) {
+// void _onItemTapped(int index) {
 
+//       ref.read(orderTabProvider.notifier).state = index;
 
-  //       ref.read(orderTabProvider.notifier).state = index;
+//   // if (index == 1) {
 
-  //   // if (index == 1) {
+//   // }
+// }
 
-  //   // }
-  // }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //  final  selectedIndex = ref.watch(orderTabProvider);
+// @override
+// Widget build(BuildContext context) {
+//  final  selectedIndex = ref.watch(orderTabProvider);
