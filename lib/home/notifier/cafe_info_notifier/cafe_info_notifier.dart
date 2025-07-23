@@ -145,7 +145,7 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
     state = AsyncLoading();
     state = await AsyncValue.guard(() async {
       ref.watch(authServiceProvider).syncMenuCategory().then((val) {
-         ref.watch(authServiceProvider).syncMenuFromSquare().ignore();
+        ref.watch(authServiceProvider).syncMenuFromSquare().ignore();
         ref.watch(authServiceProvider).syncMenuToSquare().ignore();
       });
       return CafeInfoState(
@@ -156,8 +156,8 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
   }
 
   Future<void> syncMenuFromSquare() async {
-    state= AsyncLoading();
-    state= await AsyncValue.guard(()async{
+    state = AsyncLoading();
+    state = await AsyncValue.guard(() async {
       await ref.watch(authServiceProvider).syncMenuFromSquare();
       ref.invalidate(showMenuItemssProvider);
       return CafeInfoState(
@@ -166,7 +166,6 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
       );
     });
   }
-
 
   Future<void> stripAccountStatus() async {
     state = AsyncLoading();
@@ -181,15 +180,45 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
   }
 
   Future<void> purchaseSubscription({required double amount}) async {
+    print(_paymentIntent);
     state = AsyncLoading();
     state = await AsyncValue.guard(() async {
       final stripeService = ref.read(stripeServiceProvider);
       _paymentIntent ??= await stripeService.createPaymentIntent(amount);
       await _attemptPayment(_paymentIntent!['client_secret']);
+      final response = await updateSubscription(
+          true, amount == 28.0 ? "Monthly" : "Yearly", _paymentIntent!['id']);
       return CafeInfoState(
         cafeEvent: CafeEvent.subscriptionPurchase,
       );
     });
+  }
+
+  Future<String> updateSubscription(
+      bool isPaid, String name, String transitionId) async {
+    final expirationDate = _getExpirationDate("monthly");
+    final request = {
+      'subscription_type': isPaid ? "Paid" : "Free",
+      'plan_name': name,
+      'transaction_id': transitionId,
+      'expiration_date': expirationDate
+    };
+    final data =
+        await ref.watch(authServiceProvider).updateSubscription(request);
+    return data;
+  }
+
+  DateTime _getExpirationDate(String subscriptionType) {
+    DateTime? expirationDate;
+
+    if (subscriptionType == 'monthly') {
+      expirationDate =
+          DateTime.now().add(Duration(days: 30)); // Roughly 1 month
+    } else if (subscriptionType == 'yearly') {
+      expirationDate =
+          DateTime.now().add(Duration(days: 365)); // Roughly 1 year
+    }
+    return expirationDate!;
   }
 
   Future<void> syncMenuToSquare() async {

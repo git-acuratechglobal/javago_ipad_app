@@ -5,8 +5,10 @@ import 'package:java_go/Theme/navigation.dart';
 import 'package:java_go/auth/pages/sign_up/subscription_plans_page.dart';
 import 'package:java_go/config/common/button.dart';
 import 'package:java_go/config/common/extensions.dart';
+import 'package:java_go/service/local_storage_service.dart';
 import '../../../config/async_widget.dart';
 import '../../../config/widgets/page_loading_widget.dart';
+import '../../../home/bottombar.dart';
 import '../../../home/notifier/cafe_info_notifier/cafe_info_notifier.dart';
 import '../../../home/state/cafe_info_state/cafe_info_state.dart';
 import '../../notifier/cafe_data_notifier/cafe_data_notifier.dart';
@@ -14,15 +16,13 @@ import '../steps/stepper_widget.dart';
 import 'connect_strip_web_view.dart';
 
 class StripeAccountSetup extends ConsumerStatefulWidget {
-  const StripeAccountSetup({super.key});
-
+  const StripeAccountSetup({super.key, this.isOnboardingComplete = false});
+  final bool isOnboardingComplete;
   @override
   ConsumerState createState() => _StripeAccountSetupState();
 }
 
 class _StripeAccountSetupState extends ConsumerState<StripeAccountSetup> {
-  bool showSubscriptionPage = false;
-  bool showSquarePage = false;
   final titleTextStyle = TextStyle(
     fontSize: 25,
     color: const Color(0xff461C10),
@@ -35,18 +35,15 @@ class _StripeAccountSetupState extends ConsumerState<StripeAccountSetup> {
       switch (next) {
         case AsyncData<CafeInfoState?> data when data.value != null:
           final cafeState = data.value;
-          if (cafeState?.cafeEvent == CafeEvent.stripAccountStatus) {
-            setState(() {
-              showSubscriptionPage = !showSubscriptionPage;
-            });
-          }
+          if (cafeState?.cafeEvent == CafeEvent.stripAccountStatus) {}
           if (cafeState?.cafeEvent == CafeEvent.subscriptionPurchase) {
             context.showSnackBar("Plan purchased successfully",
                 barColor: Colors.green);
-            setState(() {
-              showSubscriptionPage = false;
-              showSquarePage = !showSquarePage;
-            });
+            if (widget.isOnboardingComplete) {
+              ref.read(localStorageServiceProvider).setUserLoginSaved(true);
+              context.navigateAndRemoveUntil(CustomBottomNavBar());
+              return;
+            }
           }
           if (cafeState?.cafeEvent == CafeEvent.createSquareAccount) {
             context.navigateTo(CustomWebView(
@@ -87,10 +84,13 @@ class _StripeAccountSetupState extends ConsumerState<StripeAccountSetup> {
                         if (data?.stripeOnboardingCompleted == 0)
                           Text("SET UP YOUR PAYOUT ACCOUNT",
                               style: titleTextStyle),
-                        if (showSubscriptionPage)
+                        if (data?.stripeOnboardingCompleted == 1 &&
+                            data?.subscriptionStatus == 0)
                           Text("Choose your subscription plan",
                               style: titleTextStyle),
-                        if (showSquarePage)
+                        if (data?.stripeOnboardingCompleted == 1 &&
+                            data?.subscriptionStatus == 1 &&
+                            data?.squareOnboardingCompleted == 0)
                           Text("SET UP YOUR SQUARE ACCOUNT",
                               style: titleTextStyle),
                         50.verticalSpace,
@@ -104,10 +104,14 @@ class _StripeAccountSetupState extends ConsumerState<StripeAccountSetup> {
                               },
                             )),
                         Visibility(
-                            visible: showSubscriptionPage,
+                            visible: data?.stripeOnboardingCompleted == 1 &&
+                                data?.subscriptionStatus == 0,
                             child: SubscriptionPlansPage()),
                         Visibility(
-                            visible: showSquarePage, child: _SquareWidget()),
+                            visible: data?.stripeOnboardingCompleted == 1 &&
+                                data?.subscriptionStatus == 1 &&
+                                data?.squareOnboardingCompleted == 0,
+                            child: _SquareWidget()),
                       ],
                     ),
                   ),

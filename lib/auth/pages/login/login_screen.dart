@@ -47,6 +47,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 MapEntry(4, profile?.loyaltyCompleted),
                 MapEntry(6, profile?.stripeOnboardingCompleted),
                 MapEntry(6, profile?.squareOnboardingCompleted),
+                MapEntry(6, profile?.subscriptionStatus),
                 MapEntry(7, profile?.isPublished == 0 ? 0 : 1),
               ];
 
@@ -58,7 +59,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   .key;
 
               if (nextStepPage >= 0) {
-                context.navigateAndRemoveUntil(const CafeSteps());
+                context.navigateAndRemoveUntil(CafeSteps(
+                  isOnboardingComplete: profile?.isPublished == 1,
+                ));
                 Future.delayed(const Duration(milliseconds: 300), () {
                   if (controller.hasClients) {
                     controller.jumpToPage(nextStepPage);
@@ -111,211 +114,213 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: false,
         body: Row(
-      children: [
-        Expanded(
-          child: Container(
-              decoration: BoxDecoration(color: const Color(0xFFC0987C)),
-              child: Center(
-                child: Container(
-                  width: 308,
-                  height: 360,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(154),
-                    ),
-                  ),
+          children: [
+            Expanded(
+              child: Container(
+                  decoration: BoxDecoration(color: const Color(0xFFC0987C)),
                   child: Center(
-                    child: Image.asset(
-                      'assets/images/logo_java_go.png',
-                      width: 196.w,
-                      height: 181.02.h,
+                    child: Container(
+                      width: 308,
+                      height: 360,
+                      decoration: ShapeDecoration(
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(154),
+                        ),
+                      ),
+                      child: Center(
+                        child: Image.asset(
+                          'assets/images/logo_java_go.png',
+                          width: 196.w,
+                          height: 181.02.h,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              )),
-        ),
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(color: Color(0xFFF5F3F0)),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 121),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Cafe Log in',
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineMedium
-                        ?.copyWith(color: Color(0xFF461C10)),
-                  ),
-                  48.verticalSpace,
-                  TextFormField(
-                    cursorColor: Color(0xFFC0987C),
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                        hintStyle:
-                            Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  )),
+            ),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(color: Color(0xFFF5F3F0)),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 121),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Cafe Log in',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium
+                            ?.copyWith(color: Color(0xFF461C10)),
+                      ),
+                      48.verticalSpace,
+                      TextFormField(
+                        cursorColor: Color(0xFFC0987C),
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                            hintStyle: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
                                   color: const Color(0xFF1C0E07),
                                 ),
-                        prefixIcon: Container(
-                          width: 70.w,
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10.h, horizontal: 10.w),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Image.asset(
-                                'assets/images/email.png',
-                                color: Color(0xFF6A442E),
-                                height: 20.h,
-                                width: 20.h,
-                                fit: BoxFit.fill,
+                            prefixIcon: Container(
+                              width: 70.w,
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 10.h, horizontal: 10.w),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/email.png',
+                                    color: Color(0xFF6A442E),
+                                    height: 20.h,
+                                    width: 20.h,
+                                    fit: BoxFit.fill,
+                                  ),
+                                  SizedBox(width: 10.w),
+                                  Container(
+                                    height: 20.h,
+                                    child: VerticalDivider(
+                                      width: 2.w,
+                                      thickness: 1.5,
+                                      color: Color(0xFF6A442E),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10.w),
+                                ],
                               ),
-                              SizedBox(width: 10.w),
-                              Container(
-                                height: 20.h,
-                                child: VerticalDivider(
-                                  width: 2.w,
-                                  thickness: 1.5,
+                            ),
+                            hintText: 'Enter your email'),
+                      ),
+                      25.verticalSpace,
+                      TextFormField(
+                        cursorColor: Color(0xFFC0987C),
+                        controller: _passwordController,
+                        obscureText: !_isPasswordVisible,
+                        decoration: InputDecoration(
+                          prefixIcon: Container(
+                            width: 70.w,
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10.h, horizontal: 10.w),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(
+                                  'assets/images/frame1.png',
                                   color: Color(0xFF6A442E),
+                                  height: 20.h,
+                                  width: 20.h,
+                                  fit: BoxFit.fill,
                                 ),
-                              ),
-                              SizedBox(width: 10.w),
-                            ],
+                                SizedBox(width: 10.w),
+                                Container(
+                                  height: 20.h,
+                                  child: VerticalDivider(
+                                    width: 1.5.w,
+                                    thickness: 1.5.h,
+                                    color: Color(0xFF6A442E),
+                                  ),
+                                ),
+                                SizedBox(width: 10.w),
+                              ],
+                            ),
+                          ),
+                          suffixIcon: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _isPasswordVisible = !_isPasswordVisible;
+                                });
+                              },
+                              child: !_isPasswordVisible
+                                  ? Image.asset(
+                                      'assets/images/ic_hide_password.png')
+                                  : Image.asset(
+                                      'assets/images/ic_show_password.png')),
+                          hintText: 'Password',
+                          hintStyle:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: const Color(0xFF1C0E07),
+                                  ),
+                        ),
+                      ),
+                      25.verticalSpace,
+                      Text(
+                        'Forgot Password?',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Color(0xFF461C10),
+                              decoration: TextDecoration.underline,
+                              decorationColor: Color(0xFF461C10),
+                            ),
+                      ),
+                      107.verticalSpace,
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: PrimaryButton(
+                          isIconButton: true,
+                          isLoading: ref.watch(authNotifierProvider).isLoading,
+                          onClick: () => _onLoginPressed(),
+                        ),
+                      ),
+
+                      // Align(
+                      //   alignment: Alignment.bottomRight,
+                      //   child: ElevatedButton(
+                      //     onPressed: () {
+                      //       // context.navigateTo(CafeSteps());
+
+                      //     },
+                      //     child: Image.asset(
+                      //       'assets/images/arrow-left1.png',
+                      //       height: 24.h,
+                      //       width: 24.h,
+                      //     ),
+                      //   ),
+                      // ),
+                      47.verticalSpace,
+                      Center(
+                        child: InkWell(
+                          onTap: () {
+                            context.navigateTo(CafeSteps());
+                          },
+                          child: Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: 'Don’t have an account?',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color: Color(0xFF4E403B),
+                                      ),
+                                ),
+                                TextSpan(text: ' '),
+                                TextSpan(
+                                  text: 'Sign Up ',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color: Color(0xFF461C10),
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: Color(0xFF461C10),
+                                      ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        hintText: 'Enter your email'),
+                      )
+                    ],
                   ),
-                  25.verticalSpace,
-                  TextFormField(
-                    cursorColor: Color(0xFFC0987C),
-                    controller: _passwordController,
-                    obscureText: !_isPasswordVisible,
-                    decoration: InputDecoration(
-                      prefixIcon: Container(
-                        width: 70.w,
-                        padding: EdgeInsets.symmetric(
-                            vertical: 10.h, horizontal: 10.w),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(
-                              'assets/images/frame1.png',
-                              color: Color(0xFF6A442E),
-                              height: 20.h,
-                              width: 20.h,
-                              fit: BoxFit.fill,
-                            ),
-                            SizedBox(width: 10.w),
-                            Container(
-                              height: 20.h,
-                              child: VerticalDivider(
-                                width: 1.5.w,
-                                thickness: 1.5.h,
-                                color: Color(0xFF6A442E),
-                              ),
-                            ),
-                            SizedBox(width: 10.w),
-                          ],
-                        ),
-                      ),
-                      suffixIcon: InkWell(
-                          onTap: () {
-                            setState(() {
-                              _isPasswordVisible = !_isPasswordVisible;
-                            });
-                          },
-                          child: !_isPasswordVisible
-                              ? Image.asset(
-                                  'assets/images/ic_hide_password.png')
-                              : Image.asset(
-                                  'assets/images/ic_show_password.png')),
-                      hintText: 'Password',
-                      hintStyle:
-                          Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: const Color(0xFF1C0E07),
-                              ),
-                    ),
-                  ),
-                  25.verticalSpace,
-                  Text(
-                    'Forgot Password?',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Color(0xFF461C10),
-                          decoration: TextDecoration.underline,
-                          decorationColor: Color(0xFF461C10),
-                        ),
-                  ),
-                  107.verticalSpace,
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: PrimaryButton(
-                      isIconButton: true,
-                      isLoading: ref.watch(authNotifierProvider).isLoading,
-                      onClick: () => _onLoginPressed(),
-                    ),
-                  ),
-
-                  // Align(
-                  //   alignment: Alignment.bottomRight,
-                  //   child: ElevatedButton(
-                  //     onPressed: () {
-                  //       // context.navigateTo(CafeSteps());
-
-                  //     },
-                  //     child: Image.asset(
-                  //       'assets/images/arrow-left1.png',
-                  //       height: 24.h,
-                  //       width: 24.h,
-                  //     ),
-                  //   ),
-                  // ),
-                  47.verticalSpace,
-                  Center(
-                    child: InkWell(
-                      onTap: () {
-                        context.navigateTo(CafeSteps());
-                      },
-                      child: Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Don’t have an account?',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                    color: Color(0xFF4E403B),
-                                  ),
-                            ),
-                            TextSpan(text: ' '),
-                            TextSpan(
-                              text: 'Sign Up ',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                    color: Color(0xFF461C10),
-                                    decoration: TextDecoration.underline,
-                                    decorationColor: Color(0xFF461C10),
-                                  ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                ],
+                ),
               ),
-            ),
-          ),
-        )
-      ],
-    ));
+            )
+          ],
+        ));
   }
 }

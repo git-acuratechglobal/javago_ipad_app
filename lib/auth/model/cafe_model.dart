@@ -6,47 +6,47 @@ part 'cafe_model.g.dart';
 
 @JsonSerializable()
 class CafeModel {
-  CafeModel({
-    required this.id,
-    required this.cafeName,
-    required this.phone,
-    required this.bio,
-    required this.email,
-    required this.city,
-    required this.bannerImage,
-    required this.address,
-    required this.postcode,
-    required this.latitude,
-    required this.longitude,
-    required this.website,
-    required this.otp,
-    required this.cafeType,
-    required this.isActive,
-    required this.approved,
-    required this.signupCompleted,
-    required this.profileCompleted,
-    required this.menuCompleted,
-    required this.loyaltyCompleted,
-    required this.isListed,
-    required this.isOpen,
-    required this.cafeFilter,
-    required this.cafeTax,
-    required this.deletedAt,
-    required this.stripeAccountId,
-    required this.stripeCustomerId,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.otpExpiredAt,
-    required this.otpVerifiedAt,
-    required this.transactionId,
-    required this.stripeOnboardingCompleted,
-    required this.isPublished,
-    required this.isAdminApproved,
-    required this.timing,
-    required this.cafeManagement,
-    required this.cafeClickCollectTiming,
-    required this.squareOnboardingCompleted
-  });
+  CafeModel(
+      {required this.id,
+      required this.cafeName,
+      required this.phone,
+      required this.bio,
+      required this.email,
+      required this.city,
+      required this.bannerImage,
+      required this.address,
+      required this.postcode,
+      required this.latitude,
+      required this.longitude,
+      required this.website,
+      required this.otp,
+      required this.cafeType,
+      required this.isActive,
+      required this.approved,
+      required this.signupCompleted,
+      required this.profileCompleted,
+      required this.menuCompleted,
+      required this.loyaltyCompleted,
+      required this.isListed,
+      required this.isOpen,
+      required this.cafeFilter,
+      required this.cafeTax,
+      required this.deletedAt,
+      required this.stripeAccountId,
+      required this.stripeCustomerId,
+      required this.createdAt,
+      required this.updatedAt,
+      required this.otpExpiredAt,
+      required this.otpVerifiedAt,
+      required this.transactionId,
+      required this.stripeOnboardingCompleted,
+      required this.isPublished,
+      required this.isAdminApproved,
+      required this.timing,
+      required this.cafeManagement,
+      required this.cafeClickCollectTiming,
+      required this.squareOnboardingCompleted,
+      required this.subscriptionStatus});
 
   final int? id;
 
@@ -139,24 +139,26 @@ class CafeModel {
 
   @JsonKey(name: 'cafe_click_collect_timing')
   final List<CafeClickCollectTiming>? cafeClickCollectTiming;
+  @JsonKey(name: 'subscriptionstatus')
+  final int? subscriptionStatus;
 
-  factory CafeModel.fromJson(Map<String, dynamic> json) => _$CafeModelFromJson(json);
+  factory CafeModel.fromJson(Map<String, dynamic> json) =>
+      _$CafeModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$CafeModelToJson(this);
-
 }
 
 @JsonSerializable()
 class CafeClickCollectTiming {
   CafeClickCollectTiming({
-     this.id,
+    this.id,
     required this.cafeId,
     required this.day,
     required this.startTime,
     required this.endTime,
     required this.isActive,
-     this.createdAt,
-     this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
   });
 
   final int? id;
@@ -180,10 +182,10 @@ class CafeClickCollectTiming {
   @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
 
-  factory CafeClickCollectTiming.fromJson(Map<String, dynamic> json) => _$CafeClickCollectTimingFromJson(json);
+  factory CafeClickCollectTiming.fromJson(Map<String, dynamic> json) =>
+      _$CafeClickCollectTimingFromJson(json);
 
   Map<String, dynamic> toJson() => _$CafeClickCollectTimingToJson(this);
-
 }
 
 @JsonSerializable()
@@ -230,10 +232,10 @@ class CafeManagement {
   @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
 
-  factory CafeManagement.fromJson(Map<String, dynamic> json) => _$CafeManagementFromJson(json);
+  factory CafeManagement.fromJson(Map<String, dynamic> json) =>
+      _$CafeManagementFromJson(json);
 
   Map<String, dynamic> toJson() => _$CafeManagementToJson(this);
-
 }
 
 @JsonSerializable()
@@ -273,5 +275,4 @@ class Timing {
   factory Timing.fromJson(Map<String, dynamic> json) => _$TimingFromJson(json);
 
   Map<String, dynamic> toJson() => _$TimingToJson(this);
-
 }

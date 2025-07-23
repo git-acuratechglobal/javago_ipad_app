@@ -7,6 +7,7 @@ import 'package:java_go/home/bottombar.dart';
 import 'package:java_go/home/cafeinformationscreen.dart';
 import 'package:java_go/home/changepassword.dart';
 import 'package:java_go/home/notifier/cafe_info_notifier/cafe_info_notifier.dart';
+import 'package:java_go/home/notifier/subscription_notifier/subscription_notifier.dart';
 import 'package:java_go/home/notifiers/view_order_provider.dart';
 import 'package:java_go/home/terms_and_conditions.dart';
 import 'package:java_go/service/local_storage_service.dart';
@@ -48,137 +49,159 @@ class _AccountState extends ConsumerState<Account> {
             body: AsyncWidget(
                 value: cafeInfo,
                 data: (data) {
-                  return SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(horizontal: 117),
-                    child: Column(
-                      children: [
-                        50.verticalSpace,
-                        _AccountWidget(
-                            onTap: () {
-                              context.navigateTo(CafeInformationScreen(
-                                fromSettings: true,
-                              ));
-                            },
-                            imagePath: 'assets/images/ic_user.png',
-                            title: 'My Profile'),
-                        24.verticalSpace,
-                        Divider(
-                          thickness: 1,
-                          color: Color(0x33461C10),
-                        ),
-                        24.verticalSpace,
-                        _AccountWidget(
-                            onTap: () {
-                              context.navigateTo(ChangePassword());
-                            },
-                            imagePath: 'assets/images/ic_lock.png',
-                            title: 'Change password'),
-                        24.verticalSpace,
-                        Divider(
-                          thickness: 1,
-                          color: Color(0x33461C10),
-                        ),
-                        24.verticalSpace,
-                        _AccountWidget(
-                            onTap:
-                            // data?.squareOnboardingCompleted == 0
-                            //     ?
-                                () {
+                  return AsyncWidget(
+                      value: ref.watch(getCafeSubscriptionProvider),
+                      data: (subscriptionData) {
+                        return SingleChildScrollView(
+                          padding: EdgeInsets.symmetric(horizontal: 117),
+                          child: Column(
+                            children: [
+                              50.verticalSpace,
+                              _AccountWidget(
+                                  onTap: () {
+                                    context.navigateTo(CafeInformationScreen(
+                                      fromSettings: true,
+                                    ));
+                                  },
+                                  imagePath: 'assets/images/ic_user.png',
+                                  title: 'My Profile'),
+                              24.verticalSpace,
+                              Divider(
+                                thickness: 1,
+                                color: Color(0x33461C10),
+                              ),
+                              24.verticalSpace,
+                              _AccountWidget(
+                                  onTap: () {
+                                    context.navigateTo(CafeInformationScreen(
+                                      fromSettings: true,
+                                    ));
+                                  },
+                                  title:
+                                      "Plan: ${subscriptionData.planName}    Expires on: ${subscriptionData.formattedSubscriptionDate}"),
+                              24.verticalSpace,
+                              Divider(
+                                thickness: 1,
+                                color: Color(0x33461C10),
+                              ),
+                              24.verticalSpace,
+                              _AccountWidget(
+                                  onTap: () {
+                                    context.navigateTo(ChangePassword());
+                                  },
+                                  imagePath: 'assets/images/ic_lock.png',
+                                  title: 'Change password'),
+                              24.verticalSpace,
+                              Divider(
+                                thickness: 1,
+                                color: Color(0x33461C10),
+                              ),
+                              24.verticalSpace,
+                              _AccountWidget(
+                                  onTap:
+                                      // data?.squareOnboardingCompleted == 0
+                                      //     ?
+                                      () {
                                     ref
                                         .read(cafeInfoNotifierProvider.notifier)
                                         .createSquareAccount();
                                   },
-                                // : null,
-                            imagePath: 'assets/images/logoutcurve.png',
-                            title: data?.squareOnboardingCompleted == 0
-                                ? 'Connect Square'
-                                : 'Square Connected'),
-                        24.verticalSpace,
-                        Divider(
-                          thickness: 1,
-                          color: Color(0x33461C10),
-                        ),
-                        24.verticalSpace,
-                        _AccountWidget(
-                            onTap: () {
-                              ref
-                                  .read(cafeInfoNotifierProvider.notifier)
-                                  .syncMenuFromSquare();
-                            },
-                            imagePath: 'assets/images/logoutcurve.png',
-                            title: 'Sync from square'),
-                        24.verticalSpace,
-                        Divider(
-                          thickness: 1,
-                          color: Color(0x33461C10),
-                        ),
-                        24.verticalSpace,
-                        _AccountWidget(
-                            onTap: () {
-                              context.navigateTo(TermsAndConditionsPage());
-                            },
-                            imagePath: 'assets/images/ic_account_frame.png',
-                            title: 'Terms and Conditions'),
-                        24.verticalSpace,
-                        Divider(
-                          thickness: 1,
-                          color: Color(0x33461C10),
-                        ),
-                        24.verticalSpace,
-                        _AccountWidget(
-                            onTap: () {
-                              ref
-                                  .read(cafeInfoNotifierProvider.notifier)
-                                  .syncMenuToSquare();
-                            },
-                            imagePath: 'assets/images/ic_account_frame.png',
-                            title: 'Sync Menu to Square'),
-                        24.verticalSpace,
-                        Divider(
-                          thickness: 1,
-                          color: Color(0x33461C10),
-                        ),
-                        24.verticalSpace,
-                        _AccountWidget(
-                            onTap: () {
-                              context.navigateTo(CustomWebView(
-                                title: "Privacy Policy",
-                                initialUrl: "${Api.baseUrl}/privacy-policy",
-                              ));
-                            },
-                            imagePath: 'assets/images/ic_shield.png',
-                            title: 'Privacy Policy'),
-                        24.verticalSpace,
-                        Divider(
-                          thickness: 1,
-                          color: Color(0x33461C10),
-                        ),
-                        24.verticalSpace,
-                        _AccountWidget(
-                            onTap: () {
-                              context.navigateTo(CustomWebView(
-                                title: "FAQs",
-                                initialUrl: "${Api.baseUrl}/FAQs",
-                              ));
-                            },
-                            imagePath: 'assets/images/ic_help-circle.png',
-                            title: 'FAQs'),
-                        24.verticalSpace,
-                        Divider(
-                          thickness: 1,
-                          color: Color(0x33461C10),
-                        ),
-                        24.verticalSpace,
-                        _AccountWidget(
-                            onTap: () async {
-                              await _onLogOutSuccess();
-                            },
-                            imagePath: 'assets/images/logoutcurve.png',
-                            title: 'Logout'),
-                        300.verticalSpace,
-                      ],
-                    ),
-                  );
+                                  // : null,
+                                  imagePath: 'assets/images/logoutcurve.png',
+                                  title: data?.squareOnboardingCompleted == 0
+                                      ? 'Connect Square'
+                                      : 'Square Connected'),
+                              24.verticalSpace,
+                              Divider(
+                                thickness: 1,
+                                color: Color(0x33461C10),
+                              ),
+                              24.verticalSpace,
+                              _AccountWidget(
+                                  onTap: () {
+                                    ref
+                                        .read(cafeInfoNotifierProvider.notifier)
+                                        .syncMenuFromSquare();
+                                  },
+                                  imagePath: 'assets/images/logoutcurve.png',
+                                  title: 'Sync from square'),
+                              24.verticalSpace,
+                              Divider(
+                                thickness: 1,
+                                color: Color(0x33461C10),
+                              ),
+                              24.verticalSpace,
+                              _AccountWidget(
+                                  onTap: () {
+                                    context
+                                        .navigateTo(TermsAndConditionsPage());
+                                  },
+                                  imagePath:
+                                      'assets/images/ic_account_frame.png',
+                                  title: 'Terms and Conditions'),
+                              24.verticalSpace,
+                              Divider(
+                                thickness: 1,
+                                color: Color(0x33461C10),
+                              ),
+                              24.verticalSpace,
+                              _AccountWidget(
+                                  onTap: () {
+                                    ref
+                                        .read(cafeInfoNotifierProvider.notifier)
+                                        .syncMenuToSquare();
+                                  },
+                                  imagePath:
+                                      'assets/images/ic_account_frame.png',
+                                  title: 'Sync Menu to Square'),
+                              24.verticalSpace,
+                              Divider(
+                                thickness: 1,
+                                color: Color(0x33461C10),
+                              ),
+                              24.verticalSpace,
+                              _AccountWidget(
+                                  onTap: () {
+                                    context.navigateTo(CustomWebView(
+                                      title: "Privacy Policy",
+                                      initialUrl:
+                                          "${Api.baseUrl}/privacy-policy",
+                                    ));
+                                  },
+                                  imagePath: 'assets/images/ic_shield.png',
+                                  title: 'Privacy Policy'),
+                              24.verticalSpace,
+                              Divider(
+                                thickness: 1,
+                                color: Color(0x33461C10),
+                              ),
+                              24.verticalSpace,
+                              _AccountWidget(
+                                  onTap: () {
+                                    context.navigateTo(CustomWebView(
+                                      title: "FAQs",
+                                      initialUrl: "${Api.baseUrl}/FAQs",
+                                    ));
+                                  },
+                                  imagePath: 'assets/images/ic_help-circle.png',
+                                  title: 'FAQs'),
+                              24.verticalSpace,
+                              Divider(
+                                thickness: 1,
+                                color: Color(0x33461C10),
+                              ),
+                              24.verticalSpace,
+                              _AccountWidget(
+                                  onTap: () async {
+                                    await _onLogOutSuccess();
+                                  },
+                                  imagePath: 'assets/images/logoutcurve.png',
+                                  title: 'Logout'),
+                              300.verticalSpace,
+                            ],
+                          ),
+                        );
+                      });
                 })),
         if (authState is AsyncLoading) PageLoadingWidget(),
       ],
@@ -199,11 +222,10 @@ class _AccountState extends ConsumerState<Account> {
 }
 
 class _AccountWidget extends StatefulWidget {
-  final String imagePath;
+  final String? imagePath;
   final String title;
   final void Function()? onTap;
-  const _AccountWidget(
-      {required this.imagePath, required this.title, this.onTap});
+  const _AccountWidget({this.imagePath, required this.title, this.onTap});
 
   @override
   State<_AccountWidget> createState() => _AccountWidgetState();
@@ -218,11 +240,12 @@ class _AccountWidgetState extends State<_AccountWidget> {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            widget.imagePath,
-            width: 24.13,
-            height: 24.13,
-          ),
+          if (widget.imagePath != null)
+            Image.asset(
+              widget.imagePath!,
+              width: 24.13,
+              height: 24.13,
+            ),
           Text(
             widget.title,
             style: TextStyle(

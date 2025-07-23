@@ -75,7 +75,7 @@ Map<String, dynamic> _$$AddonItemImplToJson(_$AddonItemImpl instance) =>
 // RiverpodGenerator
 // **************************************************************************
 
-String _$itemParamNotifierHash() => r'ad370aa7b95437d4004c987e67a6ea655b4266ba';
+String _$itemParamNotifierHash() => r'81d7215501a3da82ef416ad5cf335ae86812e56e';
 
 /// See also [ItemParamNotifier].
 @ProviderFor(ItemParamNotifier)

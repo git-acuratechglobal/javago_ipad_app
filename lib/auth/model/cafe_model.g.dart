@@ -57,6 +57,7 @@ CafeModel _$CafeModelFromJson(Map<String, dynamic> json) => CafeModel(
           .toList(),
       squareOnboardingCompleted:
           (json['square_onboarding_completed'] as num?)?.toInt(),
+      subscriptionStatus: (json['subscriptionstatus'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$CafeModelToJson(CafeModel instance) => <String, dynamic>{
@@ -99,6 +100,7 @@ Map<String, dynamic> _$CafeModelToJson(CafeModel instance) => <String, dynamic>{
       'timing': instance.timing,
       'cafe_management': instance.cafeManagement,
       'cafe_click_collect_timing': instance.cafeClickCollectTiming,
+      'subscriptionstatus': instance.subscriptionStatus,
     };
 
 CafeClickCollectTiming _$CafeClickCollectTimingFromJson(

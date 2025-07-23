@@ -29,8 +29,8 @@ final cafePageControllerProvider = Provider<PageController>((ref) {
 });
 
 class CafeSteps extends ConsumerStatefulWidget {
-  const CafeSteps({super.key});
-
+  const CafeSteps({super.key, this.isOnboardingComplete = false});
+  final bool isOnboardingComplete;
   @override
   ConsumerState<CafeSteps> createState() => _CafeStepsState();
 }
@@ -53,7 +53,7 @@ class _CafeStepsState extends ConsumerState<CafeSteps> {
     Reviewscreen(
       isOpenFromSignup: true,
     ),
-    StripeAccountSetup(),
+    StripeAccountSetup(isOnboardingComplete: widget.isOnboardingComplete),
     Publishscreen(),
   ];
 

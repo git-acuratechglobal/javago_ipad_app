@@ -12,6 +12,7 @@ import 'package:java_go/home/model/menu_items_data.dart';
 import 'package:java_go/home/model/optional_data.dart';
 import 'package:java_go/home/model/order_detail.dart';
 import 'package:java_go/home/model/order_details.dart';
+import 'package:java_go/home/model/subscription_model.dart';
 import 'package:java_go/service/dio.dart';
 import 'package:java_go/service/local_storage_service.dart';
 import '../auth/model/cafe_model.dart';
@@ -967,7 +968,7 @@ class AuthService {
           },
         ),
       );
-      final result=  response.data['message'];
+      final result = response.data['message'];
       return result;
     });
   }
@@ -1098,11 +1099,10 @@ class AuthService {
   Future<String> uploadFile(String filePath) async {
     final token = await getTokens();
     return asyncGuard(() async {
-
       FormData formData = FormData.fromMap({
         "file": await MultipartFile.fromFile(
           filePath,
-           filename: filePath.split('/').last,
+          filename: filePath.split('/').last,
         ),
       });
       final response = await _dio.post(
@@ -1117,6 +1117,35 @@ class AuthService {
       );
       final msg = response.data['message'];
       return msg;
+    });
+  }
+
+  Future<String> updateSubscription(Map<String, dynamic> request) async {
+    final token = await getTokens();
+    return asyncGuard(() async {
+      final response = await _dio.post('/update-cafe-subscription',
+          data: FormData.fromMap(request),
+          options: Options(
+            headers: {
+              'x-access-token': '$token',
+              'Accept': 'application/json',
+            },
+          ));
+      final msg = response.data['message'];
+      return msg;
+    });
+  }
+
+  Future<SubscriptionModel> getSubscription() async {
+    final token = await getTokens();
+    return asyncGuard(() async {
+      final response = await _dio.get('/get-cafe-subscription',
+          options: Options(headers: {
+            'x-access-token': '$token',
+            'Accept': 'application/json',
+          }));
+      final data = response.data['subscription'];
+      return SubscriptionModel.fromJson(data);
     });
   }
 
