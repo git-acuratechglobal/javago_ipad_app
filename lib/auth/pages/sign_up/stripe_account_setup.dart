@@ -35,8 +35,8 @@ class _StripeAccountSetupState extends ConsumerState<StripeAccountSetup> {
       switch (next) {
         case AsyncData<CafeInfoState?> data when data.value != null:
           final cafeState = data.value;
-          if (cafeState?.cafeEvent == CafeEvent.stripAccountStatus) {}
           if (cafeState?.cafeEvent == CafeEvent.subscriptionPurchase) {
+            ref.invalidate(getCafeInfoProvider);
             context.showSnackBar("Plan purchased successfully",
                 barColor: Colors.green);
             if (widget.isOnboardingComplete) {
@@ -56,6 +56,11 @@ class _StripeAccountSetupState extends ConsumerState<StripeAccountSetup> {
             context.showSnackBar(data.value?.response ?? "",
                 barColor: Colors.green);
             final controller = ref.read(cafePageControllerProvider);
+            if (widget.isOnboardingComplete) {
+              ref.read(localStorageServiceProvider).setUserLoginSaved(true);
+              context.navigateAndRemoveUntil(CustomBottomNavBar());
+              return;
+            }
             if (controller.hasClients) {
               controller.jumpToPage(7);
             }
@@ -71,52 +76,58 @@ class _StripeAccountSetupState extends ConsumerState<StripeAccountSetup> {
       children: [
         Scaffold(
           backgroundColor: Color(0xffF5F3F0),
-          body: AsyncWidget(
-              value: ref.watch(getCafeInfoProvider),
-              data: (data) {
-                return SingleChildScrollView(
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        50.verticalSpace,
-                        if (data?.stripeOnboardingCompleted == 0)
-                          Text("SET UP YOUR PAYOUT ACCOUNT",
-                              style: titleTextStyle),
-                        if (data?.stripeOnboardingCompleted == 1 &&
-                            data?.subscriptionStatus == 0)
-                          Text("Choose your subscription plan",
-                              style: titleTextStyle),
-                        if (data?.stripeOnboardingCompleted == 1 &&
-                            data?.subscriptionStatus == 1 &&
-                            data?.squareOnboardingCompleted == 0)
-                          Text("SET UP YOUR SQUARE ACCOUNT",
-                              style: titleTextStyle),
-                        50.verticalSpace,
-                        Visibility(
-                            visible: data?.stripeOnboardingCompleted == 0,
-                            child: _StripeSetUpWidget(
-                              onSetUpPress: () async {
-                                ref
-                                    .read(cafeInfoNotifierProvider.notifier)
-                                    .createStripAccount();
-                              },
-                            )),
-                        Visibility(
-                            visible: data?.stripeOnboardingCompleted == 1 &&
-                                data?.subscriptionStatus == 0,
-                            child: SubscriptionPlansPage()),
-                        Visibility(
-                            visible: data?.stripeOnboardingCompleted == 1 &&
+          body: RefreshIndicator(
+            onRefresh: () async => ref.refresh(getCafeInfoProvider),
+            child: SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
+              child: AsyncWidget(
+                  value: ref.watch(getCafeInfoProvider),
+                  data: (data) {
+                    return SingleChildScrollView(
+                      child: Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            50.verticalSpace,
+                            if (data?.stripeOnboardingCompleted == 0)
+                              Text("SET UP YOUR PAYOUT ACCOUNT",
+                                  style: titleTextStyle),
+                            if (data?.stripeOnboardingCompleted == 1 &&
+                                data?.subscriptionStatus == 0)
+                              Text("Choose your subscription plan",
+                                  style: titleTextStyle),
+                            if (data?.stripeOnboardingCompleted == 1 &&
                                 data?.subscriptionStatus == 1 &&
-                                data?.squareOnboardingCompleted == 0,
-                            child: _SquareWidget()),
-                      ],
-                    ),
-                  ),
-                );
-              }),
+                                data?.squareOnboardingCompleted == 0)
+                              Text("SET UP YOUR SQUARE ACCOUNT",
+                                  style: titleTextStyle),
+                            50.verticalSpace,
+                            Visibility(
+                                visible: data?.stripeOnboardingCompleted == 0,
+                                child: _StripeSetUpWidget(
+                                  onSetUpPress: () async {
+                                    ref
+                                        .read(cafeInfoNotifierProvider.notifier)
+                                        .createStripAccount();
+                                  },
+                                )),
+                            Visibility(
+                                visible: data?.stripeOnboardingCompleted == 1 &&
+                                    data?.subscriptionStatus == 0,
+                                child: SubscriptionPlansPage()),
+                            Visibility(
+                                visible: data?.stripeOnboardingCompleted == 1 &&
+                                    data?.subscriptionStatus == 1 &&
+                                    data?.squareOnboardingCompleted == 0,
+                                child: _SquareWidget()),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+            ),
+          ),
         ),
         if (subscriptionState.isLoading) PageLoadingWidget(),
       ],

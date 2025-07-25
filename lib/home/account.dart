@@ -98,16 +98,14 @@ class _AccountState extends ConsumerState<Account> {
                               ),
                               24.verticalSpace,
                               _AccountWidget(
-                                  onTap:
-                                      // data?.squareOnboardingCompleted == 0
-                                      //     ?
-                                      () {
-                                    ref
-                                        .read(cafeInfoNotifierProvider.notifier)
-                                        .createSquareAccount();
-                                  },
-                                  // : null,
-                                  imagePath: 'assets/images/logoutcurve.png',
+                                  onTap: data?.squareOnboardingCompleted == 0
+                                      ? () {
+                                          ref
+                                              .read(cafeInfoNotifierProvider
+                                                  .notifier)
+                                              .createSquareAccount();
+                                        }
+                                      : null,
                                   title: data?.squareOnboardingCompleted == 0
                                       ? 'Connect Square'
                                       : 'Square Connected'),
@@ -123,22 +121,7 @@ class _AccountState extends ConsumerState<Account> {
                                         .read(cafeInfoNotifierProvider.notifier)
                                         .syncMenuFromSquare();
                                   },
-                                  imagePath: 'assets/images/logoutcurve.png',
                                   title: 'Sync from square'),
-                              24.verticalSpace,
-                              Divider(
-                                thickness: 1,
-                                color: Color(0x33461C10),
-                              ),
-                              24.verticalSpace,
-                              _AccountWidget(
-                                  onTap: () {
-                                    context
-                                        .navigateTo(TermsAndConditionsPage());
-                                  },
-                                  imagePath:
-                                      'assets/images/ic_account_frame.png',
-                                  title: 'Terms and Conditions'),
                               24.verticalSpace,
                               Divider(
                                 thickness: 1,
@@ -151,9 +134,21 @@ class _AccountState extends ConsumerState<Account> {
                                         .read(cafeInfoNotifierProvider.notifier)
                                         .syncMenuToSquare();
                                   },
-                                  imagePath:
-                                      'assets/images/ic_account_frame.png',
                                   title: 'Sync Menu to Square'),
+                              24.verticalSpace,
+                              Divider(
+                                thickness: 1,
+                                color: Color(0x33461C10),
+                              ),
+                              24.verticalSpace,
+                              _AccountWidget(
+                                  onTap: () {
+                                    context
+                                        .navigateTo(TermsAndConditionsPage());
+                                  },
+                                  imagePath:
+                                  'assets/images/ic_account_frame.png',
+                                  title: 'Terms and Conditions'),
                               24.verticalSpace,
                               Divider(
                                 thickness: 1,

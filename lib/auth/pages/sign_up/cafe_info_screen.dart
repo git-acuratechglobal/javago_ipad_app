@@ -38,6 +38,7 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
   TextEditingController SpecialtyController = TextEditingController();
   final _fkey = GlobalKey<FormState>();
   String? city;
+  String? postalCode;
   bool isLoading = false;
   @override
   Widget build(BuildContext context) {
@@ -105,14 +106,16 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                 width: 200,
                                 child: PrimaryButton(
                                   title: "Save Changes",
-                                  isLoading:
-                                      ref.watch(cafeInfoNotifierProvider).isLoading,
+                                  isLoading: ref
+                                      .watch(cafeInfoNotifierProvider)
+                                      .isLoading,
                                   backgroundColor: const Color(0xFFC0987C),
                                   onClick: () {
                                     if (_fkey.currentState!.validate()) {
                                       _fkey.currentState!.save();
                                       ref
-                                          .read(cafeInfoNotifierProvider.notifier)
+                                          .read(
+                                              cafeInfoNotifierProvider.notifier)
                                           .updateCafeInformation();
                                     }
                                   },
@@ -125,9 +128,10 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                           children: [
                             ImagePickerForm(
                               image: cafeData?.bannerImage,
-                              validator: (value) => cafeData?.bannerImage == null
-                                  ? validator.validateImage(value?.path)
-                                  : null,
+                              validator: (value) =>
+                                  cafeData?.bannerImage == null
+                                      ? validator.validateImage(value?.path)
+                                      : null,
                               autovalidate: true,
                               context: context,
                               onSaved: (val) {
@@ -142,7 +146,8 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
@@ -163,42 +168,56 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                       ),
                                       PlacesField(
                                         onSaved: (prediction) async {
-                                          if (prediction?.description == null) return;
+                                          if (prediction?.description == null)
+                                            return;
 
                                           // Update address immediately
-                                          cafeInfoNotifier.updateAddress(prediction!.description!);
+                                          cafeInfoNotifier.updateAddress(
+                                              prediction!.description!);
 
                                           // Only proceed if coordinates are available
-                                          if (prediction.lat == null || prediction.lng == null) {
-                                            context.showSnackBar("Coordinates not found");
+                                          if (prediction.lat == null ||
+                                              prediction.lng == null) {
+                                            context.showSnackBar(
+                                                "Coordinates not found");
                                             return;
                                           }
 
                                           setState(() => isLoading = true);
 
                                           try {
-                                            final lat = double.parse(prediction.lat!);
-                                            final lng = double.parse(prediction.lng!);
+                                            final lat =
+                                                double.parse(prediction.lat!);
+                                            final lng =
+                                                double.parse(prediction.lng!);
 
-                                            final placemarks = await placemarkFromCoordinates(lat, lng);
+                                            final placemarks =
+                                                await placemarkFromCoordinates(
+                                                    lat, lng);
 
                                             if (placemarks.isNotEmpty) {
-                                              final placemark = placemarks.first;
-                                               city = placemark.locality ??
-                                                  placemark.subAdministrativeArea ??
+                                              final placemark =
+                                                  placemarks.first;
+                                              city = placemark.locality ??
+                                                  placemark
+                                                      .subAdministrativeArea ??
                                                   placemark.administrativeArea;
-
+                                              postalCode = placemark.postalCode;
                                               if (city != null) {
-                                                cafeInfoNotifier.updateCity(city!);
+                                                cafeInfoNotifier
+                                                    .updateCity(city!);
+                                                cafeInfoNotifier.updatePostcode(
+                                                    postalCode!);
                                               }
                                             }
                                           } catch (e) {
-                                            context.showSnackBar("Error getting location details: ${e.toString()}");
+                                            context.showSnackBar(
+                                                "Error getting location details: ${e.toString()}");
                                           } finally {
-                                            if (mounted) setState(() => isLoading = false);
+                                            if (mounted)
+                                              setState(() => isLoading = false);
                                           }
                                         },
-
                                         validator: (val) =>
                                             validator.validateAddress(val!),
                                         initialValue: cafeData?.address,
@@ -221,17 +240,20 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                         },
                                       ),
                                       AppTextField(
-                                        maxLength: 7,
+                                        key: UniqueKey(),
+                                        maxLength: 10,
                                         validator: (val) =>
                                             validator.validateZipCode(val!),
-                                        inputType: TextInputType.phone,
+                                        inputType: TextInputType.streetAddress,
                                         width: 150,
-                                        initialValue: cafeData?.postcode,
+                                        initialValue:
+                                            postalCode ?? cafeData?.postcode,
                                         label: 'Postcode',
                                         hint: "Enter your postcode",
                                         onSaved: (val) {
                                           if (val != null) {
-                                            cafeInfoNotifier.updatePostcode(val);
+                                            cafeInfoNotifier
+                                                .updatePostcode(val);
                                           }
                                         },
                                       ),
@@ -256,28 +278,30 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                         value: filters,
                                         data: (data) {
                                           List<CafeFilter> selectedItems = [];
-                                          final List<int> selectedIds = (cafeData
-                                                      ?.cafeFilter ??
-                                                  '')
-                                              .split(',')
-                                              .map((e) => int.tryParse(e.trim()))
-                                              .whereType<int>()
-                                              .toList();
+                                          final List<int> selectedIds =
+                                              (cafeData?.cafeFilter ?? '')
+                                                  .split(',')
+                                                  .map((e) =>
+                                                      int.tryParse(e.trim()))
+                                                  .whereType<int>()
+                                                  .toList();
                                           if (selectedIds.isNotEmpty) {
                                             selectedItems = data.cafeFilters!
-                                                .where((filter) =>
-                                                    selectedIds.contains(filter.id))
+                                                .where((filter) => selectedIds
+                                                    .contains(filter.id))
                                                 .toList();
                                           }
                                           return Wrap(children: [
                                             CheckboxFormField(
-                                              validator: (value) =>
-                                                  validator.validateCheckBox(value),
+                                              validator: (value) => validator
+                                                  .validateCheckBox(value),
                                               items: data.cafeFilters
                                                       ?.where((e) =>
                                                           e.name != "All" &&
-                                                          e.name != "Favorites" &&
-                                                          e.name != "Vegetarian ")
+                                                          e.name !=
+                                                              "Favorites" &&
+                                                          e.name !=
+                                                              "Vegetarian ")
                                                       .toList() ??
                                                   [],
                                               onSelectionChanged: (val) {
@@ -362,11 +386,13 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                         hint: "Coffee Origin",
                                         validator: (val) =>
                                             validator.validateCoffeeOrigin(val),
-                                        initialValue:
-                                            cafeData?.cafeManagement?.coffeeOrigin,
-                                        items: coffeeOriginTypes.toSet().toList(),
+                                        initialValue: cafeData
+                                            ?.cafeManagement?.coffeeOrigin,
+                                        items:
+                                            coffeeOriginTypes.toSet().toList(),
                                         onChanged: (val) {
-                                          cafeInfoNotifier.updateCoffeeOrigin(val!);
+                                          cafeInfoNotifier
+                                              .updateCoffeeOrigin(val!);
                                         }),
                                     68.verticalSpace,
                                     Text(
@@ -385,7 +411,8 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                           validator: (value) => validator
                                               .validateCountryOrigin(value!),
                                           initialSelectedCountry: cafeData
-                                              ?.cafeManagement?.coffeeOriginCountry,
+                                              ?.cafeManagement
+                                              ?.coffeeOriginCountry,
                                           countries: originCountries,
                                           onCountrySelected:
                                               (String selectedCountry) {
@@ -414,13 +441,14 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                       width: 252,
                                       child: CountrySearchDropdown(
                                         hintText: "Coffee Roast",
-                                        validator: (value) =>
-                                            validator.validateCoffeeRoast(value),
+                                        validator: (value) => validator
+                                            .validateCoffeeRoast(value),
                                         onCountrySelected: (String value) {
-                                          cafeInfoNotifier.updateCoffeeRoast(value);
+                                          cafeInfoNotifier
+                                              .updateCoffeeRoast(value);
                                         },
-                                        initialSelectedCountry:
-                                            cafeData?.cafeManagement?.coffeeRoast,
+                                        initialSelectedCountry: cafeData
+                                            ?.cafeManagement?.coffeeRoast,
                                         countries:
                                             coffeeRoastTypes.toSet().toList(),
                                       ),
@@ -441,14 +469,15 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                                         hint: "Select speciality",
                                         validator: (value) => validator
                                             .validateSpecialityCoffee(value),
-                                        initialValue:
-                                            cafeData?.cafeManagement != null
-                                                ? (cafeData?.cafeManagement!
-                                                            .speciallityCoffee ==
-                                                        1
-                                                    ? "Yes"
-                                                    : "No")
-                                                : null,
+                                        initialValue: cafeData
+                                                    ?.cafeManagement !=
+                                                null
+                                            ? (cafeData?.cafeManagement!
+                                                        .speciallityCoffee ==
+                                                    1
+                                                ? "Yes"
+                                                : "No")
+                                            : null,
                                         items: items.toSet().toList(),
                                         onChanged: (val) {
                                           if (val == "Yes") {
@@ -478,7 +507,7 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                     width: 55,
                     height: 53,
                     child: PrimaryButton(
-                      isLoading: ref.watch(cafeInfoNotifierProvider).isLoading ,
+                      isLoading: ref.watch(cafeInfoNotifierProvider).isLoading,
                       backgroundColor: const Color(0xFFC0987C),
                       onClick: () {
                         if (_fkey.currentState!.validate()) {
@@ -494,8 +523,7 @@ class _CafeInfoScreenState extends ConsumerState<CafeInfoScreen> {
                 )
               : null,
         ),
-        if(isLoading)
-          PageLoadingWidget()
+        if (isLoading) PageLoadingWidget()
       ],
     );
   }

@@ -180,7 +180,6 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
   }
 
   Future<void> purchaseSubscription({required double amount}) async {
-    print(_paymentIntent);
     state = AsyncLoading();
     state = await AsyncValue.guard(() async {
       final stripeService = ref.read(stripeServiceProvider);
@@ -188,6 +187,7 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
       await _attemptPayment(_paymentIntent!['client_secret']);
       final response = await updateSubscription(
           true, amount == 28.0 ? "Monthly" : "Yearly", _paymentIntent!['id']);
+      ref.invalidate(getCafeInfoProvider);
       return CafeInfoState(
         cafeEvent: CafeEvent.subscriptionPurchase,
       );
