@@ -11,6 +11,7 @@ import '../../../auth/params/cafe_info_params.dart';
 import '../../../service/auth_service.dart';
 import '../../../service/strip_service.dart';
 import '../../notifiers/menu_item_showing.dart';
+import '../subscription_notifier/subscription_notifier.dart';
 part 'cafe_info_notifier.g.dart';
 
 @riverpod
@@ -179,15 +180,17 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
     });
   }
 
-  Future<void> purchaseSubscription({required double amount}) async {
+  Future<void> purchaseSubscription({required double amount,required planType}) async {
+    _paymentIntent=null;
     state = AsyncLoading();
     state = await AsyncValue.guard(() async {
       final stripeService = ref.read(stripeServiceProvider);
       _paymentIntent ??= await stripeService.createPaymentIntent(amount);
       await _attemptPayment(_paymentIntent!['client_secret']);
       final response = await updateSubscription(
-          true, amount == 28.0 ? "Monthly" : "Yearly", _paymentIntent!['id']);
+          true, planType, _paymentIntent!['id']);
       ref.invalidate(getCafeInfoProvider);
+      ref.invalidate(getCafeSubscriptionProvider);
       return CafeInfoState(
         cafeEvent: CafeEvent.subscriptionPurchase,
       );
@@ -219,6 +222,16 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
           DateTime.now().add(Duration(days: 365)); // Roughly 1 year
     }
     return expirationDate!;
+  }
+
+  Future<void> applyPromoCode(String code) async {
+    state = AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final data = await ref.watch(authServiceProvider).applyPromoCode(code);
+      ref.invalidate(getCafeSubscriptionProvider);
+      return CafeInfoState(
+          cafeEvent: CafeEvent.subscriptionPurchase, response: data);
+    });
   }
 
   Future<void> syncMenuToSquare() async {

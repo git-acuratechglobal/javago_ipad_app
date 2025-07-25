@@ -14,6 +14,7 @@ import 'package:java_go/service/local_storage_service.dart';
 import '../auth/notifier/cafe_data_notifier/cafe_data_notifier.dart';
 import '../auth/pages/login/login_screen.dart';
 import '../auth/pages/sign_up/connect_strip_web_view.dart';
+import '../auth/pages/sign_up/subscription_plans_page.dart';
 import '../config/common/api_end_points.dart';
 import '../config/widgets/page_loading_widget.dart';
 import '../service/firebase_service.dart';
@@ -52,6 +53,7 @@ class _AccountState extends ConsumerState<Account> {
                   return AsyncWidget(
                       value: ref.watch(getCafeSubscriptionProvider),
                       data: (subscriptionData) {
+                        final isExpired = subscriptionData?.isExpired;
                         return SingleChildScrollView(
                           padding: EdgeInsets.symmetric(horizontal: 117),
                           child: Column(
@@ -72,13 +74,20 @@ class _AccountState extends ConsumerState<Account> {
                               ),
                               24.verticalSpace,
                               _AccountWidget(
-                                  onTap: () {
-                                    context.navigateTo(CafeInformationScreen(
-                                      fromSettings: true,
-                                    ));
-                                  },
-                                  title:
-                                      "Plan: ${subscriptionData.planName}    Expires on: ${subscriptionData.formattedSubscriptionDate}"),
+                                onTap: () {
+                                  context.navigateTo(SubscriptionPlansPage(
+                                      canOfferApply: subscriptionData
+                                              ?.shouldApplyDiscount ??
+                                          false,
+                                      oldPromoCode: subscriptionData?.promoCode,
+                                      isFromExpiredPage: true));
+                                },
+                                title: isExpired == null
+                                    ? "No Plan is Active"
+                                    : isExpired
+                                        ? "Plan: ${subscriptionData?.planName}    Expired on: ${subscriptionData?.formattedSubscriptionDate}"
+                                        : "Plan: ${subscriptionData?.planName}    Expires on: ${subscriptionData?.formattedSubscriptionDate}",
+                              ),
                               24.verticalSpace,
                               Divider(
                                 thickness: 1,
@@ -147,7 +156,7 @@ class _AccountState extends ConsumerState<Account> {
                                         .navigateTo(TermsAndConditionsPage());
                                   },
                                   imagePath:
-                                  'assets/images/ic_account_frame.png',
+                                      'assets/images/ic_account_frame.png',
                                   title: 'Terms and Conditions'),
                               24.verticalSpace,
                               Divider(

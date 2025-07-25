@@ -37,7 +37,8 @@ class _StripeAccountSetupState extends ConsumerState<StripeAccountSetup> {
           final cafeState = data.value;
           if (cafeState?.cafeEvent == CafeEvent.subscriptionPurchase) {
             ref.invalidate(getCafeInfoProvider);
-            context.showSnackBar("Plan purchased successfully",
+            final response = data.value?.response;
+            context.showSnackBar(response ?? "Plan purchased successfully",
                 barColor: Colors.green);
             if (widget.isOnboardingComplete) {
               ref.read(localStorageServiceProvider).setUserLoginSaved(true);

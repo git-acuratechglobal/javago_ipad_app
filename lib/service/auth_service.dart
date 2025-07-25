@@ -12,6 +12,7 @@ import 'package:java_go/home/model/menu_items_data.dart';
 import 'package:java_go/home/model/optional_data.dart';
 import 'package:java_go/home/model/order_detail.dart';
 import 'package:java_go/home/model/order_details.dart';
+import 'package:java_go/home/model/promo_code_model.dart';
 import 'package:java_go/home/model/subscription_model.dart';
 import 'package:java_go/service/dio.dart';
 import 'package:java_go/service/local_storage_service.dart';
@@ -1136,7 +1137,39 @@ class AuthService {
     });
   }
 
-  Future<SubscriptionModel> getSubscription() async {
+  Future<String> applyPromoCode(String code) async {
+    final token = await getTokens();
+    return asyncGuard(() async {
+      final response = await _dio.post('/apply-promo-code',
+          data: FormData.fromMap({'promo_code': code}),
+          options: Options(
+            headers: {
+              'x-access-token': '$token',
+              'Accept': 'application/json',
+            },
+          ));
+      final msg = response.data['message'];
+      return msg;
+    });
+  }
+
+  Future<PromoCodeModel> getPromoCodeDetails(String code) async {
+    final token = await getTokens();
+    return asyncGuard(() async {
+      final response = await _dio.get('/get-promo-code-detail',
+          queryParameters: {'promo_code': code},
+          options: Options(
+            headers: {
+              'x-access-token': '$token',
+              'Accept': 'application/json',
+            },
+          ));
+      final promoJson = response.data['promo'];
+      return PromoCodeModel.fromJson(promoJson);
+    });
+  }
+
+  Future<SubscriptionModel?> getSubscription() async {
     final token = await getTokens();
     return asyncGuard(() async {
       final response = await _dio.get('/get-cafe-subscription',
@@ -1145,7 +1178,10 @@ class AuthService {
             'Accept': 'application/json',
           }));
       final data = response.data['subscription'];
-      return SubscriptionModel.fromJson(data);
+      if (data != null) {
+        return SubscriptionModel.fromJson(data);
+      }
+      return null;
     });
   }
 

@@ -43,6 +43,10 @@ class _CafeInfoTabScreenState extends ConsumerState<CafeInfoTabScreen>
               title: "Connect Your Square Account",
               initialUrl: data.value?.response ?? "",
             ));
+          } else if (data.value?.cafeEvent == CafeEvent.subscriptionPurchase) {
+            context.pop();
+            context.showSnackBar(
+                data.value!.response ?? "Plan purchased successfully");
           } else if (data.value?.cafeEvent == CafeEvent.squareAccountCreated) {
             context.pop();
             context.showSnackBar(data.value!.response!);
