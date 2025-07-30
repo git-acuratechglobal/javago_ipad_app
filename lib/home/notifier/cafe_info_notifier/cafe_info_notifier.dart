@@ -180,15 +180,16 @@ class CafeInfoNotifier extends _$CafeInfoNotifier {
     });
   }
 
-  Future<void> purchaseSubscription({required double amount,required planType}) async {
-    _paymentIntent=null;
+  Future<void> purchaseSubscription(
+      {required double amount, required planType}) async {
+    _paymentIntent = null;
     state = AsyncLoading();
     state = await AsyncValue.guard(() async {
       final stripeService = ref.read(stripeServiceProvider);
       _paymentIntent ??= await stripeService.createPaymentIntent(amount);
       await _attemptPayment(_paymentIntent!['client_secret']);
-      final response = await updateSubscription(
-          true, planType, _paymentIntent!['id']);
+      final response =
+          await updateSubscription(true, planType, _paymentIntent!['id']);
       ref.invalidate(getCafeInfoProvider);
       ref.invalidate(getCafeSubscriptionProvider);
       return CafeInfoState(

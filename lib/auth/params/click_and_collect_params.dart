@@ -82,7 +82,7 @@ class ClickAndCollectParam extends _$ClickAndCollectParam {
 
     state = ClickAndCollectParams(
       click_and_collect:1,
-      max_orders_click_collect:2,
+      max_orders_click_collect:12,
       clickAndCollectTime: rawTiming != null
           ? convertCafeTimingToCafeDayTime(rawTiming)
           : state.clickAndCollectTime,
